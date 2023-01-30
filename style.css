@@ -31,7 +31,7 @@
 .bodypart {
     position: absolute;
     --up: 0;
-    --forward: 3;
+    --forward: 4;
     bottom: calc(var(--up) * var(--unit) + var(--margin));
     left: calc(var(--forward) * var(--unit) + var(--margin) + 2px);
     --height: 2;
@@ -63,7 +63,7 @@
 .hand {
     --height: 1;
     --width: 1;
-    --forward: 6;
+    --forward: 7;
 }
 
 .hand.right {
