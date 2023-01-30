@@ -4,11 +4,71 @@
 <head>
     <meta charset="utf-8">
     <title>Unnamed Robot Game</title>
+    <link href="reset.css" rel="stylesheet" />
     <link href="style.css" rel="stylesheet" />
 </head>
 
 <body>
-
+    <div class="game">
+        <div class="side left">
+            <div class="robot">
+                <div class="bodypart head">
+                    <span class="hp">40</span>
+                </div>
+                <div class="bodypart torso">
+                    <span class="hp">80</span>
+                </div>
+                <div class="bodypart heatsink">
+                    <span class="hp">60</span>
+                </div>
+                <div class="bodypart hand right position3"></div>
+                <div class="bodypart hand left blocking position4"></div>
+            </div>
+            <div class="actions">
+                <div class="action"></div>
+                <div class="action"></div>
+                <div class="action"></div>
+            </div>
+            <div class="cards">
+                <div class="drawpile">20</div>
+                <div class="card">Punch card</div>
+                <div class="card">Up x1</div>
+                <div class="card">Down x2</div>
+                <div class="card">Spring load</div>
+                <div class="card">Disrupt</div>
+                <div class="discarded">0</div>
+            </div>
+        </div>
+        <div class="side right">
+            <div class="robot">
+                <div class="bodypart head">
+                    <span class="hp">40</span>
+                </div>
+                <div class="bodypart torso">
+                    <span class="hp">80</span>
+                </div>
+                <div class="bodypart heatsink">
+                    <span class="hp">60</span>
+                </div>
+                <div class="bodypart hand right blocking position2"></div>
+                <div class="bodypart hand left blocking position5"></div>
+            </div>
+            <div class="actions">
+                <div class="action"></div>
+                <div class="action"></div>
+                <div class="action"></div>
+            </div>
+            <div class="cards">
+                <div class="drawpile">20</div>
+                <div class="card">Up x3</div>
+                <div class="card">Punch card</div>
+                <div class="card">Down x1</div>
+                <div class="card">Punch card</div>
+                <div class="card">Grab</div>
+                <div class="discarded">0</div>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>

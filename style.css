@@ -1,0 +1,108 @@
+:root {
+    --unit: 3vmin;
+    --border: .3vmin;
+    --margin: .2vmin;
+    --gridcolor: silver;
+}
+
+.game {
+    position: relative;
+    display: flex;
+    height: calc(20 * var(--unit));
+    width: calc(20 * var(--unit));
+    margin: 10vh auto;
+    border: calc(2 * var(--border)) solid black;
+    border-radius: calc(var(--unit) / 2);
+    background-size: var(--unit) var(--unit);
+    background-image:
+        linear-gradient(to right, var(--gridcolor) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--gridcolor) 1px, transparent 1px);
+}
+
+.side {
+    flex: 50%;
+}
+
+.robot {
+    position: relative;
+    height: calc(10 * var(--unit));
+}
+
+.bodypart {
+    position: absolute;
+    --up: 0;
+    --forward: 3;
+    bottom: calc(var(--up) * var(--unit) + var(--margin));
+    left: calc(var(--forward) * var(--unit) + var(--margin) + 2px);
+    --height: 2;
+    --width: 2;
+    height: calc(var(--height) * var(--unit) - 2 * var(--border) - 2 * var(--margin) - 1px);
+    width: calc(var(--width) * var(--unit) - 2 * var(--border) - 2 * var(--margin) - 1px);
+    border: var(--border) solid black;
+    border-radius: calc(var(--unit) / 4);
+}
+
+.side.right .bodypart {
+    left: auto;
+    right: calc(var(--forward) * var(--unit) + var(--margin));
+}
+
+.head {
+    --up: 6;
+}
+
+.torso {
+    --up: 3;
+    --height: 3;
+}
+
+.heatsink {
+    --up: 1;
+}
+
+.hand {
+    --height: 1;
+    --width: 1;
+    --forward: 6;
+}
+
+.hand.right {
+    border-color: maroon;
+}
+
+.hand.left {
+    border-color: navy;
+}
+
+.hand.blocking {
+    --height: 2;
+    --width: .5;
+}
+
+.hand.position1 {
+    --up: 7;
+}
+
+.hand.position2 {
+    --up: 6;
+}
+
+.hand.position3 {
+    --up: 5;
+}
+
+.hand.position4 {
+    --up: 4;
+}
+
+.hand.position5 {
+    --up: 3;
+}
+
+.hand.position6 {
+    --up: 2;
+}
+
+.hand.position7 {
+    --up: 1;
+}
