@@ -106,3 +106,39 @@
 .hand.position7 {
     --up: 1;
 }
+
+.cards,
+.actions {
+    display: flex;
+    justify-content: center;
+}
+
+.card {
+    flex: auto;
+    flex-grow: 0;
+    height: calc(2.5 * var(--unit) - 2 * var(--border) - 2 * var(--margin) - 1px);
+    width: calc(1.8 * var(--unit) - 2 * var(--border) - 2 * var(--margin) - 1px);
+    margin: calc(.5 * var(--unit)) var(--margin);
+    border: var(--border) solid grey;
+    border-radius: calc(var(--unit) / 4);
+    font-size: 1.3vmin;
+    line-height: 1.5;
+    text-align: center;
+    background-color: white;
+    cursor: grab;
+}
+
+.action {
+    cursor: not-allowed;
+}
+
+.button {
+    width: fit-content;
+    margin: calc(.5 * var(--unit)) auto;
+    border: var(--border) solid black;
+    border-radius: calc(var(--unit) / 2);
+    font-size: 1.5vmin;
+    padding: .75vmin;
+    background-color: white;
+    cursor: pointer;
+}
