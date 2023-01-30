@@ -33,7 +33,7 @@
     --up: 0;
     --forward: 4;
     bottom: calc(var(--up) * var(--unit) + var(--margin));
-    left: calc(var(--forward) * var(--unit) + var(--margin) + 2px);
+    left: calc(var(--forward) * var(--unit) + var(--margin) + 1px);
     --height: 2;
     --width: 2;
     height: calc(var(--height) * var(--unit) - 2 * var(--border) - 2 * var(--margin) - 1px);
