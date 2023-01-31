@@ -9,64 +9,11 @@
 </head>
 
 <body>
-    <div class="game">
-        <div class="side left">
-            <div class="robot">
-                <div class="bodypart head">
-                    <span class="hp">40</span>
-                </div>
-                <div class="bodypart torso">
-                    <span class="hp">80</span>
-                </div>
-                <div class="bodypart heatsink">
-                    <span class="hp">60</span>
-                </div>
-                <div class="bodypart hand right position3"></div>
-                <div class="bodypart hand left blocking position4"></div>
-            </div>
-            <div class="actions">
-                <div class="card action"></div>
-                <div class="card action"></div>
-                <div class="card action"></div>
-            </div>
-            <div class="cards">
-                <div class="card">👊<br />Punch card</div>
-                <div class="card">👆<br />Up x1</div>
-                <div class="card">👇👇<br />Down x2</div>
-                <div class="card">💥<br />Spring load</div>
-                <div class="card">💨<br />Disrupt</div>
-            </div>
-            <div class="button">Ready</div>
-        </div>
-        <div class="side right">
-            <div class="robot">
-                <div class="bodypart head">
-                    <span class="hp">40</span>
-                </div>
-                <div class="bodypart torso">
-                    <span class="hp">80</span>
-                </div>
-                <div class="bodypart heatsink">
-                    <span class="hp">60</span>
-                </div>
-                <div class="bodypart hand right blocking position2"></div>
-                <div class="bodypart hand left blocking position5"></div>
-            </div>
-            <div class="actions">
-                <div class="card action"></div>
-                <div class="card action"></div>
-                <div class="card action"></div>
-            </div>
-            <div class="cards">
-                <div class="card">👆👆👆<br />Up x3</div>
-                <div class="card">👊<br />Punch card</div>
-                <div class="card">👇<br />Down x1</div>
-                <div class="card">👊<br />Punch card</div>
-                <div class="card">🖐<br />Grab</div>
-            </div>
-            <div class="button">Ready</div>
-        </div>
-    </div>
+    <div id="game"></div>
+    <script src="cards.js"></script>
+    <script src="game.js"></script>
+    <script src="render.js"></script>
+    <script src="app.js"></script>
 </body>
 
 </html>

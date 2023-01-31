@@ -128,7 +128,7 @@
     cursor: grab;
 }
 
-.action {
+.actions .card {
     cursor: not-allowed;
 }
 
