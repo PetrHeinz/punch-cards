@@ -238,6 +238,77 @@ class DirectRobotController {
     }
 }
 
+class RandobotController {
+    currentActionIndex = 0
+    possibleHandCardIndexes = []
+    currentToggleIndex = 0
+    currentPhase = 0
+
+    /**
+     * @param {Robot} robot
+     */
+    constructor(robot) {
+        this.robot = robot
+    }
+
+    /**
+     * @param {RobotRender} robotRender
+     */
+    initialize(robotRender) {
+        if (this.render !== undefined) throw "This controller has already been initialized"
+        this.render = robotRender
+
+        setInterval(() => {
+            if (this.robot.state === ROBOT_STATE_CONTROL) this.doAction()
+        }, 200)
+    }
+
+    afterRender() {
+    }
+
+    doAction() {
+        const phases = [
+            () => {
+                this.possibleHandCardIndexes = [0,1,2,3,4]
+
+                return true
+            },
+            () => {
+                this.possibleHandCardIndexes = this.possibleHandCardIndexes
+                    .map(i => ({ i, sort: Math.random() }))
+                    .sort((a, b) => a.sort - b.sort)
+                    .map(({ i }) => i)
+
+                this.robot.chooseAction(this.possibleHandCardIndexes.pop(), this.currentActionIndex++)
+
+                return this.possibleHandCardIndexes.length === 0 || this.currentActionIndex >= this.robot.actionCards.length
+            },
+            () => {
+                if (Math.random() > .5) {
+                    this.robot.toggleActionHand(this.currentToggleIndex)
+                }
+                this.currentToggleIndex++
+
+                return this.currentToggleIndex >= this.robot.actionCards.length
+            },
+            () => {
+                this.robot.commit()
+                this.currentActionIndex = 0
+                this.currentToggleIndex = 0
+                this.currentPhase = 0
+
+                return false
+            },
+        ]
+
+        const hasFinishedPhase = phases[this.currentPhase]()
+
+        if (hasFinishedPhase) this.currentPhase++
+
+        this.render.render(this.robot)
+    }
+}
+
 class ChangeCache {
     constructor(object) {
         this.lastJson = object !== undefined ? JSON.stringify(object) : ''

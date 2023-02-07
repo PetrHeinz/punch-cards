@@ -2,7 +2,7 @@ let game = new Game()
 let gameRender = new GameRender(
     document.getElementById('game'),
     new DirectRobotController(game.leftRobot),
-    new DirectRobotController(game.rightRobot),
+    new RandobotController(game.rightRobot),
 )
 
 gameRender.render(game)
