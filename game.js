@@ -1,16 +1,70 @@
 class Game {
-    leftRobot
-    rightRobot
+    currentAction = 0
     constructor() {
         this.leftRobot = new Robot(CARDS)
         this.rightRobot = new Robot(CARDS)
     }
+
+    tick() {
+        if (this.leftRobot.state === ROBOT_STATE_CONTROL || this.rightRobot.state === ROBOT_STATE_CONTROL) {
+            console.debug("Either robot is still waiting for input")
+            return
+        }
+
+        if (this.leftRobot.state === ROBOT_STATE_COMMIT && this.rightRobot.state === ROBOT_STATE_COMMIT) {
+            console.info("Starting action!")
+            this.leftRobot.state = ROBOT_STATE_ACTION
+            this.rightRobot.state = ROBOT_STATE_ACTION
+        }
+
+        if (this.leftRobot.state === ROBOT_STATE_PREPARE && this.rightRobot.state === ROBOT_STATE_PREPARE) {
+            console.info("Preparing for new round!")
+            this.currentAction = 0
+            this.leftRobot.drawHand()
+            this.rightRobot.drawHand()
+        }
+
+        let actions = []
+
+        if (this.leftRobot.state === ROBOT_STATE_ACTION) {
+            if (this.leftRobot.actionCards[this.currentAction] !== undefined) {
+                actions.push(getAction(this.leftRobot.actionCards[this.currentAction], this.leftRobot, this.rightRobot))
+            } else {
+                this.leftRobot.state = ROBOT_STATE_PREPARE
+            }
+        }
+
+        if (this.rightRobot.state === ROBOT_STATE_ACTION) {
+            if (this.rightRobot.actionCards[this.currentAction] !== undefined) {
+                actions.push(getAction(this.rightRobot.actionCards[this.currentAction], this.rightRobot, this.leftRobot))
+            } else {
+                this.rightRobot.state = ROBOT_STATE_PREPARE
+            }
+        }
+
+        actions.forEach(action => action.prepare())
+        actions.forEach(action => action.do())
+        actions.forEach(action => action.cleanup())
+
+        if (this.leftRobot.state === ROBOT_STATE_ACTION || this.rightRobot.state === ROBOT_STATE_ACTION) {
+            this.currentAction++
+        }
+    }
 }
 
+ROBOT_STATE_CONTROL = "CONTROL"
+ROBOT_STATE_COMMIT = "COMMIT"
+ROBOT_STATE_ACTION = "ACTION"
+ROBOT_STATE_PREPARE = "PREPARE"
+
+ROBOT_HAND_RIGHT = "RIGHT"
+ROBOT_HAND_LEFT = "LEFT"
+
 class Robot {
+    state = ROBOT_STATE_PREPARE
     discardedCards = []
     handCards = []
-    actions = []
+    actionCards = []
     constructor(cards) {
         this.head = new Bodypart(40)
         this.torso = new Bodypart(80)
@@ -19,6 +73,11 @@ class Robot {
         this.leftHand = new Hand(5, 1, 7)
         this.deckCards = buildDeck(cards)
         this.drawHand()
+    }
+    getHand(hand) {
+        if (hand !== ROBOT_HAND_RIGHT && hand !== ROBOT_HAND_LEFT) throw "Unknown hand"
+
+        return hand === ROBOT_HAND_RIGHT ? this.rightHand : this.leftHand
     }
     getBodypartAt(position) {
         switch (position) {
@@ -36,7 +95,9 @@ class Robot {
         throw "Unexpected position " + position
     }
     drawHand() {
-        this.actions = [null, null, null]
+        if (this.state !== ROBOT_STATE_PREPARE) throw "Robot can draw hand only during PREPARE"
+
+        this.actionCards = [null, null, null]
         this.discardedCards = this.discardedCards.concat(this.handCards)
         this.handCards = []
         for (let i = 0; i < 5; i++) {
@@ -46,11 +107,17 @@ class Robot {
             }
             this.handCards.push(this.deckCards.shift())
         }
+
+        this.state = ROBOT_STATE_CONTROL
+
         return this.handCards
     }
-    chooseAction(handCardIndex, actionIndex) {
-        if (this.actions[actionIndex] === undefined) {
-            console.debug('actions:', this.actions)
+    chooseAction(handCardIndex, actionIndex, hand) {
+        if (this.state !== ROBOT_STATE_CONTROL) throw "Robot can choose action only during CONTROL"
+        if (hand !== undefined && hand !== ROBOT_HAND_RIGHT && hand !== ROBOT_HAND_LEFT) throw "Unknown hand"
+
+        if (this.actionCards[actionIndex] === undefined) {
+            console.debug('actions:', this.actionCards)
             throw "Undefined action index " + actionIndex
         }
         if (this.handCards[handCardIndex] === undefined) {
@@ -58,14 +125,34 @@ class Robot {
             throw "Undefined hand card index " + handCardIndex
         }
         const chosenCard = this.handCards[handCardIndex]
-        if (this.actions.indexOf(chosenCard) > -1) {
+        if (this.actionCards.indexOf(chosenCard) > -1) {
             console.debug("This card has already been chosen")
-            this.actions[this.actions.indexOf(chosenCard)] = null
+            this.actionCards[this.actionCards.indexOf(chosenCard)] = null
         }
-        this.actions[actionIndex] = chosenCard
+
+        this.actionCards[actionIndex] = chosenCard
+        this.actionCards[actionIndex].hand = hand ?? this.actionCards[actionIndex].hand ?? ROBOT_HAND_RIGHT
+    }
+    chooseActionHand(actionIndex, hand) {
+        if (this.state !== ROBOT_STATE_CONTROL) throw "Robot can choose action hand only during CONTROL"
+        if (hand !== ROBOT_HAND_RIGHT && hand !== ROBOT_HAND_LEFT) throw "Unknown hand"
+
+        if (this.actionCards[actionIndex] === undefined) {
+            console.debug('actions:', this.actionCards)
+            throw "Undefined action index " + actionIndex
+        }
+
+        this.actionCards[actionIndex].hand = hand
     }
     discardAction(actionIndex) {
-        this.actions[actionIndex] = null
+        if (this.state !== ROBOT_STATE_CONTROL) throw "Robot can discard action only during CONTROL"
+
+        this.actionCards[actionIndex] = null
+    }
+    commit() {
+        if (this.state !== ROBOT_STATE_CONTROL) throw "Robot can commit only during CONTROL"
+
+        this.state = ROBOT_STATE_COMMIT
     }
 }
 
@@ -105,4 +192,43 @@ function shuffleCards(cards) {
         .map(card => ({ card, sort: Math.random() }))
         .sort((a, b) => a.sort - b.sort)
         .map(({ card }) => card)
+}
+
+/**
+ * @param {{id:string,hand:string}} actionCard
+ * @param {Robot} robot
+ * @param {Robot} otherRobot
+ */
+function getAction(actionCard, robot, otherRobot) {
+    if (actionCard === null) {
+        return {
+            prepare: () => {},
+            do: () => {},
+            cleanup: () => {},
+        }
+    }
+    switch (actionCard.id) {
+        case UP1: return getMoveAction(-1, robot.getHand(actionCard.hand))
+        case UP2: return getMoveAction(-2, robot.getHand(actionCard.hand))
+        case UP3: return getMoveAction(-3, robot.getHand(actionCard.hand))
+        case DOWN1: return getMoveAction(1, robot.getHand(actionCard.hand))
+        case DOWN2: return getMoveAction(2, robot.getHand(actionCard.hand))
+        case DOWN3: return getMoveAction(3, robot.getHand(actionCard.hand))
+    }
+    return {
+        prepare: () => {},
+        do: () => console.log("Unknown action card " + actionCard.id),
+        cleanup: () => {},
+    }
+}
+/**
+ * @param {number} amount
+ * @param {Hand} hand
+ */
+function getMoveAction(amount, hand) {
+    return {
+        prepare: () => {hand.position += amount},
+        do: () => {},
+        cleanup: () => {},
+    }
 }

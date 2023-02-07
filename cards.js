@@ -15,7 +15,7 @@ const CARDS = [
         id: PUNCH_CARD,
         icon: "👊",
         name: "Punch card",
-        count: 6
+        count: 6,
     },
     {
         id: UP1,

@@ -13,7 +13,7 @@ class GameRender {
     }
 
     /**
-     * @param {Game} robot 
+     * @param {Game} game
      */
     render(game) {
         this.rightRobot.render(game.rightRobot)
@@ -102,7 +102,7 @@ class RobotRender {
         this.leftHand.classList.add('blocking')
 
         this.actions.innerHTML = ''
-        robot.actions.forEach((card) => this.actions.append(this.createCard(card)))
+        robot.actionCards.forEach((card) => this.actions.append(this.createCard(card)))
         this.actions.append()
 
         this.cards.innerHTML = ''
