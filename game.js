@@ -133,16 +133,20 @@ class Robot {
         this.actionCards[actionIndex] = chosenCard
         this.actionCards[actionIndex].hand = hand ?? this.actionCards[actionIndex].hand ?? ROBOT_HAND_RIGHT
     }
-    chooseActionHand(actionIndex, hand) {
+    toggleActionHand(actionIndex) {
         if (this.state !== ROBOT_STATE_CONTROL) throw "Robot can choose action hand only during CONTROL"
-        if (hand !== ROBOT_HAND_RIGHT && hand !== ROBOT_HAND_LEFT) throw "Unknown hand"
 
         if (this.actionCards[actionIndex] === undefined) {
             console.debug('actions:', this.actionCards)
             throw "Undefined action index " + actionIndex
         }
 
-        this.actionCards[actionIndex].hand = hand
+        if (this.actionCards[actionIndex] === null) {
+            console.debug('actions:', this.actionCards)
+            throw "No action at index " + actionIndex
+        }
+
+        this.actionCards[actionIndex].hand = this.actionCards[actionIndex].hand === ROBOT_HAND_RIGHT ? ROBOT_HAND_LEFT : ROBOT_HAND_RIGHT
     }
     discardAction(actionIndex) {
         if (this.state !== ROBOT_STATE_CONTROL) throw "Robot can discard action only during CONTROL"

@@ -21,7 +21,14 @@ class GameRender {
     }
 }
 
+ROBOT_CARDS_ACTION = "ACTION"
+ROBOT_CARDS_HAND = "HAND"
+ROBOT_CARDS_NONE = "NONE"
+
 class RobotRender {
+    selected = ROBOT_CARDS_NONE
+    selectedIndex = 0
+
     constructor(root, extraClass) {
         const side = document.createElement('div')
         side.classList.add('side')
@@ -38,17 +45,62 @@ class RobotRender {
 
         side.append(robot)
 
-        this.actions = document.createElement('div')
-        this.actions.classList.add('actions')
-        side.append(this.actions)
+        this.actionCards = document.createElement('div')
+        this.actionCards.classList.add('actions')
+        this.actionCards.addEventListener("click", (event) => {
+            event.preventDefault()
+            if (event.target === this.actionCards) return
 
-        this.cards = document.createElement('div')
-        this.cards.classList.add('cards')
-        side.append(this.cards)
+            const actionCardIndex = getChildIndex(this.actionCards, event.target)
+            if (event.target.classList.contains("hand-toggle")) {
+                this.robot.toggleActionHand(actionCardIndex)
+                this.render(this.robot)
+                return
+            }
+
+            if (this.selected === ROBOT_CARDS_HAND) {
+                this.robot.chooseAction(this.selectedIndex, actionCardIndex)
+                this.render(this.robot)
+                this.selectCard(ROBOT_CARDS_NONE)
+                return
+            }
+            if (this.selected === ROBOT_CARDS_ACTION && actionCardIndex === this.selectedIndex) {
+                this.selectCard(ROBOT_CARDS_NONE)
+                return
+            }
+            this.selectCard(ROBOT_CARDS_ACTION, actionCardIndex)
+        })
+        side.append(this.actionCards)
+
+        this.handCards = document.createElement('div')
+        this.handCards.classList.add('cards')
+        this.handCards.addEventListener("click", (event) => {
+            event.preventDefault()
+            if (event.target === this.handCards) return
+
+            const handCardIndex = getChildIndex(this.handCards, event.target)
+            if (this.selected === ROBOT_CARDS_ACTION) {
+                this.robot.chooseAction(handCardIndex, this.selectedIndex)
+                this.render(this.robot)
+                this.selectCard(ROBOT_CARDS_NONE)
+                return
+            }
+            if (this.selected === ROBOT_CARDS_HAND && handCardIndex === this.selectedIndex) {
+                this.selectCard(ROBOT_CARDS_NONE)
+                return
+            }
+            this.selectCard(ROBOT_CARDS_HAND, handCardIndex)
+        })
+        side.append(this.handCards)
 
         this.readyButton = document.createElement('div')
         this.readyButton.classList.add('button')
         this.readyButton.textContent = 'Ready'
+        this.readyButton.addEventListener("click", () => {
+            this.robot.commit()
+            this.render(this.robot)
+            this.selectCard(ROBOT_CARDS_NONE)
+        })
         side.append(this.readyButton)
 
         root.append(side)
@@ -76,7 +128,7 @@ class RobotRender {
         return bodypart
     }
 
-    createCard(card) {
+    createCard(card, cardType) {
         const cardElement = document.createElement('div')
         cardElement.classList.add('card')
 
@@ -84,6 +136,13 @@ class RobotRender {
             cardElement.append(card.icon)
             cardElement.append(document.createElement('br'))
             cardElement.append(card.name)
+            if (cardType === ROBOT_CARDS_ACTION) {
+                let handElement = document.createElement("div")
+                handElement.classList.add("hand-toggle")
+                handElement.classList.add(card.hand === ROBOT_HAND_RIGHT ? "right" : "left")
+                handElement.textContent = card.hand
+                cardElement.append(handElement)
+            }
         }
 
         return cardElement
@@ -93,6 +152,8 @@ class RobotRender {
      * @param {Robot} robot 
      */
     render(robot) {
+        this.robot = robot
+
         this.head.textContent = robot.head.health
         this.torso.textContent = robot.torso.health
         this.heatsink.textContent = robot.heatsink.health
@@ -101,12 +162,40 @@ class RobotRender {
         this.leftHand.style = '--up: ' + (8 - robot.leftHand.position)
         this.leftHand.classList.add('blocking')
 
-        this.actions.innerHTML = ''
-        robot.actionCards.forEach((card) => this.actions.append(this.createCard(card)))
-        this.actions.append()
+        this.actionCards.innerHTML = ''
+        robot.actionCards.forEach((card) => this.actionCards.append(this.createCard(card, ROBOT_CARDS_ACTION)))
 
-        this.cards.innerHTML = ''
-        robot.handCards.forEach((card) => this.cards.append(this.createCard(card)))
-        this.cards.append()
+        this.handCards.innerHTML = ''
+        robot.handCards.forEach((card) => this.handCards.append(this.createCard(card, ROBOT_CARDS_HAND)))
+
+        this.readyButton.style.display = robot.state === ROBOT_STATE_CONTROL ? "" : "none"
+
+        this.selectCard(this.selected, this.selectedIndex)
     }
+
+    selectCard(selected, selectedIndex) {
+        this.actionCards.querySelectorAll(".selected")
+            .forEach(e => e.classList.remove("selected"))
+        this.handCards.querySelectorAll(".selected")
+            .forEach(e => e.classList.remove("selected"))
+        if (selected === ROBOT_CARDS_ACTION) {
+            this.actionCards.children[selectedIndex].classList.add("selected")
+        }
+        if (selected === ROBOT_CARDS_HAND) {
+            this.handCards.children[selectedIndex].classList.add("selected")
+        }
+        this.selected = selected
+        if (selectedIndex !== undefined) {
+            this.selectedIndex = selectedIndex
+        }
+    }
+}
+
+function getChildIndex(element, childElement) {
+    for (const childIndex in element.children) {
+        if (element.children[childIndex] === childElement) {
+            return childIndex
+        }
+    }
+    return getChildIndex(element, childElement.parentElement)
 }

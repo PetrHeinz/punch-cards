@@ -17,9 +17,12 @@
     background-image:
         linear-gradient(to right, var(--gridcolor) 1px, transparent 1px),
         linear-gradient(to bottom, var(--gridcolor) 1px, transparent 1px);
+    font-family: monospace;
 }
 
 .side {
+    --selected-action-card-index: 1;
+    --selected-hand-card-index: 1;
     flex: 50%;
 }
 
@@ -114,6 +117,7 @@
 }
 
 .card {
+    position: relative;
     flex: auto;
     flex-grow: 0;
     height: calc(2.5 * var(--unit) - 2 * var(--border) - 2 * var(--margin) - 1px);
@@ -125,11 +129,30 @@
     line-height: 1.5;
     text-align: center;
     background-color: white;
-    cursor: grab;
+    cursor: pointer;
 }
 
-.actions .card {
-    cursor: not-allowed;
+.card.selected {
+    border-color: red;
+}
+
+.hand-toggle {
+    position: absolute;
+    bottom: calc(-1vmin - var(--border));
+    width: 100%;
+    line-height: 1;
+    font-size: 1vmin;
+    font-weight: bold;
+    text-align: center;
+}
+.hand-toggle.right {
+    color: maroon;
+}
+.hand-toggle.left {
+    color: navy;
+}
+.hand-toggle:hover {
+    color: black;
 }
 
 .button {
