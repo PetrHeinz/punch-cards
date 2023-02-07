@@ -182,6 +182,7 @@ class Hand {
     isBlocking = true
     isAttacking = false
     isBlocked = false
+    isCharged = false
     constructor(position, min, max) {
         this.min = min
         this.max = max
@@ -234,6 +235,7 @@ function getAction(actionCard, robot, otherRobot) {
         case DOWN1: return getMoveAction(1, robot.getHand(actionCard.hand))
         case DOWN2: return getMoveAction(2, robot.getHand(actionCard.hand))
         case DOWN3: return getMoveAction(3, robot.getHand(actionCard.hand))
+        case CHARGE: return getChargeAction(robot.getHand(actionCard.hand))
     }
     return {
         prepare: () => {},
@@ -268,12 +270,26 @@ function getPunchAction(hand, otherRobot) {
             const blockingHandsCount = otherRobot.getHandsBlockingAt(hand.position).length;
             hand.isBlocked = blockingHandsCount > 0
             const damage = Math.max(0, baseDamage - blockingHandsCount * blockedDamage)
-            otherRobot.getBodypartAt(hand.position).health -= damage
+            otherRobot.getBodypartAt(hand.position).health -= hand.isCharged ? 3 * damage : damage
         },
         cleanup: () => {
             hand.isBlocked = false
             hand.isBlocking = true
             hand.isAttacking = false
+            hand.isCharged = false
         },
+    }
+}
+/**
+ * @param {Hand} hand
+ */
+function getChargeAction(hand) {
+    return {
+        prepare: () => {
+            hand.isBlocking = false
+            hand.isCharged = true
+        },
+        do: () => {},
+        cleanup: () => {},
     }
 }

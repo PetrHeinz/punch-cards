@@ -53,12 +53,12 @@ const CARDS = [
         name: "Dooown",
         count: 1
     },
-    // {
-    //     id: CHARGE,
-    //     icon: "💥",
-    //     name: "Charge",
-    //     count: 2
-    // },
+    {
+        id: CHARGE,
+        icon: "💥",
+        name: "Charge",
+        count: 2
+    },
     // {
     //     id: DISRUPT,
     //     icon: "💨",

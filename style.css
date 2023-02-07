@@ -81,15 +81,18 @@
     border-color: navy;
 }
 
+.hand.blocking {
+    --height: 2;
+    --width: .5;
+}
+.hand.charged {
+    --forward: 3.5;
+}
 .hand.attacking {
     --forward: 13;
 }
 .hand.attacking.blocked {
     --forward: 11.5;
-}
-.hand.blocking {
-    --height: 2;
-    --width: .5;
 }
 
 .hand.position1 {

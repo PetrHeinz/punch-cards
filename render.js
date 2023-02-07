@@ -140,10 +140,12 @@ class RobotRender {
         this.rightHand.classList.toggle('blocking', robot.rightHand.isBlocking)
         this.rightHand.classList.toggle('attacking', robot.rightHand.isAttacking)
         this.rightHand.classList.toggle('blocked', robot.rightHand.isBlocked)
+        this.rightHand.classList.toggle('charged', robot.rightHand.isCharged)
         this.leftHand.style = '--up: ' + (8 - robot.leftHand.position)
         this.leftHand.classList.toggle('blocking', robot.leftHand.isBlocking)
         this.leftHand.classList.toggle('attacking', robot.leftHand.isAttacking)
         this.leftHand.classList.toggle('blocked', robot.leftHand.isBlocked)
+        this.leftHand.classList.toggle('charged', robot.leftHand.isCharged)
     }
 }
 
