@@ -35,6 +35,9 @@ class RobotRender {
     selectedIndex = 0
 
     constructor(root, extraClass) {
+        this._actionCardsCache = new ChangeCache()
+        this._handCardsCache = new ChangeCache()
+
         const side = document.createElement('div')
         side.classList.add('side')
         side.classList.add(extraClass)
@@ -159,11 +162,14 @@ class RobotRender {
     render(robot) {
         this.renderRobot(robot);
 
-        this.actionCards.innerHTML = ''
-        robot.actionCards.forEach((card) => this.actionCards.append(this.createCard(card, ROBOT_CARDS_ACTION)))
-
-        this.handCards.innerHTML = ''
-        robot.handCards.forEach((card) => this.handCards.append(this.createCard(card, ROBOT_CARDS_HAND)))
+        this._actionCardsCache.ifChanged(robot.actionCards, () => {
+            this.actionCards.innerHTML = ''
+            robot.actionCards.forEach((card) => this.actionCards.append(this.createCard(card, ROBOT_CARDS_ACTION)))
+        })
+        this._handCardsCache.ifChanged(robot.handCards, () => {
+            this.handCards.innerHTML = ''
+            robot.handCards.forEach((card) => this.handCards.append(this.createCard(card, ROBOT_CARDS_HAND)))
+        })
 
         this.readyButton.style.display = robot.state === ROBOT_STATE_CONTROL ? "" : "none"
 
@@ -201,6 +207,19 @@ class RobotRender {
         if (selectedIndex !== undefined) {
             this.selectedIndex = selectedIndex
         }
+    }
+}
+
+class ChangeCache {
+    constructor(object) {
+        this.lastJson = object !== undefined ? JSON.stringify(object) : ''
+    }
+    ifChanged(object, callback) {
+        const json = JSON.stringify(object)
+        if (json !== this.lastJson) {
+            callback()
+        }
+        this.lastJson = json
     }
 }
 
