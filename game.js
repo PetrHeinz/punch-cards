@@ -44,7 +44,8 @@ class Game {
 
         actions.forEach(action => action.prepare())
         actions.forEach(action => action.do())
-        actions.forEach(action => action.cleanup())
+        // TODO: think of a better solution, this should be Render's responsibility
+        setTimeout(() => actions.forEach(action => action.cleanup()), 500)
 
         if (this.leftRobot.state === ROBOT_STATE_ACTION || this.rightRobot.state === ROBOT_STATE_ACTION) {
             this.currentAction++
@@ -93,6 +94,11 @@ class Robot {
                 return this.heatsink
         }
         throw "Unexpected position " + position
+    }
+    getHandsBlockingAt(position) {
+        return [this.rightHand, this.leftHand]
+            .filter(hand => hand.isBlocking)
+            .filter(hand => hand.position === position || hand.position === position + 1)
     }
     drawHand() {
         if (this.state !== ROBOT_STATE_PREPARE) throw "Robot can draw hand only during PREPARE"
@@ -164,13 +170,22 @@ class Bodypart {
     constructor(health) {
         this.health = health
     }
+    get health() {
+        return this._health
+    }
+    set health(health) {
+        this._health = Math.max(0, health)
+    }
 }
 
 class Hand {
+    isBlocking = true
+    isAttacking = false
+    isBlocked = false
     constructor(position, min, max) {
-        this._position = position
         this.min = min
         this.max = max
+        this.position = position
     }
     get position() {
         return this._position
@@ -212,6 +227,7 @@ function getAction(actionCard, robot, otherRobot) {
         }
     }
     switch (actionCard.id) {
+        case PUNCH_CARD: return getPunchAction(robot.getHand(actionCard.hand), otherRobot)
         case UP1: return getMoveAction(-1, robot.getHand(actionCard.hand))
         case UP2: return getMoveAction(-2, robot.getHand(actionCard.hand))
         case UP3: return getMoveAction(-3, robot.getHand(actionCard.hand))
@@ -231,8 +247,33 @@ function getAction(actionCard, robot, otherRobot) {
  */
 function getMoveAction(amount, hand) {
     return {
-        prepare: () => {hand.position += amount},
+        prepare: () => { hand.position += amount },
         do: () => {},
         cleanup: () => {},
+    }
+}
+/**
+ * @param {Hand} hand
+ * @param {Robot} otherRobot
+ */
+function getPunchAction(hand, otherRobot) {
+    return {
+        prepare: () => {
+            hand.isBlocking = false
+            hand.isAttacking = true
+        },
+        do: () => {
+            const baseDamage = 10;
+            const blockedDamage = 8;
+            const blockingHandsCount = otherRobot.getHandsBlockingAt(hand.position).length;
+            hand.isBlocked = blockingHandsCount > 0
+            const damage = Math.max(0, baseDamage - blockingHandsCount * blockedDamage)
+            otherRobot.getBodypartAt(hand.position).health -= damage
+        },
+        cleanup: () => {
+            hand.isBlocked = false
+            hand.isBlocking = true
+            hand.isAttacking = false
+        },
     }
 }

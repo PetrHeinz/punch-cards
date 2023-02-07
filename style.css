@@ -43,6 +43,11 @@
     width: calc(var(--width) * var(--unit) - 2 * var(--border) - 2 * var(--margin) - 1px);
     border: var(--border) solid black;
     border-radius: calc(var(--unit) / 4);
+    transition:
+        450ms ease-in-out left,
+        450ms ease-in-out right,
+        450ms ease-in-out top,
+        450ms ease-in-out bottom;
 }
 
 .side.right .bodypart {
@@ -72,11 +77,16 @@
 .hand.right {
     border-color: maroon;
 }
-
 .hand.left {
     border-color: navy;
 }
 
+.hand.attacking {
+    --forward: 13;
+}
+.hand.attacking.blocked {
+    --forward: 11.5;
+}
 .hand.blocking {
     --height: 2;
     --width: .5;

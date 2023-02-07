@@ -19,6 +19,11 @@ class GameRender {
         this.rightRobot.render(game.rightRobot)
         this.leftRobot.render(game.leftRobot)
     }
+
+    renderRobots(game) {
+        this.rightRobot.renderRobot(game.rightRobot)
+        this.leftRobot.renderRobot(game.leftRobot)
+    }
 }
 
 ROBOT_CARDS_ACTION = "ACTION"
@@ -152,15 +157,7 @@ class RobotRender {
      * @param {Robot} robot 
      */
     render(robot) {
-        this.robot = robot
-
-        this.head.textContent = robot.head.health
-        this.torso.textContent = robot.torso.health
-        this.heatsink.textContent = robot.heatsink.health
-        this.rightHand.style = '--up: ' + (8 - robot.rightHand.position)
-        this.rightHand.classList.add('blocking')
-        this.leftHand.style = '--up: ' + (8 - robot.leftHand.position)
-        this.leftHand.classList.add('blocking')
+        this.renderRobot(robot);
 
         this.actionCards.innerHTML = ''
         robot.actionCards.forEach((card) => this.actionCards.append(this.createCard(card, ROBOT_CARDS_ACTION)))
@@ -171,6 +168,22 @@ class RobotRender {
         this.readyButton.style.display = robot.state === ROBOT_STATE_CONTROL ? "" : "none"
 
         this.selectCard(this.selected, this.selectedIndex)
+    }
+
+    renderRobot(robot) {
+        this.robot = robot
+
+        this.head.textContent = robot.head.health
+        this.torso.textContent = robot.torso.health
+        this.heatsink.textContent = robot.heatsink.health
+        this.rightHand.style = '--up: ' + (8 - robot.rightHand.position)
+        this.rightHand.classList.toggle('blocking', robot.rightHand.isBlocking)
+        this.rightHand.classList.toggle('attacking', robot.rightHand.isAttacking)
+        this.rightHand.classList.toggle('blocked', robot.rightHand.isBlocked)
+        this.leftHand.style = '--up: ' + (8 - robot.leftHand.position)
+        this.leftHand.classList.toggle('blocking', robot.leftHand.isBlocking)
+        this.leftHand.classList.toggle('attacking', robot.leftHand.isAttacking)
+        this.leftHand.classList.toggle('blocked', robot.leftHand.isBlocked)
     }
 
     selectCard(selected, selectedIndex) {
