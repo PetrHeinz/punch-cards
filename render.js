@@ -88,7 +88,7 @@ class RobotRender {
         return bodypart
     }
 
-    createCard(card, renderHandToggle) {
+    initCard(root, card, renderHandToggle) {
         const cardElement = document.createElement('div')
         cardElement.classList.add('card')
 
@@ -105,6 +105,8 @@ class RobotRender {
             }
         }
 
+        root.append(cardElement)
+
         return cardElement
     }
 
@@ -116,11 +118,11 @@ class RobotRender {
 
         this._actionCardsCache.ifChanged(robot.actionCards, () => {
             this.actionCards.innerHTML = ''
-            robot.actionCards.forEach((card) => this.actionCards.append(this.createCard(card, true)))
+            robot.actionCards.forEach((card) => this.initCard(this.actionCards, card, true))
         })
         this._handCardsCache.ifChanged(robot.handCards, () => {
             this.handCards.innerHTML = ''
-            robot.handCards.forEach((card) => this.handCards.append(this.createCard(card)))
+            robot.handCards.forEach((card) => this.initCard(this.handCards, card))
         })
 
         this.readyButton.style.display = robot.state === ROBOT_STATE_CONTROL ? "" : "none"
