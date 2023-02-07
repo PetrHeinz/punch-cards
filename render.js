@@ -260,6 +260,7 @@ class RandobotController {
 
         setInterval(() => {
             if (this.robot.state === ROBOT_STATE_CONTROL) this.doAction()
+            if (this.robot.state === ROBOT_STATE_ACTION) this.render.actionCards.style.visibility = ""
         }, 200)
     }
 
@@ -269,6 +270,7 @@ class RandobotController {
     doAction() {
         const phases = [
             () => {
+                this.render.actionCards.style.visibility = "hidden"
                 this.possibleHandCardIndexes = [0,1,2,3,4]
 
                 return true
