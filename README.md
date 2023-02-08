@@ -1,4 +1,4 @@
-# unnamed-robot-game
+# PUNCH_CARDS
 
 A JS game prototype, to be done in 10 days.
 
