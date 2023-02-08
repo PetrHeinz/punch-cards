@@ -40,15 +40,15 @@ class RobotRender {
         const robot = document.createElement('div')
         robot.classList.add('robot')
 
-        this.state = document.createElement('div')
-        this.state.classList.add('state')
-        robot.append(this.state)
-
         this.head = this.initBodypart(robot, 'head')
         this.torso = this.initBodypart(robot, 'torso')
         this.heatsink = this.initBodypart(robot, 'heatsink')
         this.rightHand = this.initHand(robot, 'right')
         this.leftHand = this.initHand(robot, 'left')
+
+        this.state = document.createElement('div')
+        this.state.classList.add('state')
+        robot.append(this.state)
 
         side.append(robot)
 
@@ -129,7 +129,7 @@ class RobotRender {
             robot.handCards.forEach((card) => this.initCard(this.handCards, card))
         })
 
-        this.readyButton.style.display = robot.state === ROBOT_STATE_CONTROL ? "" : "none"
+        this.readyButton.classList.toggle("pushed", robot.state !== ROBOT_STATE_CONTROL)
 
         this.controller.afterRender()
     }
@@ -240,6 +240,10 @@ class DirectRobotController {
             const handCardUsed = this.robot.actionCards.indexOf(this.robot.handCards[handCardIndex]) >= 0
             this.render.handCards.children[handCardIndex].classList.toggle("used", handCardUsed)
         }
+
+        this.render.actionCards.style.cursor = "pointer"
+        this.render.handCards.style.cursor = "pointer"
+        this.render.readyButton.style.cursor = this.render.readyButton.classList.contains("pushed") ? "" : "pointer"
     }
 
     selectCard(selected, selectedIndex) {
