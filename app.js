@@ -1,4 +1,3 @@
-
 class Application {
     intervals = []
     randomSeedString = "punch-cards"

@@ -1,5 +1,6 @@
 class Game {
     currentAction = 0
+
     constructor(randomSeedString) {
         randomSeedString = randomSeedString ?? RandomGenerator.randomSeedString(32)
         this.leftRobot = new Robot(CARDS, new RandomGenerator(randomSeedString + "-left"))
@@ -96,6 +97,7 @@ class Robot {
     discardedCards = []
     handCards = []
     actionCards = []
+
     constructor(cards, randomGenerator) {
         this._randomGenerator = randomGenerator;
         this.head = new Bodypart(40)
@@ -106,11 +108,13 @@ class Robot {
         this.deckCards = this._buildDeck(cards)
         this.drawHand()
     }
+
     getHand(hand) {
         if (hand !== ROBOT_HAND_RIGHT && hand !== ROBOT_HAND_LEFT) throw "Unknown hand " + hand
 
         return hand === ROBOT_HAND_RIGHT ? this.rightHand : this.leftHand
     }
+
     getBodypartAt(position) {
         switch (position) {
             case 1:
@@ -126,16 +130,19 @@ class Robot {
         }
         throw "Unexpected position " + position
     }
+
     getHandsBlockingAt(position) {
         return [this.rightHand, this.leftHand]
             .filter(hand => hand.isBlocking)
             .filter(hand => hand.position === position || hand.position === position + 1)
     }
+
     isDestroyed() {
         return [this.head, this.torso, this.heatsink]
             .filter(bodypart => bodypart.health === 0)
             .length > 0
     }
+
     drawHand() {
         if (this.state !== ROBOT_STATE_PREPARE) throw "Robot can draw hand only during " + ROBOT_STATE_PREPARE
 
@@ -154,6 +161,7 @@ class Robot {
 
         return this.handCards
     }
+
     chooseAction(handCardIndex, actionIndex, hand) {
         if (this.state !== ROBOT_STATE_CONTROL) throw "Robot can choose action only during " + ROBOT_STATE_CONTROL
         if (hand !== undefined && hand !== ROBOT_HAND_RIGHT && hand !== ROBOT_HAND_LEFT) throw "Unknown hand " + hand
@@ -175,6 +183,7 @@ class Robot {
         this.actionCards[actionIndex] = chosenCard
         this.actionCards[actionIndex].hand = hand ?? this.actionCards[actionIndex].hand ?? ROBOT_HAND_RIGHT
     }
+
     swapActions(firstActionIndex, secondActionIndex) {
         if (this.state !== ROBOT_STATE_CONTROL) throw "Robot can swap actions only during " + ROBOT_STATE_CONTROL
 
@@ -191,6 +200,7 @@ class Robot {
         this.actionCards[firstActionIndex] = this.actionCards[secondActionIndex]
         this.actionCards[secondActionIndex] = swappedActionCard
     }
+
     toggleActionHand(actionIndex) {
         if (this.state !== ROBOT_STATE_CONTROL) throw "Robot can choose action hand only during " + ROBOT_STATE_CONTROL
 
@@ -206,16 +216,19 @@ class Robot {
 
         this.actionCards[actionIndex].hand = this.actionCards[actionIndex].hand === ROBOT_HAND_RIGHT ? ROBOT_HAND_LEFT : ROBOT_HAND_RIGHT
     }
+
     discardAction(actionIndex) {
         if (this.state !== ROBOT_STATE_CONTROL) throw "Robot can discard action only during " + ROBOT_STATE_CONTROL
 
         this.actionCards[actionIndex] = null
     }
+
     commit() {
         if (this.state !== ROBOT_STATE_CONTROL) throw "Robot can commit only during " + ROBOT_STATE_CONTROL
 
         this.state = ROBOT_STATE_COMMIT
     }
+
     _buildDeck(cards) {
         let deck = []
         cards.forEach(card => {
@@ -226,11 +239,12 @@ class Robot {
 
         return this._shuffleCards(deck)
     }
+
     _shuffleCards(cards) {
         return cards
-            .map(card => ({ card, sort: this._randomGenerator.nextRandom() }))
+            .map(card => ({card, sort: this._randomGenerator.nextRandom()}))
             .sort((a, b) => a.sort - b.sort)
-            .map(({ card }) => card)
+            .map(({card}) => card)
     }
 }
 
@@ -238,9 +252,11 @@ class Bodypart {
     constructor(health) {
         this.health = health
     }
+
     get health() {
         return this._health
     }
+
     set health(health) {
         this._health = Math.max(0, health)
     }
@@ -251,14 +267,17 @@ class Hand {
     isAttacking = false
     isBlocked = false
     isCharged = false
+
     constructor(position, min, max) {
         this.min = min
         this.max = max
         this.position = position
     }
+
     get position() {
         return this._position
     }
+
     set position(position) {
         this._position = Math.max(this.min, Math.min(position, this.max))
     }
@@ -311,13 +330,17 @@ class RandomGenerator {
         h2 = Math.imul(h4 ^ (h2 >>> 22), 2869860233);
         h3 = Math.imul(h1 ^ (h3 >>> 17), 951274213);
         h4 = Math.imul(h2 ^ (h4 >>> 19), 2716044179);
-        return [(h1^h2^h3^h4)>>>0, (h2^h1)>>>0, (h3^h1)>>>0, (h4^h1)>>>0];
+        return [(h1 ^ h2 ^ h3 ^ h4) >>> 0, (h2 ^ h1) >>> 0, (h3 ^ h1) >>> 0, (h4 ^ h1) >>> 0];
     }
 
     _xoshiro128ss() {
-        let t = this._seed[1] << 9, r = this._seed[0] * 5; r = (r << 7 | r >>> 25) * 9;
-        this._seed[2] ^= this._seed[0]; this._seed[3] ^= this._seed[1];
-        this._seed[1] ^= this._seed[2]; this._seed[0] ^= this._seed[3]; this._seed[2] ^= t;
+        let t = this._seed[1] << 9, r = this._seed[0] * 5;
+        r = (r << 7 | r >>> 25) * 9;
+        this._seed[2] ^= this._seed[0];
+        this._seed[3] ^= this._seed[1];
+        this._seed[1] ^= this._seed[2];
+        this._seed[0] ^= this._seed[3];
+        this._seed[2] ^= t;
         this._seed[3] = this._seed[3] << 11 | this._seed[3] >>> 21;
 
         return (r >>> 0) / 4294967296;
@@ -332,38 +355,57 @@ class RandomGenerator {
 function getAction(actionCard, robot, otherRobot) {
     if (actionCard === null) {
         return {
-            prepare: () => {},
-            do: () => {},
-            cleanup: () => {},
+            prepare: () => {
+            },
+            do: () => {
+            },
+            cleanup: () => {
+            },
         }
     }
     switch (actionCard.id) {
-        case PUNCH_CARD: return getPunchAction(robot.getHand(actionCard.hand), otherRobot)
-        case UP1: return getMoveAction(-1, robot.getHand(actionCard.hand))
-        case UP2: return getMoveAction(-2, robot.getHand(actionCard.hand))
-        case UP3: return getMoveAction(-3, robot.getHand(actionCard.hand))
-        case DOWN1: return getMoveAction(1, robot.getHand(actionCard.hand))
-        case DOWN2: return getMoveAction(2, robot.getHand(actionCard.hand))
-        case DOWN3: return getMoveAction(3, robot.getHand(actionCard.hand))
-        case CHARGE: return getChargeAction(robot.getHand(actionCard.hand))
+        case PUNCH_CARD:
+            return getPunchAction(robot.getHand(actionCard.hand), otherRobot)
+        case UP1:
+            return getMoveAction(-1, robot.getHand(actionCard.hand))
+        case UP2:
+            return getMoveAction(-2, robot.getHand(actionCard.hand))
+        case UP3:
+            return getMoveAction(-3, robot.getHand(actionCard.hand))
+        case DOWN1:
+            return getMoveAction(1, robot.getHand(actionCard.hand))
+        case DOWN2:
+            return getMoveAction(2, robot.getHand(actionCard.hand))
+        case DOWN3:
+            return getMoveAction(3, robot.getHand(actionCard.hand))
+        case CHARGE:
+            return getChargeAction(robot.getHand(actionCard.hand))
     }
     return {
-        prepare: () => {},
+        prepare: () => {
+        },
         do: () => console.warn("Unknown action card " + actionCard.id),
-        cleanup: () => {},
+        cleanup: () => {
+        },
     }
 }
+
 /**
  * @param {number} amount
  * @param {Hand} hand
  */
 function getMoveAction(amount, hand) {
     return {
-        prepare: () => { hand.position += amount },
-        do: () => {},
-        cleanup: () => {},
+        prepare: () => {
+            hand.position += amount
+        },
+        do: () => {
+        },
+        cleanup: () => {
+        },
     }
 }
+
 /**
  * @param {Hand} hand
  * @param {Robot} otherRobot
@@ -390,6 +432,7 @@ function getPunchAction(hand, otherRobot) {
         },
     }
 }
+
 /**
  * @param {Hand} hand
  */
@@ -399,7 +442,9 @@ function getChargeAction(hand) {
             hand.isBlocking = false
             hand.isCharged = true
         },
-        do: () => {},
-        cleanup: () => {},
+        do: () => {
+        },
+        cleanup: () => {
+        },
     }
 }

@@ -128,7 +128,7 @@ class RobotRender {
     }
 
     /**
-     * @param {Robot} robot 
+     * @param {Robot} robot
      */
     render(robot) {
         this.renderRobot(robot);
@@ -320,9 +320,9 @@ class RandobotController {
             },
             () => {
                 this.possibleHandCardIndexes = this.possibleHandCardIndexes
-                    .map(i => ({ i, sort: this._randomGenerator.nextRandom() }))
+                    .map(i => ({i, sort: this._randomGenerator.nextRandom()}))
                     .sort((a, b) => a.sort - b.sort)
-                    .map(({ i }) => i)
+                    .map(({i}) => i)
 
                 this.robot.chooseAction(this.possibleHandCardIndexes.pop(), this.currentActionIndex++)
 
@@ -358,6 +358,7 @@ class ChangeCache {
     constructor(object) {
         this.lastJson = object !== undefined ? JSON.stringify(object) : ''
     }
+
     ifChanged(object, callback) {
         const json = JSON.stringify(object)
         if (json !== this.lastJson) {
