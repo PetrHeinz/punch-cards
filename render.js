@@ -177,7 +177,7 @@ class DirectRobotController {
         this.render = robotRender
 
         this.render.actionCards.addEventListener("click", (event) => {
-            event.preventDefault()
+            if (this.robot.state !== ROBOT_STATE_CONTROL) return
             if (event.target === this.render.actionCards) return
 
             const actionCardIndex = getChildIndex(this.render.actionCards, event.target)
@@ -205,7 +205,7 @@ class DirectRobotController {
         })
 
         this.render.handCards.addEventListener("click", (event) => {
-            event.preventDefault()
+            if (this.robot.state !== ROBOT_STATE_CONTROL) return
             if (event.target === this.render.handCards) return
 
             const handCardIndex = getChildIndex(this.render.handCards, event.target)
@@ -227,6 +227,7 @@ class DirectRobotController {
         })
 
         this.render.readyButton.addEventListener("click", () => {
+            if (this.robot.state !== ROBOT_STATE_CONTROL) return
             this.robot.commit()
             this.render.render(this.robot)
             this.selectCard(ROBOT_CARDS_NONE)
@@ -241,9 +242,9 @@ class DirectRobotController {
             this.render.handCards.children[handCardIndex].classList.toggle("used", handCardUsed)
         }
 
-        this.render.actionCards.style.cursor = "pointer"
-        this.render.handCards.style.cursor = "pointer"
-        this.render.readyButton.style.cursor = this.render.readyButton.classList.contains("pushed") ? "" : "pointer"
+        this.render.actionCards.style.cursor = this.robot.state === ROBOT_STATE_CONTROL ? "pointer" : ""
+        this.render.handCards.style.cursor = this.robot.state === ROBOT_STATE_CONTROL ? "pointer" : ""
+        this.render.readyButton.style.cursor = this.robot.state === ROBOT_STATE_CONTROL ? "pointer" : ""
     }
 
     selectCard(selected, selectedIndex) {
