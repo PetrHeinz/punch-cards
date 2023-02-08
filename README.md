@@ -3,9 +3,12 @@
 A JS game prototype, to be done in 10 days.
 
 Features:
-- tactical 1v1 card game
 - two robots fist-fight each other to disassembly
-- turn-based, each player plays concurrently
-- quick play
-- drawn cards are known to both players
-- multiplayer on a shared screen controlled via phones
+- tactical 1v1 card game
+- turn-based, both players play at the same time
+- quick play with optional timer _(not yet implemented)_
+- cards in hand are known to both players
+- multiplayer on a shared screen controlled via phones _(not yet implemented)_
+- bot support
+
+**Play at [petrheinz.github.io/punch-cards](https://petrheinz.github.io/punch-cards/)!**
