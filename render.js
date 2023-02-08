@@ -250,9 +250,11 @@ class RandobotController {
 
     /**
      * @param {Robot} robot
+     * @param {?string} randomSeedString
      */
-    constructor(robot) {
+    constructor(robot, randomSeedString) {
         this.robot = robot
+        this._randomGenerator = new RandomGenerator(randomSeedString);
     }
 
     /**
@@ -275,13 +277,13 @@ class RandobotController {
         const phases = [
             () => {
                 this.render.actionCards.style.visibility = "hidden"
-                this.possibleHandCardIndexes = [0,1,2,3,4]
+                this.possibleHandCardIndexes = [...this.robot.actionCards.keys()]
 
                 return true
             },
             () => {
                 this.possibleHandCardIndexes = this.possibleHandCardIndexes
-                    .map(i => ({ i, sort: Math.random() }))
+                    .map(i => ({ i, sort: this._randomGenerator.nextRandom() }))
                     .sort((a, b) => a.sort - b.sort)
                     .map(({ i }) => i)
 
@@ -290,7 +292,7 @@ class RandobotController {
                 return this.possibleHandCardIndexes.length === 0 || this.currentActionIndex >= this.robot.actionCards.length
             },
             () => {
-                if (Math.random() > .5) {
+                if (this._randomGenerator.nextRandom() > .5) {
                     this.robot.toggleActionHand(this.currentToggleIndex)
                 }
                 this.currentToggleIndex++

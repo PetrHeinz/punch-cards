@@ -1,8 +1,10 @@
-let game = new Game()
+const randomSeedString = "punch-cards"
+
+let game = new Game(randomSeedString)
 let gameRender = new GameRender(
     document.getElementById('game'),
     new DirectRobotController(game.leftRobot),
-    new RandobotController(game.rightRobot),
+    new RandobotController(game.rightRobot, randomSeedString),
 )
 
 gameRender.render(game)
