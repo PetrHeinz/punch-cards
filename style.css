@@ -152,6 +152,10 @@
     cursor: pointer;
 }
 
+.card.used {
+    color: grey;
+    border-color: darkgrey;
+}
 .card.selected {
     border-color: red;
 }

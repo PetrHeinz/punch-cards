@@ -193,7 +193,11 @@ class DirectRobotController {
                 this.selectCard(ROBOT_CARDS_NONE)
                 return
             }
-            if (this.selected === ROBOT_CARDS_ACTION && actionCardIndex === this.selectedIndex) {
+            if (this.selected === ROBOT_CARDS_ACTION) {
+                if (actionCardIndex !== this.selectedIndex) {
+                    this.robot.swapActions(actionCardIndex, this.selectedIndex)
+                    this.render.render(this.robot)
+                }
                 this.selectCard(ROBOT_CARDS_NONE)
                 return
             }
@@ -206,7 +210,11 @@ class DirectRobotController {
 
             const handCardIndex = getChildIndex(this.render.handCards, event.target)
             if (this.selected === ROBOT_CARDS_ACTION) {
-                this.robot.chooseAction(handCardIndex, this.selectedIndex)
+                if (this.robot.actionCards[this.selectedIndex] === this.robot.handCards[handCardIndex]) {
+                    this.robot.discardAction(this.selectedIndex)
+                } else {
+                    this.robot.chooseAction(handCardIndex, this.selectedIndex)
+                }
                 this.render.render(this.robot)
                 this.selectCard(ROBOT_CARDS_NONE)
                 return
@@ -227,6 +235,11 @@ class DirectRobotController {
 
     afterRender() {
         this.selectCard(this.selected, this.selectedIndex)
+
+        for (const handCardIndex in this.robot.handCards) {
+            const handCardUsed = this.robot.actionCards.indexOf(this.robot.handCards[handCardIndex]) >= 0
+            this.render.handCards.children[handCardIndex].classList.toggle("used", handCardUsed)
+        }
     }
 
     selectCard(selected, selectedIndex) {

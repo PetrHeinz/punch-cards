@@ -175,6 +175,22 @@ class Robot {
         this.actionCards[actionIndex] = chosenCard
         this.actionCards[actionIndex].hand = hand ?? this.actionCards[actionIndex].hand ?? ROBOT_HAND_RIGHT
     }
+    swapActions(firstActionIndex, secondActionIndex) {
+        if (this.state !== ROBOT_STATE_CONTROL) throw "Robot can swap actions only during " + ROBOT_STATE_CONTROL
+
+        if (this.actionCards[firstActionIndex] === undefined) {
+            console.debug('actions:', this.actionCards)
+            throw "Undefined action index " + firstActionIndex
+        }
+        if (this.actionCards[secondActionIndex] === undefined) {
+            console.debug('actions:', this.actionCards)
+            throw "Undefined action index " + secondActionIndex
+        }
+
+        const swappedActionCard = this.actionCards[firstActionIndex]
+        this.actionCards[firstActionIndex] = this.actionCards[secondActionIndex]
+        this.actionCards[secondActionIndex] = swappedActionCard
+    }
     toggleActionHand(actionIndex) {
         if (this.state !== ROBOT_STATE_CONTROL) throw "Robot can choose action hand only during " + ROBOT_STATE_CONTROL
 
