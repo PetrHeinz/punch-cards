@@ -10,9 +10,8 @@ body {
     background-color: lightslategray;
 }
 
-.game {
+.menu, .game {
     position: relative;
-    display: flex;
     height: calc(20 * var(--unit));
     width: calc(20 * var(--unit));
     margin: 5vh auto;
@@ -25,6 +24,54 @@ body {
     font-family: monospace;
     font-size: var(--fontsize);
     user-select: none;
+}
+.game {
+    display: flex;
+}
+
+.menu-upper {
+    z-index: 10;
+    position: absolute;
+    top: 0;
+    display: flex;
+    width: calc(100% - var(--unit) / 2);
+    padding: 0 calc(var(--unit) / 4);
+    justify-content: space-between;
+    line-height: var(--unit);
+    font-size: 150%;
+    color: darkslategray;
+}
+
+.line {
+    display: block;
+    line-height: var(--unit);
+    margin-left: calc(1.25 * var(--unit));
+    font-size: 150%;
+}
+h1.line {
+    margin-left: 0;
+    line-height: calc(3 * var(--unit));
+    text-align: center;
+    font-size: 600%;
+    font-weight: bold;
+}
+
+.input {
+    border-style: none;
+    font-size: inherit;
+    font-family: inherit;
+    font-weight: bold;
+    color: red;
+    background-color: transparent;
+}
+
+.controller-left, .controller-right {
+    margin-left: calc(2.25 * var(--unit));
+    cursor: pointer;
+}
+.controller-left.selected, .controller-right.selected {
+    font-weight: bold;
+    color: red;
 }
 
 .side {
@@ -190,6 +237,13 @@ body {
     color: black;
 }
 
+.clickable {
+    cursor: pointer;
+}
+.clickable:hover {
+    color: red;
+}
+
 .button {
     width: fit-content;
     --button-height: calc(1.5 * var(--unit) - 2 * var(--border) - 2 * var(--margin) - 1px);
@@ -205,4 +259,5 @@ body {
 .button.pushed {
     color: grey;
     border-color: darkgrey;
+    cursor: inherit;
 }

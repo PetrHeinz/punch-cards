@@ -6,10 +6,23 @@ class GameRender {
         const game = document.createElement('div')
         game.classList.add('game')
 
+        this.menu = document.createElement("div")
+        this.menu.classList.add("menu-upper")
+        game.append(this.menu)
+
         this.leftRobot = new RobotRender(game, 'left', leftController)
         this.rightRobot = new RobotRender(game, 'right', rightController)
 
         root.append(game)
+    }
+
+    addMenuButton(text, callback) {
+        let button = document.createElement("div")
+        button.classList.add("clickable")
+        button.textContent = text
+        button.addEventListener("click", () => callback())
+
+        this.menu.append(button)
     }
 
     /**
@@ -244,7 +257,7 @@ class DirectRobotController {
 
         this.render.actionCards.style.cursor = this.robot.state === ROBOT_STATE_CONTROL ? "pointer" : ""
         this.render.handCards.style.cursor = this.robot.state === ROBOT_STATE_CONTROL ? "pointer" : ""
-        this.render.readyButton.style.cursor = this.robot.state === ROBOT_STATE_CONTROL ? "pointer" : ""
+        this.render.readyButton.classList.toggle("clickable", this.robot.state === ROBOT_STATE_CONTROL)
     }
 
     selectCard(selected, selectedIndex) {
@@ -287,9 +300,10 @@ class RandobotController {
         if (this.render !== undefined) throw "This controller has already been initialized"
         this.render = robotRender
 
-        setInterval(() => {
+        const interval = setInterval(() => {
             if (this.robot.state === ROBOT_STATE_CONTROL) this.doAction()
             if (this.robot.state === ROBOT_STATE_ACTION) this.render.actionCards.style.visibility = ""
+            if (this.robot.state === ROBOT_STATE_WINNER || this.robot.state === ROBOT_STATE_DEAD) clearInterval(interval)
         }, 200)
     }
 
