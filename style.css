@@ -31,6 +31,13 @@
     height: calc(10 * var(--unit));
 }
 
+.state {
+    width: 100%;
+    text-align: center;
+    line-height: calc(2 * var(--unit));
+    font-size: 2vmin;
+}
+
 .bodypart {
     position: absolute;
     --up: 0;

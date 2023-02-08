@@ -13,7 +13,7 @@ setInterval(() => {
     gameRender.render(game)
 }, 1000)
 
-// TODO: think of a better solution, this should be handled by events or someting...
+// TODO: think of a better solution, this should be handled by events or something...
 setInterval(() => {
     gameRender.renderRobots(game)
 }, 100)

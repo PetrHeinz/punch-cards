@@ -40,6 +40,10 @@ class RobotRender {
         const robot = document.createElement('div')
         robot.classList.add('robot')
 
+        this.state = document.createElement('div')
+        this.state.classList.add('state')
+        robot.append(this.state)
+
         this.head = this.initBodypart(robot, 'head')
         this.torso = this.initBodypart(robot, 'torso')
         this.heatsink = this.initBodypart(robot, 'heatsink')
@@ -133,6 +137,7 @@ class RobotRender {
     renderRobot(robot) {
         this.robot = robot
 
+        this.state.textContent = robot.state
         this.head.textContent = robot.head.health
         this.torso.textContent = robot.torso.health
         this.heatsink.textContent = robot.heatsink.health
