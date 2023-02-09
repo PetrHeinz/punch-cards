@@ -2,12 +2,39 @@
     --unit: 4vmin;
     --border: .5vmin;
     --margin: .2vmin;
-    --gridcolor: silver;
-    --fontsize: 1.5vmin
+    --fontsize: 1.5vmin;
+
+    --color-active-text: red;
+    --color-bg: lightslategray;
+    --color-bodypart-border: black;
+    --color-bodypart-text: black;
+    --color-button-bg: white;
+    --color-button-border-inactive: darkgrey;
+    --color-button-border: black;
+    --color-button-text-hover: red;
+    --color-button-text-inactive: grey;
+    --color-button-text: black;
+    --color-card-bg: white;
+    --color-card-border-selected: red;
+    --color-card-border-used: darkgrey;
+    --color-card-border: grey;
+    --color-card-hand-left-text: navy;
+    --color-card-hand-right-text: maroon;
+    --color-card-hand-text-hover: black;
+    --color-card-text-used: grey;
+    --color-card-text: black;
+    --color-clickable-text-hover: red;
+    --color-game-border: black;
+    --color-grid-bg: white;
+    --color-grid: silver;
+    --color-hand-left-border: navy;
+    --color-hand-right-border: maroon;
+    --color-header-menu-text-hover: red;
+    --color-header-menu-text: darkslategray;
 }
 
 body {
-    background-color: lightslategray;
+    background-color: var(--color-bg);
 }
 
 .menu, .game {
@@ -15,12 +42,12 @@ body {
     height: calc(20 * var(--unit));
     width: calc(20 * var(--unit));
     margin: 5vh auto;
-    border: calc(2 * var(--border)) solid black;
+    border: calc(2 * var(--border)) solid var(--color-game-border);
     border-radius: calc(var(--unit) / 2);
     background-size: var(--unit) var(--unit);
     background-image:
-        linear-gradient(to right, var(--gridcolor) 1px, transparent 1px),
-        linear-gradient(to bottom, var(--gridcolor) 1px, white 1px);
+        linear-gradient(to right, var(--color-grid) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--color-grid) 1px, var(--color-grid-bg) 1px);
     font-family: monospace;
     font-size: var(--fontsize);
     user-select: none;
@@ -39,7 +66,13 @@ body {
     justify-content: space-between;
     line-height: var(--unit);
     font-size: 150%;
-    color: darkslategray;
+    color: var(--color-header-menu-text);
+}
+.menu-upper .clickable {
+    cursor: pointer;
+}
+.menu-upper .clickable:hover {
+    color: var(--color-header-menu-text-hover);
 }
 
 .line {
@@ -61,7 +94,7 @@ h1.line {
     font-size: inherit;
     font-family: inherit;
     font-weight: bold;
-    color: red;
+    color: var(--color-active-text);
     background-color: transparent;
 }
 
@@ -71,7 +104,7 @@ h1.line {
 }
 .controller-left.selected, .controller-right.selected {
     font-weight: bold;
-    color: red;
+    color: var(--color-active-text);
 }
 
 .side {
@@ -104,7 +137,7 @@ h1.line {
     --width: 2;
     height: calc(var(--height) * var(--unit) - 2 * var(--border) - 2 * var(--margin) - 1px);
     width: calc(var(--width) * var(--unit) - 2 * var(--border) - 2 * var(--margin) - 1px);
-    border: var(--border) solid black;
+    border: var(--border) solid var(--color-bodypart-border);
     border-radius: calc(var(--unit) / 4);
     text-align: center;
     padding: var(--margin);
@@ -114,6 +147,7 @@ h1.line {
         450ms ease-in-out right,
         450ms ease-in-out top,
         450ms ease-in-out bottom;
+    color: var(--color-bodypart-text)
 }
 
 .side.right .bodypart {
@@ -141,10 +175,10 @@ h1.line {
 }
 
 .hand.right {
-    border-color: maroon;
+    border-color: var(--color-hand-right-border);
 }
 .hand.left {
-    border-color: navy;
+    border-color: var(--color-hand-left-border);
 }
 
 .hand.blocking {
@@ -203,19 +237,20 @@ h1.line {
     height: var(--card-height);
     width: calc(1.8 * var(--unit) - 2 * var(--border) - 2 * var(--margin) - 1px);
     margin: calc(.5 * var(--unit)) var(--margin);
-    border: var(--border) solid grey;
+    border: var(--border) solid var(--color-card-border);
     border-radius: calc(var(--unit) / 4);
     line-height: calc(var(--card-height) / 3);
     text-align: center;
-    background-color: white;
+    background-color: var(--color-card-bg);
+    color: var(--color-card-text);
 }
 
 .card.used {
-    color: grey;
-    border-color: darkgrey;
+    color: var(--color-card-text-used);
+    border-color: var(--color-card-border-used);
 }
 .card.selected {
-    border-color: red;
+    border-color: var(--color-card-border-selected);
 }
 
 .hand-toggle {
@@ -228,20 +263,13 @@ h1.line {
     text-align: center;
 }
 .hand-toggle.right {
-    color: maroon;
+    color: var(--color-card-hand-right-text);
 }
 .hand-toggle.left {
-    color: navy;
+    color: var(--color-card-hand-left-text);
 }
 .hand-toggle:hover {
-    color: black;
-}
-
-.clickable {
-    cursor: pointer;
-}
-.clickable:hover {
-    color: red;
+    color: var(--color-card-hand-text-hover);
 }
 
 .button {
@@ -250,14 +278,21 @@ h1.line {
     height: var(--button-height);
     line-height: var(--button-height);
     margin: calc(.5 * var(--unit)) auto;
-    border: var(--border) solid black;
+    border: var(--border) solid var(--color-button-border);
     border-radius: var(--unit);
     font-size: 150%;
     padding: 0 calc(.5 * var(--unit));
-    background-color: white;
+    background-color: var(--color-button-bg);
+    color: var(--color-button-text)
 }
 .button.pushed {
-    color: grey;
-    border-color: darkgrey;
+    color: var(--color-button-text-inactive);
+    border-color: var(--color-button-border-inactive);
     cursor: inherit;
+}
+.button.clickable {
+    cursor: pointer;
+}
+.button.clickable:hover {
+    color: var(--color-button-text-hover);
 }
