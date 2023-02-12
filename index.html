@@ -10,10 +10,13 @@
 
 <body>
     <div id="game"></div>
-    <script src="cards.js"></script>
-    <script src="game.js"></script>
-    <script src="render.js"></script>
-    <script src="app.js"></script>
+    <script>
+        import("./app.js").then((module) => {
+            const application = new module.default(document.getElementById('game'))
+
+            application.showMenu()
+        })
+    </script>
 </body>
 
 </html>

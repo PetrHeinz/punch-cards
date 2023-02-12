@@ -1,4 +1,13 @@
-class GameRender {
+import {
+    RandomGenerator,
+    ROBOT_HAND_RIGHT,
+    ROBOT_STATE_ACTION,
+    ROBOT_STATE_CONTROL,
+    ROBOT_STATE_DEAD,
+    ROBOT_STATE_WINNER
+} from "./game.js";
+
+export default class GameRender {
     constructor(root, leftController, rightController) {
         if (root.children.length > 0) {
             throw "Root element is not empty"
@@ -39,7 +48,7 @@ class GameRender {
     }
 }
 
-class RobotRender {
+export class RobotRender {
     constructor(root, extraClass, controller) {
         this.controller = controller
 
@@ -167,11 +176,11 @@ class RobotRender {
     }
 }
 
-ROBOT_CARDS_ACTION = "ACTION"
-ROBOT_CARDS_HAND = "HAND"
-ROBOT_CARDS_NONE = "NONE"
+export const ROBOT_CARDS_ACTION = "ACTION"
+export const ROBOT_CARDS_HAND = "HAND"
+export const ROBOT_CARDS_NONE = "NONE"
 
-class DirectRobotController {
+export class DirectRobotController {
     selected = ROBOT_CARDS_NONE
     selectedIndex = 0
 
@@ -278,7 +287,7 @@ class DirectRobotController {
     }
 }
 
-class RandobotController {
+export class RandobotController {
     currentActionIndex = 0
     possibleHandCardIndexes = []
     currentToggleIndex = 0

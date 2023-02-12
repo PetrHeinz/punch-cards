@@ -1,16 +1,16 @@
-const PUNCH_CARD = "punch_card"
-const UP1 = "up1"
-const UP2 = "up2"
-const UP3 = "up3"
-const DOWN1 = "down1"
-const DOWN2 = "down2"
-const DOWN3 = "down3"
-const CHARGE = "charge"
-const GRAB = "grab"
-const DISRUPT = "disrupt"
-const REPAIR = "repair"
+export const PUNCH_CARD = "punch_card"
+export const UP1 = "up1"
+export const UP2 = "up2"
+export const UP3 = "up3"
+export const DOWN1 = "down1"
+export const DOWN2 = "down2"
+export const DOWN3 = "down3"
+export const CHARGE = "charge"
+export const GRAB = "grab"
+export const DISRUPT = "disrupt"
+export const REPAIR = "repair"
 
-const CARDS = [
+export const CARDS = [
     {
         id: PUNCH_CARD,
         icon: "👊",

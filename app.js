@@ -1,4 +1,7 @@
-class Application {
+import GameRender, {DirectRobotController, RandobotController} from "./render.js";
+import Game from "./game.js";
+
+export default class Application {
     intervals = []
     randomSeedString = "punch-cards"
     controllers = [
@@ -127,7 +130,3 @@ class Application {
         this.root.innerHTML = ''
     }
 }
-
-const application = new Application(document.getElementById('game'))
-
-application.showMenu()

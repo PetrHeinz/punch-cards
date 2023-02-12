@@ -1,10 +1,12 @@
-class Game {
+import {CARDS, CHARGE, DOWN1, DOWN2, DOWN3, PUNCH_CARD, UP1, UP2, UP3} from "./cards.js";
+
+export default class Game {
     currentAction = 0
 
     constructor(randomSeedString) {
         randomSeedString = randomSeedString ?? RandomGenerator.randomSeedString(32)
-        this.leftRobot = new Robot(CARDS, new RandomGenerator(randomSeedString + "-left"))
-        this.rightRobot = new Robot(CARDS, new RandomGenerator(randomSeedString + "-right"))
+        this.leftRobot = new Robot(CARDS, new RandomGenerator(`${randomSeedString}-left`))
+        this.rightRobot = new Robot(CARDS, new RandomGenerator(`${randomSeedString}-right`))
     }
 
     isOver() {
@@ -82,17 +84,17 @@ class Game {
     }
 }
 
-const ROBOT_STATE_CONTROL = "WAITING_FOR_INPUT"
-const ROBOT_STATE_COMMIT = "INPUT_ACCEPTED"
-const ROBOT_STATE_ACTION = "ACTION"
-const ROBOT_STATE_PREPARE = "PREPARING"
-const ROBOT_STATE_DEAD = "DISASSEMBLED"
-const ROBOT_STATE_WINNER = "WINNER"
+export const ROBOT_STATE_CONTROL = "WAITING_FOR_INPUT"
+export const ROBOT_STATE_COMMIT = "INPUT_ACCEPTED"
+export const ROBOT_STATE_ACTION = "ACTION"
+export const ROBOT_STATE_PREPARE = "PREPARING"
+export const ROBOT_STATE_DEAD = "DISASSEMBLED"
+export const ROBOT_STATE_WINNER = "WINNER"
 
-const ROBOT_HAND_RIGHT = "RIGHT"
-const ROBOT_HAND_LEFT = "LEFT"
+export const ROBOT_HAND_RIGHT = "RIGHT"
+export const ROBOT_HAND_LEFT = "LEFT"
 
-class Robot {
+export class Robot {
     state = ROBOT_STATE_PREPARE
     discardedCards = []
     handCards = []
@@ -248,7 +250,7 @@ class Robot {
     }
 }
 
-class Bodypart {
+export class Bodypart {
     constructor(health) {
         this.health = health
     }
@@ -262,7 +264,7 @@ class Bodypart {
     }
 }
 
-class Hand {
+export class Hand {
     isBlocking = true
     isAttacking = false
     isBlocked = false
@@ -286,7 +288,7 @@ class Hand {
 /**
  * @see https://stackoverflow.com/questions/521295/seeding-the-random-number-generator-in-javascript
  */
-class RandomGenerator {
+export class RandomGenerator {
     /**
      * @param {?string} seedString
      */
