@@ -1,6 +1,8 @@
-import GameRender, {DirectRobotController, RandobotController} from "./render.js";
+import GameRender from "./render.js";
 import Game from "./game.js";
 import {EventManager} from "./events.js";
+import DirectRobotController from "./directRobotController.js";
+import RandobotController from "./randobotController.js";
 
 export default class Application {
     randomSeedString = "punch-cards"
