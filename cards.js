@@ -1,87 +1,108 @@
-export const BLANK = "blank"
-export const PUNCH_CARD = "punch_card"
-export const UP1 = "up1"
-export const UP2 = "up2"
-export const UP3 = "up3"
-export const DOWN1 = "down1"
-export const DOWN2 = "down2"
-export const DOWN3 = "down3"
-export const CHARGE = "charge"
-export const GRAB = "grab"
-export const DISRUPT = "disrupt"
-export const REPAIR = "repair"
-
 export const CARDS = [
     {
-        id: PUNCH_CARD,
         icon: "👊",
         name: "Punch card",
         count: 6,
+        getAction: punchAction(),
     },
     {
-        id: UP1,
         icon: "👆",
         name: "Up",
-        count: 3
+        count: 3,
+        getAction: moveAction(-1),
     },
     {
-        id: UP2,
         icon: "👆👆",
         name: "Uup",
-        count: 2
+        count: 2,
+        getAction: moveAction(-2),
     },
     {
-        id: UP3,
         icon: "👆👆👆",
         name: "Uuup",
-        count: 1
+        count: 1,
+        getAction: moveAction(-3),
     },
     {
-        id: DOWN1,
         icon: "👇",
         name: "Down",
-        count: 3
+        count: 3,
+        getAction: moveAction(1),
     },
     {
-        id: DOWN2,
         icon: "👇👇",
         name: "Doown",
-        count: 2
+        count: 2,
+        getAction: moveAction(2),
     },
     {
-        id: DOWN3,
         icon: "👇👇👇",
         name: "Dooown",
-        count: 1
+        count: 1,
+        getAction: moveAction(3),
     },
     {
-        id: CHARGE,
         icon: "💥",
         name: "Charge",
-        count: 2
+        count: 2,
+        getAction: getCharge(),
     },
-    // {
-    //     id: DISRUPT,
-    //     icon: "💨",
-    //     name: "Disrupt",
-    //     count: 1
-    // },
-    // {
-    //     id: GRAB,
-    //     icon: "🖐",
-    //     name: "Grab",
-    //     count: 1
-    // },
-    // {
-    //     id: REPAIR,
-    //     icon: "🔧",
-    //     name: "Repair",
-    //     count: 1
-    // },
 ];
 
 export const BLANK_CARD = {
-    id: BLANK,
     icon: "📄",
     name: "Blank",
+    getAction: () => ({
+        prepare: () => {},
+        do: () => {},
+        cleanup: () => {},
+    })
+}
+
+function moveAction(amount) {
+    return (hand) => ({
+        prepare: () => {
+            hand.position += amount
+        },
+        do: () => {
+        },
+        cleanup: () => {
+        },
+    })
+}
+
+function punchAction() {
+    return (hand, thisRobot, otherRobot) => ({
+        prepare: () => {
+            hand.isBlocking = false
+            hand.isAttacking = true
+        },
+        do: () => {
+            const baseDamage = 10;
+            const blockedDamage = 8;
+            const blockingHandsCount = otherRobot.getHandsBlockingAt(hand.position).length;
+            hand.isBlocked = blockingHandsCount > 0
+            const damage = Math.max(0, baseDamage - blockingHandsCount * blockedDamage)
+            otherRobot.getBodypartAt(hand.position).health -= hand.isCharged ? 3 * damage : damage
+        },
+        cleanup: () => {
+            hand.isBlocked = false
+            hand.isBlocking = true
+            hand.isAttacking = false
+            hand.isCharged = false
+        },
+    })
+}
+
+function getCharge() {
+    return (hand) => ({
+        prepare: () => {
+            hand.isBlocking = false
+            hand.isCharged = true
+        },
+        do: () => {
+        },
+        cleanup: () => {
+        },
+    })
 }

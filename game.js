@@ -1,4 +1,4 @@
-import {BLANK, BLANK_CARD, CARDS, CHARGE, DOWN1, DOWN2, DOWN3, PUNCH_CARD, UP1, UP2, UP3} from "./cards.js";
+import {BLANK_CARD, CARDS} from "./cards.js";
 
 export default class Game {
     currentAction = 0
@@ -59,7 +59,7 @@ export default class Game {
 
         if (this.leftRobot.state === ROBOT_STATE_ACTION) {
             if (this.leftRobot.actions[this.currentAction] !== undefined) {
-                actions.push(getAction(this.leftRobot.actions[this.currentAction], this.leftRobot, this.rightRobot))
+                actions.push(this.leftRobot.actions[this.currentAction].getAction(this.leftRobot, this.rightRobot))
             } else {
                 this.leftRobot.state = this.leftRobot.isDestroyed() ? ROBOT_STATE_DEAD : ROBOT_STATE_PREPARE
             }
@@ -67,7 +67,7 @@ export default class Game {
 
         if (this.rightRobot.state === ROBOT_STATE_ACTION) {
             if (this.rightRobot.actions[this.currentAction] !== undefined) {
-                actions.push(getAction(this.rightRobot.actions[this.currentAction], this.rightRobot, this.leftRobot))
+                actions.push(this.rightRobot.actions[this.currentAction].getAction(this.rightRobot, this.leftRobot))
             } else {
                 this.rightRobot.state = this.rightRobot.isDestroyed() ? ROBOT_STATE_DEAD : ROBOT_STATE_PREPARE
             }
@@ -98,11 +98,7 @@ export class Robot {
     state = ROBOT_STATE_PREPARE
     discardedCards = []
     handCards = []
-    actions = [
-        {card: {...BLANK_CARD}, hand: ROBOT_HAND_RIGHT},
-        {card: {...BLANK_CARD}, hand: ROBOT_HAND_RIGHT},
-        {card: {...BLANK_CARD}, hand: ROBOT_HAND_RIGHT},
-    ]
+    actions = [new Action(), new Action(), new Action()]
 
     constructor(cards, randomGenerator) {
         this._randomGenerator = randomGenerator;
@@ -152,7 +148,7 @@ export class Robot {
     drawHand() {
         if (this.state !== ROBOT_STATE_PREPARE) throw "Robot can draw hand only during " + ROBOT_STATE_PREPARE
 
-        this.actions.forEach(action => action.card = {...BLANK_CARD})
+        this.actions.forEach(action => action.discard())
         this.discardedCards = this.discardedCards.concat(this.handCards)
         this.handCards = []
         for (let i = 0; i < 5; i++) {
@@ -213,13 +209,13 @@ export class Robot {
             throw "Undefined action index " + actionIndex
         }
 
-        this.actions[actionIndex].hand = this.actions[actionIndex].hand === ROBOT_HAND_RIGHT ? ROBOT_HAND_LEFT : ROBOT_HAND_RIGHT
+        this.actions[actionIndex].toggleHand()
     }
 
     discardAction(actionIndex) {
         if (this.state !== ROBOT_STATE_CONTROL) throw "Robot can discard action only during " + ROBOT_STATE_CONTROL
 
-        this.actions[actionIndex].card = {...BLANK_CARD}
+        this.actions[actionIndex].discard()
     }
 
     commit() {
@@ -244,6 +240,21 @@ export class Robot {
             .map(card => ({card, sort: this._randomGenerator.nextRandom()}))
             .sort((a, b) => a.sort - b.sort)
             .map(({card}) => card)
+    }
+}
+
+export class Action {
+    card = {...BLANK_CARD}
+    hand = ROBOT_HAND_RIGHT
+
+    toggleHand() {
+        this.hand = this.hand === ROBOT_HAND_RIGHT ? ROBOT_HAND_LEFT : ROBOT_HAND_RIGHT
+    }
+    discard() {
+        this.card = {...BLANK_CARD}
+    }
+    getAction(thisRobot, otherRobot) {
+        return this.card.getAction(thisRobot.getHand(this.hand), thisRobot, otherRobot)
     }
 }
 
@@ -343,104 +354,5 @@ export class RandomGenerator {
         this._seed[3] = this._seed[3] << 11 | this._seed[3] >>> 21;
 
         return (r >>> 0) / 4294967296;
-    }
-}
-
-/**
- * @param {{card:{id:string},hand:string}} action
- * @param {Robot} robot
- * @param {Robot} otherRobot
- */
-function getAction(action, robot, otherRobot) {
-    if (action === null) {
-        return
-    }
-    switch (action.card.id) {
-        case PUNCH_CARD:
-            return getPunchAction(robot.getHand(action.hand), otherRobot)
-        case UP1:
-            return getMoveAction(-1, robot.getHand(action.hand))
-        case UP2:
-            return getMoveAction(-2, robot.getHand(action.hand))
-        case UP3:
-            return getMoveAction(-3, robot.getHand(action.hand))
-        case DOWN1:
-            return getMoveAction(1, robot.getHand(action.hand))
-        case DOWN2:
-            return getMoveAction(2, robot.getHand(action.hand))
-        case DOWN3:
-            return getMoveAction(3, robot.getHand(action.hand))
-        case CHARGE:
-            return getChargeAction(robot.getHand(action.hand))
-        case BLANK:
-            return {
-                prepare: () => {},
-                do: () => {},
-                cleanup: () => {},
-            }
-    }
-    return {
-        prepare: () => {},
-        do: () => console.warn("Unknown action card " + action.card.id),
-        cleanup: () => {},
-    }
-}
-
-/**
- * @param {number} amount
- * @param {Hand} hand
- */
-function getMoveAction(amount, hand) {
-    return {
-        prepare: () => {
-            hand.position += amount
-        },
-        do: () => {
-        },
-        cleanup: () => {
-        },
-    }
-}
-
-/**
- * @param {Hand} hand
- * @param {Robot} otherRobot
- */
-function getPunchAction(hand, otherRobot) {
-    return {
-        prepare: () => {
-            hand.isBlocking = false
-            hand.isAttacking = true
-        },
-        do: () => {
-            const baseDamage = 10;
-            const blockedDamage = 8;
-            const blockingHandsCount = otherRobot.getHandsBlockingAt(hand.position).length;
-            hand.isBlocked = blockingHandsCount > 0
-            const damage = Math.max(0, baseDamage - blockingHandsCount * blockedDamage)
-            otherRobot.getBodypartAt(hand.position).health -= hand.isCharged ? 3 * damage : damage
-        },
-        cleanup: () => {
-            hand.isBlocked = false
-            hand.isBlocking = true
-            hand.isAttacking = false
-            hand.isCharged = false
-        },
-    }
-}
-
-/**
- * @param {Hand} hand
- */
-function getChargeAction(hand) {
-    return {
-        prepare: () => {
-            hand.isBlocking = false
-            hand.isCharged = true
-        },
-        do: () => {
-        },
-        cleanup: () => {
-        },
     }
 }
