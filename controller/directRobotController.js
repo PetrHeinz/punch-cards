@@ -79,7 +79,7 @@ export default class DirectRobotController {
         this.selectCard(this.selected, this.selectedIndex)
 
         for (const handCardIndex in this.robot.handCards) {
-            const handCardUsed = this.robot.actions.indexOf(this.robot.handCards[handCardIndex]) >= 0
+            const handCardUsed = this.robot.actions.map(action => action.card).indexOf(this.robot.handCards[handCardIndex]) >= 0
             this.render.handCards.children[handCardIndex].classList.toggle("used", handCardUsed)
         }
 
