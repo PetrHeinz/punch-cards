@@ -238,7 +238,7 @@ export class Robot {
             this.actions[this.actions.map(action => action.card).indexOf(chosenCard)].discard()
         }
 
-        this.actions[actionIndex].card = chosenCard
+        this.actions[actionIndex].insertCard(chosenCard, handCardIndex)
         this._cardsInfoUpdate()
     }
 
@@ -296,26 +296,37 @@ export class Robot {
 
 export class Action {
     /** @type {Card} */
-    card = new BlankCard()
-    hand = ROBOT_HAND_RIGHT
+    _card = new BlankCard()
+    _hand = ROBOT_HAND_RIGHT
 
     get info() {
         return {
             card: this.card.info,
-            hand: this.hand,
+            hand: this._hand,
+            handCardIndex: this._handCardIndex
         }
     }
 
+    get card() {
+        return this._card
+    }
+
+    insertCard(card, handCardIndex) {
+        this._card = card
+        this._handCardIndex = handCardIndex
+    }
+
     toggleHand() {
-        this.hand = this.hand === ROBOT_HAND_RIGHT ? ROBOT_HAND_LEFT : ROBOT_HAND_RIGHT
+        this._hand = this._hand === ROBOT_HAND_RIGHT ? ROBOT_HAND_LEFT : ROBOT_HAND_RIGHT
     }
 
     discard() {
-        this.card = new BlankCard()
+        this._card = new BlankCard()
+        this._handCardIndex = undefined
     }
 
     getAction(thisRobot, otherRobot) {
-        return this.card.getAction(thisRobot.getHand(this.hand), thisRobot, otherRobot)
+        return this.card.getAction(thisRobot.getHand(this._hand), thisRobot, otherRobot)
     }
 }
 
