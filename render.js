@@ -8,7 +8,7 @@ import {
 import {RandomGenerator} from "./randomGenerator.js";
 
 export default class GameRender {
-    constructor(root, leftController, rightController) {
+    constructor(root, eventManager, leftController, rightController) {
         if (root.children.length > 0) {
             throw "Root element is not empty"
         }
@@ -23,6 +23,25 @@ export default class GameRender {
         this.rightRobot = new RobotRender(game, 'right', rightController)
 
         root.append(game)
+
+        eventManager.listen("leftRobotInfoUpdate", (leftRobotInfo) => this.leftRobot.renderRobotInfo(leftRobotInfo))
+        eventManager.listen("rightRobotInfoUpdate", (rightRobotInfo) => this.rightRobot.renderRobotInfo(rightRobotInfo))
+        eventManager.listen("leftCardsInfoUpdate", (leftCardsInfo) => this.leftRobot.renderCardsInfo(leftCardsInfo))
+        eventManager.listen("rightCardsInfoUpdate", (rightCardsInfo) => this.rightRobot.renderCardsInfo(rightCardsInfo))
+
+        eventManager.listen("actionPhaseInfoUpdate.prepare", ({leftRobotInfo, rightRobotInfo}) => {
+            this.leftRobot.renderRobotInfo(leftRobotInfo)
+            this.rightRobot.renderRobotInfo(rightRobotInfo)
+        })
+        eventManager.listen("actionPhaseInfoUpdate.do", ({leftRobotInfo, rightRobotInfo}) => setTimeout(() => {
+            this.leftRobot.renderRobotInfo(leftRobotInfo)
+            this.rightRobot.renderRobotInfo(rightRobotInfo)
+        }, 500))
+        eventManager.listen("actionPhaseInfoUpdate.cleanup", ({leftRobotInfo, rightRobotInfo}) => setTimeout(() => {
+            this.leftRobot.renderRobotInfo(leftRobotInfo)
+            this.rightRobot.renderRobotInfo(rightRobotInfo)
+        }, 550))
+        eventManager.replay()
     }
 
     addMenuButton(text, callback) {
@@ -32,19 +51,6 @@ export default class GameRender {
         button.addEventListener("click", () => callback())
 
         this.menu.append(button)
-    }
-
-    /**
-     * @param {Game} game
-     */
-    render(game) {
-        this.rightRobot.render(game.rightRobot)
-        this.leftRobot.render(game.leftRobot)
-    }
-
-    renderRobots(game) {
-        this.rightRobot.renderRobot(game.rightRobot)
-        this.leftRobot.renderRobot(game.leftRobot)
     }
 }
 
@@ -138,43 +144,40 @@ export class RobotRender {
         return cardElement
     }
 
-    /**
-     * @param {Robot} robot
-     */
-    render(robot) {
-        this.renderRobot(robot);
-
-        this._actionCardsCache.ifChanged(robot.actions, () => {
+    renderCardsInfo(cardsInfo) {
+        this._actionCardsCache.ifChanged(cardsInfo.actions, () => {
             this.actionCards.innerHTML = ''
-            robot.actions.forEach((action) => this.initAction(this.actionCards, action))
+            cardsInfo.actions.forEach((action) => this.initAction(this.actionCards, action))
         })
-        this._handCardsCache.ifChanged(robot.handCards, () => {
+        this._handCardsCache.ifChanged(cardsInfo.handCards, () => {
             this.handCards.innerHTML = ''
-            robot.handCards.forEach((card) => this.initCard(this.handCards, card))
+            cardsInfo.handCards.forEach((card) => this.initCard(this.handCards, card))
         })
-
-        this.readyButton.classList.toggle("pushed", robot.state !== ROBOT_STATE_CONTROL)
 
         this.controller.afterRender()
     }
 
-    renderRobot(robot) {
-        this.robot = robot
+    renderRobotInfo(robotInfo) {
+        this.robot = robotInfo
 
-        this.state.textContent = robot.state
-        this.head.textContent = robot.head.health
-        this.torso.textContent = robot.torso.health
-        this.heatsink.textContent = robot.heatsink.health
-        this.rightHand.style = '--up: ' + (8 - robot.rightHand.position)
-        this.rightHand.classList.toggle('blocking', robot.rightHand.isBlocking)
-        this.rightHand.classList.toggle('attacking', robot.rightHand.isAttacking)
-        this.rightHand.classList.toggle('blocked', robot.rightHand.isBlocked)
-        this.rightHand.classList.toggle('charged', robot.rightHand.isCharged)
-        this.leftHand.style = '--up: ' + (8 - robot.leftHand.position)
-        this.leftHand.classList.toggle('blocking', robot.leftHand.isBlocking)
-        this.leftHand.classList.toggle('attacking', robot.leftHand.isAttacking)
-        this.leftHand.classList.toggle('blocked', robot.leftHand.isBlocked)
-        this.leftHand.classList.toggle('charged', robot.leftHand.isCharged)
+        this.state.textContent = robotInfo.state
+        this.head.textContent = robotInfo.head.health
+        this.torso.textContent = robotInfo.torso.health
+        this.heatsink.textContent = robotInfo.heatsink.health
+        this.rightHand.style = '--up: ' + (8 - robotInfo.rightHand.position)
+        this.rightHand.classList.toggle('blocking', robotInfo.rightHand.isBlocking)
+        this.rightHand.classList.toggle('attacking', robotInfo.rightHand.isAttacking)
+        this.rightHand.classList.toggle('blocked', robotInfo.rightHand.isBlocked)
+        this.rightHand.classList.toggle('charged', robotInfo.rightHand.isCharged)
+        this.leftHand.style = '--up: ' + (8 - robotInfo.leftHand.position)
+        this.leftHand.classList.toggle('blocking', robotInfo.leftHand.isBlocking)
+        this.leftHand.classList.toggle('attacking', robotInfo.leftHand.isAttacking)
+        this.leftHand.classList.toggle('blocked', robotInfo.leftHand.isBlocked)
+        this.leftHand.classList.toggle('charged', robotInfo.leftHand.isCharged)
+
+        this.readyButton.classList.toggle("pushed", robotInfo.state !== ROBOT_STATE_CONTROL)
+
+        this.controller.afterRender()
     }
 }
 
@@ -207,20 +210,17 @@ export class DirectRobotController {
             const actionCardIndex = getChildIndex(this.render.actionCards, event.target)
             if (event.target.classList.contains("hand-toggle")) {
                 this.robot.toggleActionHand(actionCardIndex)
-                this.render.render(this.robot)
                 return
             }
 
             if (this.selected === ROBOT_CARDS_HAND) {
                 this.robot.chooseAction(this.selectedIndex, actionCardIndex)
-                this.render.render(this.robot)
                 this.selectCard(ROBOT_CARDS_NONE)
                 return
             }
             if (this.selected === ROBOT_CARDS_ACTION) {
                 if (actionCardIndex !== this.selectedIndex) {
                     this.robot.swapActions(actionCardIndex, this.selectedIndex)
-                    this.render.render(this.robot)
                 }
                 this.selectCard(ROBOT_CARDS_NONE)
                 return
@@ -239,7 +239,6 @@ export class DirectRobotController {
                 } else {
                     this.robot.chooseAction(handCardIndex, this.selectedIndex)
                 }
-                this.render.render(this.robot)
                 this.selectCard(ROBOT_CARDS_NONE)
                 return
             }
@@ -253,7 +252,6 @@ export class DirectRobotController {
         this.render.readyButton.addEventListener("click", () => {
             if (this.robot.state !== ROBOT_STATE_CONTROL) return
             this.robot.commit()
-            this.render.render(this.robot)
             this.selectCard(ROBOT_CARDS_NONE)
         })
     }
@@ -360,8 +358,6 @@ export class RandobotController {
         const hasFinishedPhase = phases[this.currentPhase]()
 
         if (hasFinishedPhase) this.currentPhase++
-
-        this.render.render(this.robot)
     }
 }
 

@@ -1,8 +1,8 @@
 import GameRender, {DirectRobotController, RandobotController} from "./render.js";
 import Game from "./game.js";
+import {EventManager} from "./events.js";
 
 export default class Application {
-    intervals = []
     randomSeedString = "punch-cards"
     controllers = [
         {
@@ -27,9 +27,12 @@ export default class Application {
     startGame() {
         this.clear()
 
-        let game = new Game(this.randomSeedString)
+        const eventManager = new EventManager()
+
+        let game = new Game(this.randomSeedString, eventManager)
         let gameRender = new GameRender(
             this.root,
+            eventManager,
             this.controllers[this.leftControllerIndex].create(game.leftRobot),
             this.controllers[this.rightControllerIndex].create(game.rightRobot),
         )
@@ -37,19 +40,7 @@ export default class Application {
         gameRender.addMenuButton("BACK_TO_MENU", () => this.showMenu())
         gameRender.addMenuButton("RESTART_GAME", () => this.startGame())
 
-        gameRender.render(game)
-
-        const gameTickInterval = setInterval(() => {
-            game.tick()
-            gameRender.render(game)
-        }, 1000);
-        this.intervals.push(gameTickInterval)
-
-        // TODO: think of a better solution, this should be handled by events or something...
-        const helperInterval = setInterval(() => {
-            gameRender.renderRobots(game)
-        }, 100);
-        this.intervals.push(helperInterval)
+        this.gameTickInterval = setInterval(() => game.tick(), 1000)
     }
 
     showMenu() {
@@ -126,7 +117,7 @@ export default class Application {
     }
 
     clear() {
-        this.intervals.forEach(interval => clearInterval(interval))
+        clearInterval(this.gameTickInterval)
         this.root.innerHTML = ''
     }
 }

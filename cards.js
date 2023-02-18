@@ -2,21 +2,32 @@ export class Card {
     icon = ""
     name = "N/A"
 
-    getAction(hand, thisRobot, otherRobot) {
+    get info() {
         return {
-            prepare: () => this._prepare(hand, thisRobot, otherRobot),
-            do: () => this._do(hand, thisRobot, otherRobot),
-            cleanup: () => this._cleanup(hand, thisRobot, otherRobot),
+            icon: this.icon,
+            name: this.name,
         }
     }
 
-    _prepare(hand, thisRobot, otherRobot) {
+    getAction(hand, thisRobot, otherRobot) {
+        return {
+            prepare: () => this._prepare(hand, thisRobot),
+            afterPrepare: () => this._afterPrepare(hand, thisRobot, otherRobot),
+            do: () => this._do(hand, thisRobot, otherRobot),
+            cleanup: () => this._cleanup(hand, thisRobot),
+        }
+    }
+
+    _prepare(hand, thisRobot) {
+    }
+
+    _afterPrepare(hand, thisRobot, otherRobot) {
     }
 
     _do(hand, thisRobot, otherRobot) {
     }
 
-    _cleanup(hand, thisRobot, otherRobot) {
+    _cleanup(hand, thisRobot) {
     }
 }
 
@@ -29,11 +40,14 @@ export class PunchCard extends Card {
         hand.isAttacking = true
     }
 
+    _afterPrepare(hand, thisRobot, otherRobot) {
+        hand.isBlocked = otherRobot.getHandsBlockingAt(hand.position).length > 0
+    }
+
     _do(hand, thisRobot, otherRobot) {
-        const baseDamage = 10;
-        const blockedDamage = 8;
-        const blockingHandsCount = otherRobot.getHandsBlockingAt(hand.position).length;
-        hand.isBlocked = blockingHandsCount > 0
+        const baseDamage = 10
+        const blockedDamage = 8
+        const blockingHandsCount = otherRobot.getHandsBlockingAt(hand.position).length
         const damage = Math.max(0, baseDamage - blockingHandsCount * blockedDamage)
         otherRobot.getBodypartAt(hand.position).health -= hand.isCharged ? 3 * damage : damage
     }

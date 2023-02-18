@@ -4,10 +4,32 @@ import {RandomGenerator} from "./randomGenerator.js";
 export default class Game {
     currentAction = 0
 
-    constructor(randomSeedString) {
+    constructor(randomSeedString, eventManager) {
         randomSeedString = randomSeedString ?? RandomGenerator.randomSeedString(32)
-        this.leftRobot = new Robot(createDeck(), new RandomGenerator(`${randomSeedString}-left`))
-        this.rightRobot = new Robot(createDeck(), new RandomGenerator(`${randomSeedString}-right`))
+        this.leftRobot = new Robot(
+            createDeck(),
+            new RandomGenerator(`${randomSeedString}-left`),
+            this._leftRobotInfoUpdate = () => eventManager.publish('leftRobotInfoUpdate', this.leftRobot.robotInfo),
+            this._leftCardsInfoUpdate = () => eventManager.publish('leftCardsInfoUpdate', this.leftRobot.cardsInfo),
+        )
+        this.rightRobot = new Robot(
+            createDeck(),
+            new RandomGenerator(`${randomSeedString}-right`),
+            this._rightRobotInfoUpdate = () => eventManager.publish('rightRobotInfoUpdate', this.rightRobot.robotInfo),
+            this._rightCardsInfoUpdate = () => eventManager.publish('rightCardsInfoUpdate', this.rightRobot.cardsInfo),
+        )
+        this._actionPhaseInfoUpdate = (phase) => eventManager.publish(
+            'actionPhaseInfoUpdate.' + phase,
+            {leftRobotInfo: this.leftRobot.robotInfo, rightRobotInfo: this.rightRobot.robotInfo}
+        )
+        let tickCounter = 0
+        this._tickUpdate = () => eventManager.publish('tick', {tickCounter: tickCounter++})
+
+        this._leftRobotInfoUpdate()
+        this._leftCardsInfoUpdate()
+        this._rightRobotInfoUpdate()
+        this._rightCardsInfoUpdate()
+        this._tickUpdate()
     }
 
     isOver() {
@@ -19,6 +41,8 @@ export default class Game {
     }
 
     tick() {
+        this._tickUpdate()
+
         if (this.isOver()) {
             console.debug("Game is already over")
             return
@@ -29,24 +53,18 @@ export default class Game {
             return
         }
 
-        if (this.leftRobot.state === ROBOT_STATE_DEAD && this.rightRobot.state === ROBOT_STATE_DEAD) {
-            console.info("Game over! Mutual annihilation!")
-        }
-
         if (this.leftRobot.state === ROBOT_STATE_PREPARE && this.rightRobot.state === ROBOT_STATE_DEAD) {
-            console.info("Game over! Left robot won!")
+            console.info("Left robot won!")
             this.leftRobot.state = ROBOT_STATE_WINNER
+            this._leftRobotInfoUpdate()
+            return
         }
 
         if (this.leftRobot.state === ROBOT_STATE_DEAD && this.rightRobot.state === ROBOT_STATE_PREPARE) {
-            console.info("Game over! Right robot won!")
+            console.info("Right robot won!")
             this.rightRobot.state = ROBOT_STATE_WINNER
-        }
-
-        if (this.leftRobot.state === ROBOT_STATE_COMMIT && this.rightRobot.state === ROBOT_STATE_COMMIT) {
-            console.info("Starting action!")
-            this.leftRobot.state = ROBOT_STATE_ACTION
-            this.rightRobot.state = ROBOT_STATE_ACTION
+            this._rightRobotInfoUpdate()
+            return
         }
 
         if (this.leftRobot.state === ROBOT_STATE_PREPARE && this.rightRobot.state === ROBOT_STATE_PREPARE) {
@@ -54,6 +72,15 @@ export default class Game {
             this.currentAction = 0
             this.leftRobot.drawHand()
             this.rightRobot.drawHand()
+            return
+        }
+
+        if (this.leftRobot.state === ROBOT_STATE_COMMIT && this.rightRobot.state === ROBOT_STATE_COMMIT) {
+            console.info("Starting action!")
+            this.leftRobot.state = ROBOT_STATE_ACTION
+            this.rightRobot.state = ROBOT_STATE_ACTION
+            this._leftRobotInfoUpdate()
+            this._rightRobotInfoUpdate()
         }
 
         let actions = []
@@ -63,6 +90,7 @@ export default class Game {
                 actions.push(this.leftRobot.actions[this.currentAction].getAction(this.leftRobot, this.rightRobot))
             } else {
                 this.leftRobot.state = this.leftRobot.isDestroyed() ? ROBOT_STATE_DEAD : ROBOT_STATE_PREPARE
+                this._leftRobotInfoUpdate()
             }
         }
 
@@ -71,14 +99,20 @@ export default class Game {
                 actions.push(this.rightRobot.actions[this.currentAction].getAction(this.rightRobot, this.leftRobot))
             } else {
                 this.rightRobot.state = this.rightRobot.isDestroyed() ? ROBOT_STATE_DEAD : ROBOT_STATE_PREPARE
+                this._rightRobotInfoUpdate()
             }
         }
 
         if (this.leftRobot.state === ROBOT_STATE_ACTION || this.rightRobot.state === ROBOT_STATE_ACTION) {
             actions.forEach(action => action.prepare())
+            actions.forEach(action => action.afterPrepare())
+            this._actionPhaseInfoUpdate('prepare')
+
             actions.forEach(action => action.do())
-            // TODO: think of a better solution, this should be Render's responsibility
-            setTimeout(() => actions.forEach(action => action.cleanup()), 500)
+            this._actionPhaseInfoUpdate('do')
+
+            actions.forEach(action => action.cleanup())
+            this._actionPhaseInfoUpdate('cleanup')
 
             this.currentAction++
         }
@@ -101,15 +135,35 @@ export class Robot {
     handCards = []
     actions = [new Action(), new Action(), new Action()]
 
-    constructor(cards, randomGenerator) {
-        this._randomGenerator = randomGenerator;
+    constructor(cards, randomGenerator, robotInfoUpdateCallback, cardsInfoUpdateCallback) {
+        this._randomGenerator = randomGenerator
+        this._robotInfoUpdate = robotInfoUpdateCallback
+        this._cardsInfoUpdate = cardsInfoUpdateCallback
         this.head = new Bodypart(40)
         this.torso = new Bodypart(80)
         this.heatsink = new Bodypart(60)
         this.rightHand = new Hand(3, 1, 7)
         this.leftHand = new Hand(5, 1, 7)
         this.deckCards = this._shuffleCards(cards)
-        this.drawHand()
+    }
+
+    get robotInfo() {
+        return {
+            state: this.state,
+            head: this.head.info,
+            torso: this.torso.info,
+            heatsink: this.heatsink.info,
+            rightHand: this.rightHand.info,
+            leftHand: this.leftHand.info,
+        }
+    }
+    get cardsInfo() {
+        return {
+            actions: this.actions.map(action => action.info),
+            handCards: this.handCards.map(card => card.info),
+            deckCardsCount: this.deckCards.length,
+            discardedCardsCount: this.discardedCards.length,
+        }
     }
 
     getHand(hand) {
@@ -159,8 +213,10 @@ export class Robot {
             }
             this.handCards.push(this.deckCards.shift())
         }
+        this._cardsInfoUpdate()
 
         this.state = ROBOT_STATE_CONTROL
+        this._robotInfoUpdate()
 
         return this.handCards
     }
@@ -183,6 +239,7 @@ export class Robot {
         }
 
         this.actions[actionIndex].card = chosenCard
+        this._cardsInfoUpdate()
     }
 
     swapActions(firstActionIndex, secondActionIndex) {
@@ -200,6 +257,7 @@ export class Robot {
         const swappedAction = this.actions[firstActionIndex]
         this.actions[firstActionIndex] = this.actions[secondActionIndex]
         this.actions[secondActionIndex] = swappedAction
+        this._cardsInfoUpdate()
     }
 
     toggleActionHand(actionIndex) {
@@ -211,18 +269,21 @@ export class Robot {
         }
 
         this.actions[actionIndex].toggleHand()
+        this._cardsInfoUpdate()
     }
 
     discardAction(actionIndex) {
         if (this.state !== ROBOT_STATE_CONTROL) throw "Robot can discard action only during " + ROBOT_STATE_CONTROL
 
         this.actions[actionIndex].discard()
+        this._cardsInfoUpdate()
     }
 
     commit() {
         if (this.state !== ROBOT_STATE_CONTROL) throw "Robot can commit only during " + ROBOT_STATE_CONTROL
 
         this.state = ROBOT_STATE_COMMIT
+        this._robotInfoUpdate()
     }
 
     _shuffleCards(cards) {
@@ -237,6 +298,13 @@ export class Action {
     /** @type {Card} */
     card = new BlankCard()
     hand = ROBOT_HAND_RIGHT
+
+    get info() {
+        return {
+            card: this.card.info,
+            hand: this.hand,
+        }
+    }
 
     toggleHand() {
         this.hand = this.hand === ROBOT_HAND_RIGHT ? ROBOT_HAND_LEFT : ROBOT_HAND_RIGHT
@@ -254,6 +322,12 @@ export class Action {
 export class Bodypart {
     constructor(health) {
         this.health = health
+    }
+
+    get info() {
+        return {
+            health: this.health,
+        }
     }
 
     get health() {
@@ -275,6 +349,16 @@ export class Hand {
         this.min = min
         this.max = max
         this.position = position
+    }
+
+    get info() {
+        return {
+            position: this.position,
+            isBlocking: this.isBlocking,
+            isAttacking: this.isAttacking,
+            isBlocked: this.isBlocked,
+            isCharged: this.isCharged,
+        }
     }
 
     get position() {
