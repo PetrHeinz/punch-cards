@@ -18,6 +18,7 @@ export default class Robot {
     actions = [new Action(), new Action(), new Action()]
 
     constructor(cards, randomGenerator, robotInfoUpdateCallback, cardsInfoUpdateCallback) {
+        this.id = Math.random().toString(36).slice(2)
         this._randomGenerator = randomGenerator
         this._robotInfoUpdate = robotInfoUpdateCallback
         this._cardsInfoUpdate = cardsInfoUpdateCallback
@@ -31,6 +32,7 @@ export default class Robot {
 
     get robotInfo() {
         return {
+            id: this.id,
             state: this.state,
             head: this.head.info,
             torso: this.torso.info,

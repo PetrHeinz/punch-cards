@@ -73,6 +73,7 @@ export default class RobotRender {
         handElement.classList.add(action.hand === ROBOT_HAND_RIGHT ? "right" : "left")
         handElement.textContent = action.hand
         cardElement.append(handElement)
+        cardElement.dataset.handCardIndex = action.handCardIndex
     }
 
     initCard(root, card) {

@@ -4,6 +4,7 @@ import EventManager from "../utils/events.js";
 import Game from "../game/game.js";
 import GameRender from "../render/gameRender.js";
 import {appendButton, appendHeading, appendLine, clear} from "./documentEdit.js";
+import RemoteReceiverController from "../controller/remoteReceiverController.js";
 
 export default class AppServer {
     randomSeedString = "punch-cards"
@@ -16,11 +17,16 @@ export default class AppServer {
             name: 'Randobot',
             create: (robot) => new RandobotController(robot, this.randomSeedString),
         },
+        {
+            name: 'Remote control',
+            create: (robot) => new RemoteReceiverController(robot, (listener) => this.controllerListeners.push(listener)),
+        },
     ]
     leftControllerIndex = 0
     rightControllerIndex = 1
 
     clientConnections = []
+    controllerListeners = []
 
     /**
      * @param {Element} root
@@ -35,8 +41,9 @@ export default class AppServer {
             connection.on('open', () => {
                 this.clientConnections.push(connection)
             })
-            connection.on('data', function (data) {
+            connection.on('data', (data) => {
                 console.debug('Received', data)
+                this.controllerListeners.forEach((listener) => listener(data))
             });
             connection.on("error", (error) => {
                 console.error(error)

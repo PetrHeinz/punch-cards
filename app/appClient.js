@@ -2,6 +2,7 @@ import EventManager from "../utils/events.js";
 import GameRender from "../render/gameRender.js";
 import NoopController from "../controller/noopController.js";
 import {appendButton, appendHeading, appendLine, clear} from "./documentEdit.js";
+import RemoteTransmitterController from "../controller/remoteTransmitterController.js";
 
 export default class AppClient {
     /**
@@ -74,8 +75,8 @@ export default class AppClient {
         new GameRender(
             this.root,
             this.eventManager,
-            new NoopController(),
-            new NoopController(),
+            new RemoteTransmitterController((data) => this.serverConnection.send(data)),
+            new RemoteTransmitterController((data) => this.serverConnection.send(data)),
         )
     }
 }
