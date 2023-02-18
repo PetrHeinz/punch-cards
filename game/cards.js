@@ -1,4 +1,4 @@
-export class Card {
+class Card {
     icon = ""
     name = "N/A"
 
