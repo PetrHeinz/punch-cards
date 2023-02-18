@@ -114,7 +114,16 @@ export class RobotRender {
         return bodypart
     }
 
-    initCard(root, card, renderHandToggle) {
+    initAction(root, action) {
+        const cardElement = this.initCard(root, action.card)
+        const handElement = document.createElement("div")
+        handElement.classList.add("hand-toggle")
+        handElement.classList.add(action.hand === ROBOT_HAND_RIGHT ? "right" : "left")
+        handElement.textContent = action.hand
+        cardElement.append(handElement)
+    }
+
+    initCard(root, card) {
         const cardElement = document.createElement('div')
         cardElement.classList.add('card')
 
@@ -122,13 +131,6 @@ export class RobotRender {
             cardElement.append(card.icon)
             cardElement.append(document.createElement('br'))
             cardElement.append(card.name)
-            if (renderHandToggle) {
-                let handElement = document.createElement("div")
-                handElement.classList.add("hand-toggle")
-                handElement.classList.add(card.hand === ROBOT_HAND_RIGHT ? "right" : "left")
-                handElement.textContent = card.hand
-                cardElement.append(handElement)
-            }
         }
 
         root.append(cardElement)
@@ -142,9 +144,9 @@ export class RobotRender {
     render(robot) {
         this.renderRobot(robot);
 
-        this._actionCardsCache.ifChanged(robot.actionCards, () => {
+        this._actionCardsCache.ifChanged(robot.actions, () => {
             this.actionCards.innerHTML = ''
-            robot.actionCards.forEach((card) => this.initCard(this.actionCards, card, true))
+            robot.actions.forEach((action) => this.initAction(this.actionCards, action))
         })
         this._handCardsCache.ifChanged(robot.handCards, () => {
             this.handCards.innerHTML = ''
@@ -232,7 +234,7 @@ export class DirectRobotController {
 
             const handCardIndex = getChildIndex(this.render.handCards, event.target)
             if (this.selected === ROBOT_CARDS_ACTION) {
-                if (this.robot.actionCards[this.selectedIndex] === this.robot.handCards[handCardIndex]) {
+                if (this.robot.actions[this.selectedIndex].card === this.robot.handCards[handCardIndex]) {
                     this.robot.discardAction(this.selectedIndex)
                 } else {
                     this.robot.chooseAction(handCardIndex, this.selectedIndex)
@@ -260,7 +262,7 @@ export class DirectRobotController {
         this.selectCard(this.selected, this.selectedIndex)
 
         for (const handCardIndex in this.robot.handCards) {
-            const handCardUsed = this.robot.actionCards.indexOf(this.robot.handCards[handCardIndex]) >= 0
+            const handCardUsed = this.robot.actions.indexOf(this.robot.handCards[handCardIndex]) >= 0
             this.render.handCards.children[handCardIndex].classList.toggle("used", handCardUsed)
         }
 
@@ -323,7 +325,7 @@ export class RandobotController {
         const phases = [
             () => {
                 this.render.actionCards.style.visibility = "hidden"
-                this.possibleHandCardIndexes = [...this.robot.actionCards.keys()]
+                this.possibleHandCardIndexes = [...this.robot.handCards.keys()]
 
                 return true
             },
@@ -335,7 +337,7 @@ export class RandobotController {
 
                 this.robot.chooseAction(this.possibleHandCardIndexes.pop(), this.currentActionIndex++)
 
-                return this.possibleHandCardIndexes.length === 0 || this.currentActionIndex >= this.robot.actionCards.length
+                return this.possibleHandCardIndexes.length === 0 || this.currentActionIndex >= this.robot.actions.length
             },
             () => {
                 if (this._randomGenerator.nextRandom() > .5) {
@@ -343,7 +345,7 @@ export class RandobotController {
                 }
                 this.currentToggleIndex++
 
-                return this.currentToggleIndex >= this.robot.actionCards.length
+                return this.currentToggleIndex >= this.robot.actions.length
             },
             () => {
                 this.robot.commit()

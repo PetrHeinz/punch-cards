@@ -1,4 +1,4 @@
-import {CARDS, CHARGE, DOWN1, DOWN2, DOWN3, PUNCH_CARD, UP1, UP2, UP3} from "./cards.js";
+import {BLANK, BLANK_CARD, CARDS, CHARGE, DOWN1, DOWN2, DOWN3, PUNCH_CARD, UP1, UP2, UP3} from "./cards.js";
 
 export default class Game {
     currentAction = 0
@@ -58,16 +58,16 @@ export default class Game {
         let actions = []
 
         if (this.leftRobot.state === ROBOT_STATE_ACTION) {
-            if (this.leftRobot.actionCards[this.currentAction] !== undefined) {
-                actions.push(getAction(this.leftRobot.actionCards[this.currentAction], this.leftRobot, this.rightRobot))
+            if (this.leftRobot.actions[this.currentAction] !== undefined) {
+                actions.push(getAction(this.leftRobot.actions[this.currentAction], this.leftRobot, this.rightRobot))
             } else {
                 this.leftRobot.state = this.leftRobot.isDestroyed() ? ROBOT_STATE_DEAD : ROBOT_STATE_PREPARE
             }
         }
 
         if (this.rightRobot.state === ROBOT_STATE_ACTION) {
-            if (this.rightRobot.actionCards[this.currentAction] !== undefined) {
-                actions.push(getAction(this.rightRobot.actionCards[this.currentAction], this.rightRobot, this.leftRobot))
+            if (this.rightRobot.actions[this.currentAction] !== undefined) {
+                actions.push(getAction(this.rightRobot.actions[this.currentAction], this.rightRobot, this.leftRobot))
             } else {
                 this.rightRobot.state = this.rightRobot.isDestroyed() ? ROBOT_STATE_DEAD : ROBOT_STATE_PREPARE
             }
@@ -98,7 +98,11 @@ export class Robot {
     state = ROBOT_STATE_PREPARE
     discardedCards = []
     handCards = []
-    actionCards = []
+    actions = [
+        {card: {...BLANK_CARD}, hand: ROBOT_HAND_RIGHT},
+        {card: {...BLANK_CARD}, hand: ROBOT_HAND_RIGHT},
+        {card: {...BLANK_CARD}, hand: ROBOT_HAND_RIGHT},
+    ]
 
     constructor(cards, randomGenerator) {
         this._randomGenerator = randomGenerator;
@@ -148,7 +152,7 @@ export class Robot {
     drawHand() {
         if (this.state !== ROBOT_STATE_PREPARE) throw "Robot can draw hand only during " + ROBOT_STATE_PREPARE
 
-        this.actionCards = [null, null, null]
+        this.actions.forEach(action => action.card = {...BLANK_CARD})
         this.discardedCards = this.discardedCards.concat(this.handCards)
         this.handCards = []
         for (let i = 0; i < 5; i++) {
@@ -164,12 +168,11 @@ export class Robot {
         return this.handCards
     }
 
-    chooseAction(handCardIndex, actionIndex, hand) {
+    chooseAction(handCardIndex, actionIndex) {
         if (this.state !== ROBOT_STATE_CONTROL) throw "Robot can choose action only during " + ROBOT_STATE_CONTROL
-        if (hand !== undefined && hand !== ROBOT_HAND_RIGHT && hand !== ROBOT_HAND_LEFT) throw "Unknown hand " + hand
 
-        if (this.actionCards[actionIndex] === undefined) {
-            console.debug('actions:', this.actionCards)
+        if (this.actions[actionIndex] === undefined) {
+            console.debug('actions:', this.actions)
             throw "Undefined action index " + actionIndex
         }
         if (this.handCards[handCardIndex] === undefined) {
@@ -177,52 +180,46 @@ export class Robot {
             throw "Undefined hand card index " + handCardIndex
         }
         const chosenCard = this.handCards[handCardIndex]
-        if (this.actionCards.indexOf(chosenCard) > -1) {
+        if (this.actions.map(action => action.card).indexOf(chosenCard) > -1) {
             console.debug("This card has already been chosen")
-            this.actionCards[this.actionCards.indexOf(chosenCard)] = null
+            this.actions[this.actions.map(action => action.card).indexOf(chosenCard)].card = {...BLANK_CARD}
         }
 
-        this.actionCards[actionIndex] = chosenCard
-        this.actionCards[actionIndex].hand = hand ?? this.actionCards[actionIndex].hand ?? ROBOT_HAND_RIGHT
+        this.actions[actionIndex].card = chosenCard
     }
 
     swapActions(firstActionIndex, secondActionIndex) {
         if (this.state !== ROBOT_STATE_CONTROL) throw "Robot can swap actions only during " + ROBOT_STATE_CONTROL
 
-        if (this.actionCards[firstActionIndex] === undefined) {
-            console.debug('actions:', this.actionCards)
+        if (this.actions[firstActionIndex] === undefined) {
+            console.debug('actions:', this.actions)
             throw "Undefined action index " + firstActionIndex
         }
-        if (this.actionCards[secondActionIndex] === undefined) {
-            console.debug('actions:', this.actionCards)
+        if (this.actions[secondActionIndex] === undefined) {
+            console.debug('actions:', this.actions)
             throw "Undefined action index " + secondActionIndex
         }
 
-        const swappedActionCard = this.actionCards[firstActionIndex]
-        this.actionCards[firstActionIndex] = this.actionCards[secondActionIndex]
-        this.actionCards[secondActionIndex] = swappedActionCard
+        const swappedAction = this.actions[firstActionIndex]
+        this.actions[firstActionIndex] = this.actions[secondActionIndex]
+        this.actions[secondActionIndex] = swappedAction
     }
 
     toggleActionHand(actionIndex) {
         if (this.state !== ROBOT_STATE_CONTROL) throw "Robot can choose action hand only during " + ROBOT_STATE_CONTROL
 
-        if (this.actionCards[actionIndex] === undefined) {
-            console.debug('actions:', this.actionCards)
+        if (this.actions[actionIndex] === undefined) {
+            console.debug('actions:', this.actions)
             throw "Undefined action index " + actionIndex
         }
 
-        if (this.actionCards[actionIndex] === null) {
-            console.debug('actions:', this.actionCards)
-            throw "No action at index " + actionIndex
-        }
-
-        this.actionCards[actionIndex].hand = this.actionCards[actionIndex].hand === ROBOT_HAND_RIGHT ? ROBOT_HAND_LEFT : ROBOT_HAND_RIGHT
+        this.actions[actionIndex].hand = this.actions[actionIndex].hand === ROBOT_HAND_RIGHT ? ROBOT_HAND_LEFT : ROBOT_HAND_RIGHT
     }
 
     discardAction(actionIndex) {
         if (this.state !== ROBOT_STATE_CONTROL) throw "Robot can discard action only during " + ROBOT_STATE_CONTROL
 
-        this.actionCards[actionIndex] = null
+        this.actions[actionIndex].card = {...BLANK_CARD}
     }
 
     commit() {
@@ -350,45 +347,42 @@ export class RandomGenerator {
 }
 
 /**
- * @param {{id:string,hand:string}} actionCard
+ * @param {{card:{id:string},hand:string}} action
  * @param {Robot} robot
  * @param {Robot} otherRobot
  */
-function getAction(actionCard, robot, otherRobot) {
-    if (actionCard === null) {
-        return {
-            prepare: () => {
-            },
-            do: () => {
-            },
-            cleanup: () => {
-            },
-        }
+function getAction(action, robot, otherRobot) {
+    if (action === null) {
+        return
     }
-    switch (actionCard.id) {
+    switch (action.card.id) {
         case PUNCH_CARD:
-            return getPunchAction(robot.getHand(actionCard.hand), otherRobot)
+            return getPunchAction(robot.getHand(action.hand), otherRobot)
         case UP1:
-            return getMoveAction(-1, robot.getHand(actionCard.hand))
+            return getMoveAction(-1, robot.getHand(action.hand))
         case UP2:
-            return getMoveAction(-2, robot.getHand(actionCard.hand))
+            return getMoveAction(-2, robot.getHand(action.hand))
         case UP3:
-            return getMoveAction(-3, robot.getHand(actionCard.hand))
+            return getMoveAction(-3, robot.getHand(action.hand))
         case DOWN1:
-            return getMoveAction(1, robot.getHand(actionCard.hand))
+            return getMoveAction(1, robot.getHand(action.hand))
         case DOWN2:
-            return getMoveAction(2, robot.getHand(actionCard.hand))
+            return getMoveAction(2, robot.getHand(action.hand))
         case DOWN3:
-            return getMoveAction(3, robot.getHand(actionCard.hand))
+            return getMoveAction(3, robot.getHand(action.hand))
         case CHARGE:
-            return getChargeAction(robot.getHand(actionCard.hand))
+            return getChargeAction(robot.getHand(action.hand))
+        case BLANK:
+            return {
+                prepare: () => {},
+                do: () => {},
+                cleanup: () => {},
+            }
     }
     return {
-        prepare: () => {
-        },
-        do: () => console.warn("Unknown action card " + actionCard.id),
-        cleanup: () => {
-        },
+        prepare: () => {},
+        do: () => console.warn("Unknown action card " + action.card.id),
+        cleanup: () => {},
     }
 }
 

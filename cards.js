@@ -1,3 +1,4 @@
+export const BLANK = "blank"
 export const PUNCH_CARD = "punch_card"
 export const UP1 = "up1"
 export const UP2 = "up2"
@@ -78,3 +79,9 @@ export const CARDS = [
     //     count: 1
     // },
 ];
+
+export const BLANK_CARD = {
+    id: BLANK,
+    icon: "📄",
+    name: "Blank",
+}
