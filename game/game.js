@@ -1,5 +1,5 @@
 import {BlankCard, createDeck} from "./cards.js";
-import {RandomGenerator} from "./randomGenerator.js";
+import RandomGenerator from "../utils/randomGenerator.js";
 
 export default class Game {
     currentAction = 0

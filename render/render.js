@@ -1,4 +1,4 @@
-import {ROBOT_HAND_RIGHT, ROBOT_STATE_CONTROL} from "./game.js";
+import {ROBOT_HAND_RIGHT, ROBOT_STATE_CONTROL} from "../game/game.js";
 
 export default class GameRender {
     constructor(root, eventManager, leftController, rightController) {

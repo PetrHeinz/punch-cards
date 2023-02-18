@@ -1,5 +1,5 @@
-import {RandomGenerator} from "./randomGenerator.js";
-import {ROBOT_STATE_ACTION, ROBOT_STATE_CONTROL, ROBOT_STATE_DEAD, ROBOT_STATE_WINNER} from "./game.js";
+import RandomGenerator from "../utils/randomGenerator.js";
+import {ROBOT_STATE_ACTION, ROBOT_STATE_CONTROL, ROBOT_STATE_DEAD, ROBOT_STATE_WINNER} from "../game/game.js";
 
 export default class RandobotController {
     currentActionIndex = 0

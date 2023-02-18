@@ -1,4 +1,4 @@
-export class EventManager {
+export default class EventManager {
     _events = []
     _callbacks = {}
 

@@ -1,4 +1,4 @@
-import {ROBOT_STATE_CONTROL} from "./game.js";
+import {ROBOT_STATE_CONTROL} from "../game/game.js";
 
 const ROBOT_CARDS_ACTION = "ACTION"
 const ROBOT_CARDS_HAND = "HAND"
