@@ -1,12 +1,19 @@
 export default class EventManager {
     _events = []
-    _callbacks = {}
+    _callbacksByType = {}
+    _callbacks = []
 
-    listen(type, callback) {
-        if (this._callbacks[type] === undefined) {
-            this._callbacks[type] = []
+    listen(type, callback, withReplay = true) {
+        if (this._callbacksByType[type] === undefined) {
+            this._callbacksByType[type] = []
         }
-        this._callbacks[type].push(callback)
+        this._callbacksByType[type].push(callback)
+        this._events.forEach(({eventType, payload}) => eventType === type && callback(payload))
+    }
+
+    listenToAll(callback) {
+        this._callbacks.push(callback)
+        this._events.forEach(({type, payload}) => callback(type, payload))
     }
 
     publish(type, payload) {
@@ -15,13 +22,10 @@ export default class EventManager {
         console.debug(type, payload)
     }
 
-    replay() {
-        this._events.forEach(({type, payload}) => this._call(type, payload))
-    }
-
     _call(type, payload) {
-        if (this._callbacks[type] !== undefined) {
-            this._callbacks[type].forEach(callback => callback(payload))
+        if (this._callbacksByType[type] !== undefined) {
+            this._callbacksByType[type].forEach(callback => callback(payload))
         }
+        this._callbacks.forEach(callback => callback(type, payload))
     }
 }

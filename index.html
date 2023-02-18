@@ -9,12 +9,13 @@
 </head>
 
 <body>
-    <div id="game"></div>
+    <div id="root"></div>
+    <script src="https://unpkg.com/peerjs@1.3.2/dist/peerjs.min.js"></script>
     <script>
         import("./app.js").then((module) => {
-            const application = new module.default(document.getElementById('game'))
+            const application = new module.default(document.getElementById('root'))
 
-            application.showMenu()
+            application.start()
         })
     </script>
 </body>

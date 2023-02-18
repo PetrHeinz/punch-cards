@@ -34,7 +34,6 @@ export default class GameRender {
             this.leftRobot.renderRobotInfo(leftRobotInfo)
             this.rightRobot.renderRobotInfo(rightRobotInfo)
         }, 550))
-        eventManager.replay()
     }
 
     addMenuButton(text, callback) {
