@@ -49,7 +49,6 @@ export default class RobotRender {
         const bodypart = document.createElement('div')
         bodypart.classList.add('bodypart')
         bodypart.classList.add(extraClass)
-        bodypart.textContent = 'N/A'
 
         root.append(bodypart)
 
