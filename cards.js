@@ -1,108 +1,142 @@
-export const CARDS = [
-    {
-        icon: "👊",
-        name: "Punch card",
-        count: 6,
-        getAction: punchAction(),
-    },
-    {
-        icon: "👆",
-        name: "Up",
-        count: 3,
-        getAction: moveAction(-1),
-    },
-    {
-        icon: "👆👆",
-        name: "Uup",
-        count: 2,
-        getAction: moveAction(-2),
-    },
-    {
-        icon: "👆👆👆",
-        name: "Uuup",
-        count: 1,
-        getAction: moveAction(-3),
-    },
-    {
-        icon: "👇",
-        name: "Down",
-        count: 3,
-        getAction: moveAction(1),
-    },
-    {
-        icon: "👇👇",
-        name: "Doown",
-        count: 2,
-        getAction: moveAction(2),
-    },
-    {
-        icon: "👇👇👇",
-        name: "Dooown",
-        count: 1,
-        getAction: moveAction(3),
-    },
-    {
-        icon: "💥",
-        name: "Charge",
-        count: 2,
-        getAction: getCharge(),
-    },
-];
+export class Card {
+    icon = ""
+    name = "N/A"
 
-export const BLANK_CARD = {
-    icon: "📄",
-    name: "Blank",
-    getAction: () => ({
-        prepare: () => {},
-        do: () => {},
-        cleanup: () => {},
-    })
+    getAction(hand, thisRobot, otherRobot) {
+        return {
+            prepare: () => this._prepare(hand, thisRobot, otherRobot),
+            do: () => this._do(hand, thisRobot, otherRobot),
+            cleanup: () => this._cleanup(hand, thisRobot, otherRobot),
+        }
+    }
+
+    _prepare(hand, thisRobot, otherRobot) {
+    }
+
+    _do(hand, thisRobot, otherRobot) {
+    }
+
+    _cleanup(hand, thisRobot, otherRobot) {
+    }
 }
 
-function moveAction(amount) {
-    return (hand) => ({
-        prepare: () => {
-            hand.position += amount
-        },
-        do: () => {
-        },
-        cleanup: () => {
-        },
-    })
+export class PunchCard extends Card {
+    icon = "👊"
+    name = "Punch card"
+
+    _prepare(hand) {
+        hand.isBlocking = false
+        hand.isAttacking = true
+    }
+
+    _do(hand, thisRobot, otherRobot) {
+        const baseDamage = 10;
+        const blockedDamage = 8;
+        const blockingHandsCount = otherRobot.getHandsBlockingAt(hand.position).length;
+        hand.isBlocked = blockingHandsCount > 0
+        const damage = Math.max(0, baseDamage - blockingHandsCount * blockedDamage)
+        otherRobot.getBodypartAt(hand.position).health -= hand.isCharged ? 3 * damage : damage
+    }
+
+    _cleanup(hand) {
+        hand.isBlocked = false
+        hand.isBlocking = true
+        hand.isAttacking = false
+        hand.isCharged = false
+    }
 }
 
-function punchAction() {
-    return (hand, thisRobot, otherRobot) => ({
-        prepare: () => {
-            hand.isBlocking = false
-            hand.isAttacking = true
-        },
-        do: () => {
-            const baseDamage = 10;
-            const blockedDamage = 8;
-            const blockingHandsCount = otherRobot.getHandsBlockingAt(hand.position).length;
-            hand.isBlocked = blockingHandsCount > 0
-            const damage = Math.max(0, baseDamage - blockingHandsCount * blockedDamage)
-            otherRobot.getBodypartAt(hand.position).health -= hand.isCharged ? 3 * damage : damage
-        },
-        cleanup: () => {
-            hand.isBlocked = false
-            hand.isBlocking = true
-            hand.isAttacking = false
-            hand.isCharged = false
-        },
-    })
+export class Up1Card extends Card {
+    icon = "👆"
+    name = "Up"
+
+    _prepare(hand) {
+        hand.position -= 1
+    }
 }
 
-function getCharge() {
-    return (hand) => ({
-        prepare: () => {
-            hand.isBlocking = false
-            hand.isCharged = true
-        },
-        do: () => {
-        },
-        cleanup: () => {
-        },
-    })
+export class Up2Card extends Card {
+    icon = "👆👆"
+    name = "Uup"
+
+    _prepare(hand) {
+        hand.position -= 2
+    }
+}
+
+export class Up3Card extends Card {
+    icon = "👆👆👆"
+    name = "Uuup"
+
+    _prepare(hand) {
+        hand.position -= 3
+    }
+}
+
+export class Down1Card extends Card {
+    icon = "👇"
+    name = "Down"
+
+    _prepare(hand) {
+        hand.position += 1
+    }
+}
+
+export class Down2Card extends Card {
+    icon = "👇👇"
+    name = "Doown"
+
+    _prepare(hand) {
+        hand.position += 2
+    }
+}
+
+export class Down3Card extends Card {
+    icon = "👇👇👇"
+    name = "Dooown"
+
+    _prepare(hand) {
+        hand.position += 3
+    }
+}
+
+export class ChargeCard extends Card {
+    icon = "💥"
+    name = "Charge"
+
+    _prepare(hand) {
+        hand.isBlocking = false
+        hand.isCharged = true
+    }
+}
+
+export class BlankCard extends Card {
+    icon = "📄"
+    name = "Blank"
+}
+
+/** @return {Card[]} */
+export function createDeck() {
+    return [
+        new PunchCard(),
+        new PunchCard(),
+        new PunchCard(),
+        new PunchCard(),
+        new PunchCard(),
+        new PunchCard(),
+        new Up1Card(),
+        new Up1Card(),
+        new Up1Card(),
+        new Up2Card(),
+        new Up2Card(),
+        new Up3Card(),
+        new Down1Card(),
+        new Down1Card(),
+        new Down1Card(),
+        new Down2Card(),
+        new Down2Card(),
+        new Down3Card(),
+        new ChargeCard(),
+        new ChargeCard(),
+    ]
 }

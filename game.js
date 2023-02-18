@@ -1,13 +1,13 @@
-import {BLANK_CARD, CARDS} from "./cards.js";
-import {RandomGenerator} from "./randomGenerator";
+import {BlankCard, createDeck} from "./cards.js";
+import {RandomGenerator} from "./randomGenerator.js";
 
 export default class Game {
     currentAction = 0
 
     constructor(randomSeedString) {
         randomSeedString = randomSeedString ?? RandomGenerator.randomSeedString(32)
-        this.leftRobot = new Robot(CARDS, new RandomGenerator(`${randomSeedString}-left`))
-        this.rightRobot = new Robot(CARDS, new RandomGenerator(`${randomSeedString}-right`))
+        this.leftRobot = new Robot(createDeck(), new RandomGenerator(`${randomSeedString}-left`))
+        this.rightRobot = new Robot(createDeck(), new RandomGenerator(`${randomSeedString}-right`))
     }
 
     isOver() {
@@ -108,7 +108,7 @@ export class Robot {
         this.heatsink = new Bodypart(60)
         this.rightHand = new Hand(3, 1, 7)
         this.leftHand = new Hand(5, 1, 7)
-        this.deckCards = this._buildDeck(cards)
+        this.deckCards = this._shuffleCards(cards)
         this.drawHand()
     }
 
@@ -179,7 +179,7 @@ export class Robot {
         const chosenCard = this.handCards[handCardIndex]
         if (this.actions.map(action => action.card).indexOf(chosenCard) > -1) {
             console.debug("This card has already been chosen")
-            this.actions[this.actions.map(action => action.card).indexOf(chosenCard)].card = {...BLANK_CARD}
+            this.actions[this.actions.map(action => action.card).indexOf(chosenCard)].discard()
         }
 
         this.actions[actionIndex].card = chosenCard
@@ -225,17 +225,6 @@ export class Robot {
         this.state = ROBOT_STATE_COMMIT
     }
 
-    _buildDeck(cards) {
-        let deck = []
-        cards.forEach(card => {
-            for (let i = 0; i < card.count; i++) {
-                deck.push({...card})
-            }
-        })
-
-        return this._shuffleCards(deck)
-    }
-
     _shuffleCards(cards) {
         return cards
             .map(card => ({card, sort: this._randomGenerator.nextRandom()}))
@@ -245,15 +234,18 @@ export class Robot {
 }
 
 export class Action {
-    card = {...BLANK_CARD}
+    /** @type {Card} */
+    card = new BlankCard()
     hand = ROBOT_HAND_RIGHT
 
     toggleHand() {
         this.hand = this.hand === ROBOT_HAND_RIGHT ? ROBOT_HAND_LEFT : ROBOT_HAND_RIGHT
     }
+
     discard() {
-        this.card = {...BLANK_CARD}
+        this.card = new BlankCard()
     }
+
     getAction(thisRobot, otherRobot) {
         return this.card.getAction(thisRobot.getHand(this.hand), thisRobot, otherRobot)
     }

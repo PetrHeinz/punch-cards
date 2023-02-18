@@ -5,7 +5,7 @@ import {
     ROBOT_STATE_DEAD,
     ROBOT_STATE_WINNER
 } from "./game.js";
-import {RandomGenerator} from "./randomGenerator";
+import {RandomGenerator} from "./randomGenerator.js";
 
 export default class GameRender {
     constructor(root, leftController, rightController) {
