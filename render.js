@@ -1,11 +1,11 @@
 import {
-    RandomGenerator,
     ROBOT_HAND_RIGHT,
     ROBOT_STATE_ACTION,
     ROBOT_STATE_CONTROL,
     ROBOT_STATE_DEAD,
     ROBOT_STATE_WINNER
 } from "./game.js";
+import {RandomGenerator} from "./randomGenerator";
 
 export default class GameRender {
     constructor(root, leftController, rightController) {
