@@ -1,11 +1,13 @@
-import DirectRobotController from "../controller/directRobotController.js";
-import RandobotController from "../controller/randobotController.js";
+import Randobot from "../controller/randobot.js";
 import EventManager from "../utils/events.js";
 import Game from "../game/game.js";
 import GameRender from "../render/gameRender.js";
 import {appendButton, appendHeading, appendInput, appendLine, clear} from "./documentEdit.js";
-import RemoteReceiverController from "../controller/remoteReceiverController.js";
 import Timer from "../utils/timer.js";
+import ControllableCardsRender from "../render/controllableCardsRender.js";
+import DirectControl from "../controller/directControl.js";
+import HiddenCardsRender from "../render/hiddenCardsRender.js";
+import RemoteControl from "../controller/remoteControl.js";
 
 export default class AppServer {
     randomSeedString = "punch-cards"
@@ -13,17 +15,28 @@ export default class AppServer {
         {
             name: 'Direct control',
             remoteControl: false,
-            create: (robot) => new DirectRobotController(robot),
+            createCardsRender: (robot) => {
+                return new ControllableCardsRender(new DirectControl(robot))
+            },
         },
         {
             name: 'Randobot',
             remoteControl: false,
-            create: (robot) => new RandobotController(robot, this.randomSeedString),
+            createCardsRender: (robot) => {
+                const randobot = new Randobot(robot, this.randomSeedString)
+                randobot.start()
+
+                return new HiddenCardsRender()
+            },
         },
         {
             name: 'Remote control',
             remoteControl: true,
-            create: (robot) => new RemoteReceiverController(robot, (listener) => this.controllerListeners.push(listener)),
+            createCardsRender: (robot) => {
+                this.controllerListeners.push(RemoteControl.createReceiver(robot))
+
+                return new HiddenCardsRender()
+            },
         },
     ]
     leftControllerIndex = 0
@@ -102,8 +115,8 @@ export default class AppServer {
         let gameRender = new GameRender(
             this.root,
             eventManager,
-            this.controllers[this.leftControllerIndex].create(game.leftRobot),
-            this.controllers[this.rightControllerIndex].create(game.rightRobot),
+            this.controllers[this.leftControllerIndex].createCardsRender(game.leftRobot),
+            this.controllers[this.rightControllerIndex].createCardsRender(game.rightRobot),
             tickTimeout,
         )
 
@@ -137,7 +150,13 @@ export default class AppServer {
             () => eventManager.publish("messageOverlay", {text: ""}),
         )
 
-        this.timer.doPeriodically(() => game.tick(), tickTimeout, 3*tickTimeout)
+        this.timer.doPeriodically(() => {
+            game.tick()
+            if (game.isOver()) {
+                eventManager.publish("messageOverlay", {text: "GAME OVER"})
+                this.timer.clear()
+            }
+        }, tickTimeout, 3 * tickTimeout)
     }
 
     showMenu() {

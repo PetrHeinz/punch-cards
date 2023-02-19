@@ -1,9 +1,12 @@
 import EventManager from "../utils/events.js";
 import GameRender from "../render/gameRender.js";
 import {appendButton, appendHeading, appendLine, clear} from "./documentEdit.js";
-import RemoteTransmitterController from "../controller/remoteTransmitterController.js";
-import NoopController from "../controller/noopController.js";
 import Timer from "../utils/timer.js";
+import CardsRender from "../render/cardsRender.js";
+import HiddenCardsRender from "../render/hiddenCardsRender.js";
+import ControllableCardsRender from "../render/controllableCardsRender.js";
+import RemoteControl from "../controller/remoteControl.js";
+import {ROBOT_SIDE_LEFT, ROBOT_SIDE_RIGHT} from "../game/robot.js";
 
 export default class AppClient {
     /**
@@ -93,16 +96,27 @@ export default class AppClient {
         clear(this.root)
         this.timer.clear()
 
+        const leftCardsRender = this._createCardsRender(ROBOT_SIDE_LEFT, options.leftRemoteControl, options.rightRemoteControl)
+        const rightCardsRender = this._createCardsRender(ROBOT_SIDE_RIGHT, options.rightRemoteControl, options.leftRemoteControl)
+
         new GameRender(
             this.root,
             this.eventManager,
-            options.leftRemoteControl
-                ? new RemoteTransmitterController((data) => this.serverConnection.send(data))
-                : new NoopController(),
-            options.rightRemoteControl
-                ? new RemoteTransmitterController((data) => this.serverConnection.send(data))
-                : new NoopController(),
+            leftCardsRender,
+            rightCardsRender,
             options.tickTimeout,
         )
+    }
+
+    _createCardsRender(side, thisRemoteControl, otherRemoteControl) {
+        if (!thisRemoteControl && !otherRemoteControl) {
+            return new CardsRender()
+        }
+
+        if (thisRemoteControl) {
+            return new ControllableCardsRender(new RemoteControl(side, this.serverConnection))
+        }
+
+        return new HiddenCardsRender()
     }
 }

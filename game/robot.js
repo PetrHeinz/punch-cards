@@ -22,7 +22,7 @@ export default class Robot {
     constructor(side, cards, randomGenerator, robotUpdateCallback) {
         if (side !== ROBOT_SIDE_RIGHT && side !== ROBOT_SIDE_LEFT) throw "Unknown side " + side
 
-        this.side = Math.random().toString(36).slice(2)
+        this.side = side
         this._randomGenerator = randomGenerator
         this._robotUpdate = robotUpdateCallback
         this.head = new Bodypart(40)
@@ -106,7 +106,6 @@ export default class Robot {
 
         this.state = ROBOT_STATE_CONTROL
 
-        console.log("updating!")
         this._robotUpdate()
 
         return this.handCards

@@ -2,7 +2,7 @@ import RobotRender from "./robotRender.js";
 import CardsRender from "./cardsRender.js";
 
 export default class GameRender {
-    constructor(root, eventManager, leftController, rightController, tickTimeout) {
+    constructor(root, eventManager, leftCardRender, rightCardRender, tickTimeout) {
         if (root.children.length > 0) {
             throw "Root element is not empty"
         }
@@ -13,18 +13,20 @@ export default class GameRender {
         this.menu.classList.add("menu-upper")
         game.append(this.menu)
 
+        this.leftCardsRender = leftCardRender
         const leftSide = document.createElement('div')
         leftSide.classList.add('side')
         leftSide.classList.add("left")
         this.leftRobot = new RobotRender(leftSide)
-        this.leftCardsRender = new CardsRender(leftSide, leftController)
+        leftCardRender.initialize(leftSide)
         game.append(leftSide)
 
+        this.rightCardsRender = rightCardRender
         const rightSide = document.createElement('div')
         rightSide.classList.add('side')
         rightSide.classList.add("right")
         this.rightRobot = new RobotRender(rightSide)
-        this.rightCardsRender = new CardsRender(rightSide, rightController)
+        rightCardRender.initialize(rightSide)
         game.append(rightSide)
 
         this.messageOverlay = document.createElement("div")

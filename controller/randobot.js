@@ -1,7 +1,7 @@
 import RandomGenerator from "../utils/randomGenerator.js";
-import {ROBOT_STATE_ACTION, ROBOT_STATE_CONTROL, ROBOT_STATE_DEAD, ROBOT_STATE_WINNER} from "../game/robot.js";
+import {ROBOT_STATE_CONTROL, ROBOT_STATE_DEAD, ROBOT_STATE_WINNER} from "../game/robot.js";
 
-export default class RandobotController {
+export default class Randobot {
     currentActionIndex = 0
     possibleHandCardIndexes = []
     currentToggleIndex = 0
@@ -13,30 +13,23 @@ export default class RandobotController {
      */
     constructor(robot, randomSeedString) {
         this.robot = robot
-        this._randomGenerator = new RandomGenerator(randomSeedString);
+        this._randomGenerator = new RandomGenerator(randomSeedString)
     }
 
-    /**
-     * @param {CardsRender} cardsRender
-     */
-    initialize(cardsRender) {
-        if (this.render !== undefined) throw "This controller has already been initialized"
-        this.render = cardsRender
-
-        const interval = setInterval(() => {
+    start() {
+        this.interval = setInterval(() => {
             if (this.robot.state === ROBOT_STATE_CONTROL) this.doAction()
-            if (this.robot.state === ROBOT_STATE_ACTION) this.render.actionCards.style.visibility = ""
-            if (this.robot.state === ROBOT_STATE_WINNER || this.robot.state === ROBOT_STATE_DEAD) clearInterval(interval)
+            if (this.robot.state === ROBOT_STATE_WINNER || this.robot.state === ROBOT_STATE_DEAD) this.stop()
         }, 200)
     }
 
-    afterRender() {
+    stop() {
+        clearInterval(this.interval)
     }
 
     doAction() {
         const phases = [
             () => {
-                this.render.actionCards.style.visibility = "hidden"
                 this.possibleHandCardIndexes = [...this.robot.handCards.keys()]
 
                 return true
