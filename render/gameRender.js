@@ -1,7 +1,7 @@
 import RobotRender from "./robotRender.js";
 
 export default class GameRender {
-    constructor(root, eventManager, leftController, rightController) {
+    constructor(root, eventManager, leftController, rightController, tickTimeout) {
         if (root.children.length > 0) {
             throw "Root element is not empty"
         }
@@ -22,18 +22,30 @@ export default class GameRender {
         eventManager.listen("leftCardsInfoUpdate", (leftCardsInfo) => this.leftRobot.renderCardsInfo(leftCardsInfo))
         eventManager.listen("rightCardsInfoUpdate", (rightCardsInfo) => this.rightRobot.renderCardsInfo(rightCardsInfo))
 
+        let currentTickTimeout = 0
         eventManager.listen("actionPhaseInfoUpdate.prepare", ({leftRobotInfo, rightRobotInfo}) => {
-            this.leftRobot.renderRobotInfo(leftRobotInfo)
-            this.rightRobot.renderRobotInfo(rightRobotInfo)
+            this._renderRobotsInfoWithTimeout(leftRobotInfo, rightRobotInfo)
         })
-        eventManager.listen("actionPhaseInfoUpdate.do", ({leftRobotInfo, rightRobotInfo}) => setTimeout(() => {
+        eventManager.listen("actionPhaseInfoUpdate.do", ({leftRobotInfo, rightRobotInfo}) => {
+            this._renderRobotsInfoWithTimeout(leftRobotInfo, rightRobotInfo, .5 * currentTickTimeout)
+        })
+        eventManager.listen("actionPhaseInfoUpdate.cleanup", ({leftRobotInfo, rightRobotInfo}) => {
+            this._renderRobotsInfoWithTimeout(leftRobotInfo, rightRobotInfo, .55 * currentTickTimeout)
+        })
+        currentTickTimeout = tickTimeout
+    }
+
+    _renderRobotsInfoWithTimeout(leftRobotInfo, rightRobotInfo, timeout = 0) {
+        if (timeout === 0) {
             this.leftRobot.renderRobotInfo(leftRobotInfo)
             this.rightRobot.renderRobotInfo(rightRobotInfo)
-        }, 500))
-        eventManager.listen("actionPhaseInfoUpdate.cleanup", ({leftRobotInfo, rightRobotInfo}) => setTimeout(() => {
+            return
+        }
+
+        setTimeout(() => {
             this.leftRobot.renderRobotInfo(leftRobotInfo)
             this.rightRobot.renderRobotInfo(rightRobotInfo)
-        }, 550))
+        }, timeout)
     }
 
     addMenuButton(text, callback) {

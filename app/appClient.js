@@ -77,6 +77,7 @@ export default class AppClient {
             this.eventManager,
             new RemoteTransmitterController((data) => this.serverConnection.send(data)),
             new RemoteTransmitterController((data) => this.serverConnection.send(data)),
+            1000, // TODO: read from server
         )
     }
 }

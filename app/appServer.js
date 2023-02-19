@@ -60,18 +60,19 @@ export default class AppServer {
         const eventManager = new EventManager()
         eventManager.listenToAll((type, payload) => this.clientConnections.forEach((connection) => connection.send({type, payload})))
 
+        const tickTimeout = 1000;
         let game = new Game(this.randomSeedString, eventManager)
         let gameRender = new GameRender(
             this.root,
             eventManager,
             this.controllers[this.leftControllerIndex].create(game.leftRobot),
             this.controllers[this.rightControllerIndex].create(game.rightRobot),
+            tickTimeout,
         )
 
         gameRender.addMenuButton("BACK_TO_MENU", () => this.showMenu())
         gameRender.addMenuButton("RESTART_GAME", () => this.startGame())
-
-        this.gameTickInterval = setInterval(() => game.tick(), 1000)
+        this.gameTickInterval = setInterval(() => game.tick(), tickTimeout)
     }
 
     showMenu() {
