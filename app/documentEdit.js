@@ -24,6 +24,19 @@ export function appendLine(element, text) {
     return message
 }
 
+export function appendInput(element, labelText, value) {
+    const input = document.createElement("input")
+    input.classList.add("input")
+    input.value = value
+    const label = document.createElement("label")
+    label.classList.add("line")
+    label.append(labelText + ": ")
+    label.append(input)
+    element.append(label)
+
+    return input
+}
+
 export function clear(element) {
     element.innerHTML = ""
 }

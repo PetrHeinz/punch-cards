@@ -3,7 +3,7 @@ import RandobotController from "../controller/randobotController.js";
 import EventManager from "../utils/events.js";
 import Game from "../game/game.js";
 import GameRender from "../render/gameRender.js";
-import {appendButton, appendHeading, appendLine, clear} from "./documentEdit.js";
+import {appendButton, appendHeading, appendInput, appendLine, clear} from "./documentEdit.js";
 import RemoteReceiverController from "../controller/remoteReceiverController.js";
 
 export default class AppServer {
@@ -36,6 +36,9 @@ export default class AppServer {
         this.root = root
         this.createInviteLink = createInviteLink
         this.peer = new Peer()
+        this.peer.on('open', (id) => {
+            console.info('Peer.js is ready to connect. Peer ID is ' + id)
+        })
         this.peer.on('connection', (connection) => {
             console.info("Client connected")
             connection.on('open', () => {
@@ -44,11 +47,11 @@ export default class AppServer {
             connection.on('data', (data) => {
                 console.debug('Received', data)
                 this.controllerListeners.forEach((listener) => listener(data))
-            });
+            })
             connection.on("error", (error) => {
                 console.error(error)
             })
-        });
+        })
         this.peer.on("error", (error) => {
             console.error(error)
         })
@@ -83,43 +86,27 @@ export default class AppServer {
 
         appendHeading(menu)
 
-        const randomSeedStringInput = document.createElement("input")
-        randomSeedStringInput.classList.add("input")
-        randomSeedStringInput.size = randomSeedStringInput.maxLength = 32
-        randomSeedStringInput.value = this.randomSeedString
+        const randomSeedStringInput = appendInput(menu, "Random seed string", this.randomSeedString)
         randomSeedStringInput.addEventListener("input", () => {
             const randomSeedString = randomSeedStringInput.value.trim()
             this.randomSeedString = randomSeedString !== "" ? randomSeedString : null
         })
-        const randomSeedStringLabel = document.createElement("label")
-        randomSeedStringLabel.classList.add("line")
-        randomSeedStringLabel.append("Random seed string: ")
-        randomSeedStringLabel.append(randomSeedStringInput)
-        menu.append(randomSeedStringLabel)
 
-        const inviteLinkInput = document.createElement("input")
-        inviteLinkInput.id = 'invite-link-input'
-        inviteLinkInput.classList.add("input")
-        inviteLinkInput.readOnly = true
-        inviteLinkInput.size = 32
         const inviteLinkDefaultText = "connecting to the network...";
-        inviteLinkInput.value = this.peer.id ? this.createInviteLink(this.peer.id) : inviteLinkDefaultText
+        const inviteLinkInput = appendInput(menu, "Invite friends via URL", this.peer.id ? this.createInviteLink(this.peer.id) : inviteLinkDefaultText)
+        inviteLinkInput.readOnly = true
+        this.peer.on('open', (peerId) => {
+            inviteLinkInput.value = this.createInviteLink(peerId)
+        })
+        inviteLinkInput.classList.add("status")
         inviteLinkInput.addEventListener("click", () => {
             if (inviteLinkInput.value === inviteLinkDefaultText) return
             inviteLinkInput.select()
-            navigator.clipboard.writeText(inviteLinkInput.value)
+            navigator.clipboard.writeText(inviteLinkInput.value).then(() => {
+                inviteLinkInput.classList.add("success")
+                setTimeout(() => inviteLinkInput.classList.remove("success"), 1000)
+            })
         })
-        const inviteLinkLabel = document.createElement("label")
-        inviteLinkLabel.classList.add("line")
-        inviteLinkLabel.append("Invite friends: ")
-        inviteLinkLabel.append(inviteLinkInput)
-        menu.append(inviteLinkLabel)
-        this.peer.on('open', (peerId) => {
-            const inviteLinkInput = document.getElementById('invite-link-input')
-            if (inviteLinkInput) {
-                inviteLinkInput.value = this.createInviteLink(peerId)
-            }
-        });
 
         appendLine(menu, "Choose left controller:")
 

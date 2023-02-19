@@ -78,7 +78,7 @@ body {
 .line {
     display: block;
     line-height: var(--unit);
-    margin-left: calc(1.25 * var(--unit));
+    margin: 0 calc(1.25 * var(--unit));
     font-size: 150%;
 }
 h1.line {
@@ -90,12 +90,25 @@ h1.line {
 }
 
 .input {
+    width: 100%;
     border-style: none;
     font-size: inherit;
     font-family: inherit;
     font-weight: bold;
     color: var(--color-active-text);
     background-color: transparent;
+}
+.line:has(.input.status):after {
+    content: "✅";
+    float: right;
+    position: relative;
+    bottom: var(--unit);
+    left: var(--unit);
+    transform: scale(0);
+    transition: .2s cubic-bezier(1, 0, 0.75, 2) transform;
+}
+.line:has(.input.status.success):after {
+    transform: scale(1.25);
 }
 
 .controller-left, .controller-right {
