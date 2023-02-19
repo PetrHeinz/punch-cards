@@ -11,7 +11,7 @@ export default class RemoteTransmitterController {
 
     constructor(sendActionCallback) {
         this.sendAction = (robotRender, data) => {
-            data.robotId = robotRender.robot.id
+            data.side = robotRender.robot.side
             sendActionCallback(data)
         }
     }

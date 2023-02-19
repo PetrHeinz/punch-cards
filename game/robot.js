@@ -10,6 +10,8 @@ export const ROBOT_STATE_DEAD = "DISASSEMBLED"
 export const ROBOT_STATE_WINNER = "WINNER"
 export const ROBOT_HAND_RIGHT = "RIGHT"
 export const ROBOT_HAND_LEFT = "LEFT"
+export const ROBOT_SIDE_RIGHT = "ROBOT_RIGHT"
+export const ROBOT_SIDE_LEFT = "ROBOT_LEFT"
 
 export default class Robot {
     state = ROBOT_STATE_PREPARE
@@ -17,8 +19,10 @@ export default class Robot {
     handCards = []
     actions = [new Action(), new Action(), new Action()]
 
-    constructor(cards, randomGenerator, robotInfoUpdateCallback, cardsInfoUpdateCallback) {
-        this.id = Math.random().toString(36).slice(2)
+    constructor(side, cards, randomGenerator, robotInfoUpdateCallback, cardsInfoUpdateCallback) {
+        if (side !== ROBOT_SIDE_RIGHT && side !== ROBOT_SIDE_LEFT) throw "Unknown side " + side
+
+        this.side = Math.random().toString(36).slice(2)
         this._randomGenerator = randomGenerator
         this._robotInfoUpdate = robotInfoUpdateCallback
         this._cardsInfoUpdate = cardsInfoUpdateCallback
@@ -32,7 +36,7 @@ export default class Robot {
 
     get robotInfo() {
         return {
-            id: this.id,
+            side: this.side,
             state: this.state,
             head: this.head.info,
             torso: this.torso.info,

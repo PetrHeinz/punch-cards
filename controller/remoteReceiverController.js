@@ -19,7 +19,7 @@ export default class RemoteReceiverController {
     }
 
     onAction(data) {
-        if (data.robotId !== this.robot.id) return
+        if (data.side !== this.robot.side) return
 
         switch (data.action) {
             case "chooseAction":

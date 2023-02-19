@@ -2,7 +2,7 @@ import ChangeCache from "../utils/changeCache.js";
 import {ROBOT_HAND_RIGHT, ROBOT_STATE_CONTROL} from "../game/robot.js";
 
 export default class RobotRender {
-    constructor(root, extraClass, controller) {
+    constructor(root, sideClass, controller) {
         this.controller = controller
 
         this._actionCardsCache = new ChangeCache()
@@ -10,7 +10,7 @@ export default class RobotRender {
 
         const side = document.createElement('div')
         side.classList.add('side')
-        side.classList.add(extraClass)
+        side.classList.add(sideClass)
 
         const robot = document.createElement('div')
         robot.classList.add('robot')

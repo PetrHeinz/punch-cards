@@ -1,6 +1,8 @@
 import {createDeck} from "./cards.js";
 import RandomGenerator from "../utils/randomGenerator.js";
 import Robot, {
+    ROBOT_SIDE_LEFT,
+    ROBOT_SIDE_RIGHT,
     ROBOT_STATE_ACTION,
     ROBOT_STATE_COMMIT,
     ROBOT_STATE_CONTROL,
@@ -19,12 +21,14 @@ export default class Game {
         this._tickUpdate = () => eventManager.publish('tick', {tickCounter: tickCounter++})
 
         this.leftRobot = new Robot(
+            ROBOT_SIDE_LEFT,
             createDeck(),
             new RandomGenerator(`${randomSeedString}-left`),
             this._leftRobotInfoUpdate = () => eventManager.publish('leftRobotInfoUpdate', this.leftRobot.robotInfo),
             this._leftCardsInfoUpdate = () => eventManager.publish('leftCardsInfoUpdate', this.leftRobot.cardsInfo),
         )
         this.rightRobot = new Robot(
+            ROBOT_SIDE_RIGHT,
             createDeck(),
             new RandomGenerator(`${randomSeedString}-right`),
             this._rightRobotInfoUpdate = () => eventManager.publish('rightRobotInfoUpdate', this.rightRobot.robotInfo),
