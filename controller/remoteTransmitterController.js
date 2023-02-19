@@ -11,7 +11,7 @@ export default class RemoteTransmitterController {
 
     constructor(sendActionCallback) {
         this.sendAction = (cardsRender, data) => {
-            data.side = cardsRender.robotInfo.side
+            data.side = cardsRender.cardsInfo.side
             sendActionCallback(data)
         }
     }
@@ -24,7 +24,7 @@ export default class RemoteTransmitterController {
         this.render = cardsRender
 
         this.render.actionCards.addEventListener("click", (event) => {
-            if (this.render.robotInfo.state !== ROBOT_STATE_CONTROL) return
+            if (this.render.cardsInfo.state !== ROBOT_STATE_CONTROL) return
             if (event.target === this.render.actionCards) return
 
             const actionCardIndex = getChildIndex(this.render.actionCards, event.target)
@@ -49,7 +49,7 @@ export default class RemoteTransmitterController {
         })
 
         this.render.handCards.addEventListener("click", (event) => {
-            if (this.render.robotInfo.state !== ROBOT_STATE_CONTROL) return
+            if (this.render.cardsInfo.state !== ROBOT_STATE_CONTROL) return
             if (event.target === this.render.handCards) return
 
             const handCardIndex = getChildIndex(this.render.handCards, event.target)
@@ -70,7 +70,7 @@ export default class RemoteTransmitterController {
         })
 
         this.render.readyButton.addEventListener("click", () => {
-            if (this.render.robotInfo.state !== ROBOT_STATE_CONTROL) return
+            if (this.render.cardsInfo.state !== ROBOT_STATE_CONTROL) return
             this.sendAction(cardsRender, {action: "commit"})
             this.selectCard(ROBOT_CARDS_NONE)
         })
@@ -89,9 +89,9 @@ export default class RemoteTransmitterController {
             this.render.handCards.children[handCardIndex].classList.toggle("used", handCardUsed)
         }
 
-        this.render.actionCards.style.cursor = this.render.robotInfo.state === ROBOT_STATE_CONTROL ? "pointer" : ""
-        this.render.handCards.style.cursor = this.render.robotInfo.state === ROBOT_STATE_CONTROL ? "pointer" : ""
-        this.render.readyButton.classList.toggle("clickable", this.render.robotInfo.state === ROBOT_STATE_CONTROL)
+        this.render.actionCards.style.cursor = this.render.cardsInfo.state === ROBOT_STATE_CONTROL ? "pointer" : ""
+        this.render.handCards.style.cursor = this.render.cardsInfo.state === ROBOT_STATE_CONTROL ? "pointer" : ""
+        this.render.readyButton.classList.toggle("clickable", this.render.cardsInfo.state === ROBOT_STATE_CONTROL)
     }
 
     selectCard(selected, selectedIndex) {

@@ -19,13 +19,12 @@ export default class Robot {
     handCards = []
     actions = [new Action(), new Action(), new Action()]
 
-    constructor(side, cards, randomGenerator, robotInfoUpdateCallback, cardsInfoUpdateCallback) {
+    constructor(side, cards, randomGenerator, robotUpdateCallback) {
         if (side !== ROBOT_SIDE_RIGHT && side !== ROBOT_SIDE_LEFT) throw "Unknown side " + side
 
         this.side = Math.random().toString(36).slice(2)
         this._randomGenerator = randomGenerator
-        this._robotInfoUpdate = robotInfoUpdateCallback
-        this._cardsInfoUpdate = cardsInfoUpdateCallback
+        this._robotUpdate = robotUpdateCallback
         this.head = new Bodypart(40)
         this.torso = new Bodypart(80)
         this.heatsink = new Bodypart(60)
@@ -48,6 +47,8 @@ export default class Robot {
 
     get cardsInfo() {
         return {
+            side: this.side,
+            state: this.state,
             actions: this.actions.map(action => action.info),
             handCards: this.handCards.map(card => card.info),
             deckCardsCount: this.deckCards.length,
@@ -102,10 +103,11 @@ export default class Robot {
             }
             this.handCards.push(this.deckCards.shift())
         }
-        this._cardsInfoUpdate()
 
         this.state = ROBOT_STATE_CONTROL
-        this._robotInfoUpdate()
+
+        console.log("updating!")
+        this._robotUpdate()
 
         return this.handCards
     }
@@ -128,7 +130,8 @@ export default class Robot {
         }
 
         this.actions[actionIndex].insertCard(chosenCard, handCardIndex)
-        this._cardsInfoUpdate()
+
+        this._robotUpdate()
     }
 
     swapActions(firstActionIndex, secondActionIndex) {
@@ -146,7 +149,8 @@ export default class Robot {
         const swappedAction = this.actions[firstActionIndex]
         this.actions[firstActionIndex] = this.actions[secondActionIndex]
         this.actions[secondActionIndex] = swappedAction
-        this._cardsInfoUpdate()
+
+        this._robotUpdate()
     }
 
     toggleActionHand(actionIndex) {
@@ -158,21 +162,23 @@ export default class Robot {
         }
 
         this.actions[actionIndex].toggleHand()
-        this._cardsInfoUpdate()
+
+        this._robotUpdate()
     }
 
     discardAction(actionIndex) {
         if (this.state !== ROBOT_STATE_CONTROL) throw "Robot can discard action only during " + ROBOT_STATE_CONTROL
 
         this.actions[actionIndex].discard()
-        this._cardsInfoUpdate()
+
+        this._robotUpdate()
     }
 
     commit() {
         if (this.state !== ROBOT_STATE_CONTROL) throw "Robot can commit only during " + ROBOT_STATE_CONTROL
 
         this.state = ROBOT_STATE_COMMIT
-        this._robotInfoUpdate()
+        this._robotUpdate()
     }
 
     _shuffleCards(cards) {

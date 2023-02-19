@@ -5,7 +5,6 @@ export default class CardsRender {
     constructor(root, controller) {
         this.controller = controller
 
-        this._stateCache = new ChangeCache()
         this._actionCardsCache = new ChangeCache()
         this._handCardsCache = new ChangeCache()
 
@@ -50,7 +49,9 @@ export default class CardsRender {
         return cardElement
     }
 
-    renderCardsInfo(cardsInfo) {
+    render(cardsInfo) {
+        this.cardsInfo = cardsInfo
+
         this._actionCardsCache.ifChanged(cardsInfo.actions, () => {
             this.actionCards.innerHTML = ''
             cardsInfo.actions.forEach((action) => this.initAction(this.actionCards, action))
@@ -60,16 +61,8 @@ export default class CardsRender {
             cardsInfo.handCards.forEach((card) => this.initCard(this.handCards, card))
         })
 
+        this.readyButton.classList.toggle("pushed", cardsInfo.state !== ROBOT_STATE_CONTROL)
+
         this.controller.afterRender()
-    }
-
-    renderRobotInfo(robotInfo) {
-        this.robotInfo = robotInfo
-
-        this._stateCache.ifChanged(robotInfo.state, () => {
-            this.readyButton.classList.toggle("pushed", robotInfo.state !== ROBOT_STATE_CONTROL)
-
-            this.controller.afterRender()
-        })
     }
 }

@@ -1,4 +1,5 @@
 import {createDeck} from "./cards.js";
+import ChangeCache from "../utils/changeCache.js";
 import RandomGenerator from "../utils/randomGenerator.js";
 import Robot, {
     ROBOT_SIDE_LEFT,
@@ -13,37 +14,66 @@ import Robot, {
 
 export default class Game {
     currentAction = 0
+    _tickCounter = 0
 
     constructor(randomSeedString, eventManager) {
         randomSeedString = randomSeedString ?? RandomGenerator.randomSeedString(32)
+        this.eventManager = eventManager
 
-        let tickCounter = 0
-        this._tickUpdate = () => eventManager.publish('tick', {tickCounter: tickCounter++})
+        this._leftRobotInfoCache = new ChangeCache()
+        this._leftCardsInfoCache = new ChangeCache()
+        this._rightRobotInfoCache = new ChangeCache()
+        this._rightCardsInfoCache = new ChangeCache()
 
         this.leftRobot = new Robot(
             ROBOT_SIDE_LEFT,
             createDeck(),
             new RandomGenerator(`${randomSeedString}-left`),
-            this._leftRobotInfoUpdate = () => eventManager.publish('leftRobotInfoUpdate', this.leftRobot.robotInfo),
-            this._leftCardsInfoUpdate = () => eventManager.publish('leftCardsInfoUpdate', this.leftRobot.cardsInfo),
+            () => this._leftRobotUpdate(),
         )
         this.rightRobot = new Robot(
             ROBOT_SIDE_RIGHT,
             createDeck(),
             new RandomGenerator(`${randomSeedString}-right`),
-            this._rightRobotInfoUpdate = () => eventManager.publish('rightRobotInfoUpdate', this.rightRobot.robotInfo),
-            this._rightCardsInfoUpdate = () => eventManager.publish('rightCardsInfoUpdate', this.rightRobot.cardsInfo),
-        )
-        this._actionPhaseInfoUpdate = (phase) => eventManager.publish(
-            'actionPhaseInfoUpdate.' + phase,
-            {leftRobotInfo: this.leftRobot.robotInfo, rightRobotInfo: this.rightRobot.robotInfo}
+            () => this._rightRobotUpdate(),
         )
 
         this._tickUpdate()
-        this._leftRobotInfoUpdate()
-        this._leftCardsInfoUpdate()
-        this._rightRobotInfoUpdate()
-        this._rightCardsInfoUpdate()
+        this._robotsUpdate()
+    }
+
+    _tickUpdate() {
+        this.eventManager.publish('tick', {tickCounter: this._tickCounter++})
+    }
+
+    _robotsUpdate() {
+        this._leftRobotUpdate()
+        this._rightRobotUpdate()
+    }
+
+    _leftRobotUpdate() {
+        this._leftCardsInfoCache.ifChanged(this.leftRobot.cardsInfo, () => {
+            this.eventManager.publish('leftCardsInfoUpdate', this.leftRobot.cardsInfo)
+        })
+        this._leftRobotInfoCache.ifChanged(this.leftRobot.robotInfo, () => {
+            this.eventManager.publish('leftRobotInfoUpdate', this.leftRobot.robotInfo)
+        })
+    }
+
+    _rightRobotUpdate() {
+        this._rightCardsInfoCache.ifChanged(this.rightRobot.cardsInfo, () => {
+            this.eventManager.publish('rightCardsInfoUpdate', this.rightRobot.cardsInfo)
+        })
+        this._rightRobotInfoCache.ifChanged(this.rightRobot.robotInfo, () => {
+            this.eventManager.publish('rightRobotInfoUpdate', this.rightRobot.robotInfo)
+        })
+    }
+
+    _actionPhaseInfoUpdate(phase) {
+        this.eventManager.publish(
+            'actionPhaseInfoUpdate.' + phase,
+            {leftRobotInfo: this.leftRobot.robotInfo, rightRobotInfo: this.rightRobot.robotInfo}
+        )
     }
 
     isOver() {
@@ -70,14 +100,14 @@ export default class Game {
         if (this.leftRobot.state === ROBOT_STATE_PREPARE && this.rightRobot.state === ROBOT_STATE_DEAD) {
             console.info("Left robot won!")
             this.leftRobot.state = ROBOT_STATE_WINNER
-            this._leftRobotInfoUpdate()
+            this._leftRobotUpdate()
             return
         }
 
         if (this.leftRobot.state === ROBOT_STATE_DEAD && this.rightRobot.state === ROBOT_STATE_PREPARE) {
             console.info("Right robot won!")
             this.rightRobot.state = ROBOT_STATE_WINNER
-            this._rightRobotInfoUpdate()
+            this._rightRobotUpdate()
             return
         }
 
@@ -93,8 +123,7 @@ export default class Game {
             console.info("Starting action!")
             this.leftRobot.state = ROBOT_STATE_ACTION
             this.rightRobot.state = ROBOT_STATE_ACTION
-            this._leftRobotInfoUpdate()
-            this._rightRobotInfoUpdate()
+            this._robotsUpdate()
         }
 
         let actions = []
@@ -104,7 +133,7 @@ export default class Game {
                 actions.push(this.leftRobot.actions[this.currentAction].getAction(this.leftRobot, this.rightRobot))
             } else {
                 this.leftRobot.state = this.leftRobot.isDestroyed() ? ROBOT_STATE_DEAD : ROBOT_STATE_PREPARE
-                this._leftRobotInfoUpdate()
+                this._leftRobotUpdate()
             }
         }
 
@@ -113,7 +142,7 @@ export default class Game {
                 actions.push(this.rightRobot.actions[this.currentAction].getAction(this.rightRobot, this.leftRobot))
             } else {
                 this.rightRobot.state = this.rightRobot.isDestroyed() ? ROBOT_STATE_DEAD : ROBOT_STATE_PREPARE
-                this._rightRobotInfoUpdate()
+                this._rightRobotUpdate()
             }
         }
 

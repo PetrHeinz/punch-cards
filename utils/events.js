@@ -17,9 +17,9 @@ export default class EventManager {
     }
 
     publish(type, payload) {
+        console.debug(`[${this._formatTime()}] Published event "${type}":` , payload)
         this._events.push({type, payload})
         this._call(type, payload)
-        console.debug(`[${this._formatTime()}] Published event "${type}":` , payload)
     }
 
     hasEvent(type) {
