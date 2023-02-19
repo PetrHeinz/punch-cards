@@ -10,37 +10,37 @@ export default class RemoteTransmitterController {
     selectedIndex = 0
 
     constructor(sendActionCallback) {
-        this.sendAction = (robotRender, data) => {
-            data.side = robotRender.robot.side
+        this.sendAction = (cardsRender, data) => {
+            data.side = cardsRender.robotInfo.side
             sendActionCallback(data)
         }
     }
 
     /**
-     * @param {RobotRender} robotRender
+     * @param {CardsRender} cardsRender
      */
-    initialize(robotRender) {
+    initialize(cardsRender) {
         if (this.render !== undefined) throw "This controller has already been initialized"
-        this.render = robotRender
+        this.render = cardsRender
 
         this.render.actionCards.addEventListener("click", (event) => {
-            if (this.render.state.textContent !== ROBOT_STATE_CONTROL) return
+            if (this.render.robotInfo.state !== ROBOT_STATE_CONTROL) return
             if (event.target === this.render.actionCards) return
 
             const actionCardIndex = getChildIndex(this.render.actionCards, event.target)
             if (event.target.classList.contains("hand-toggle")) {
-                this.sendAction(robotRender, {action: "toggleActionHand", actionIndex: actionCardIndex})
+                this.sendAction(cardsRender, {action: "toggleActionHand", actionIndex: actionCardIndex})
                 return
             }
 
             if (this.selected === ROBOT_CARDS_HAND) {
-                this.sendAction(robotRender, {action: "chooseAction", handCardIndex: this.selectedIndex, actionIndex: actionCardIndex})
+                this.sendAction(cardsRender, {action: "chooseAction", handCardIndex: this.selectedIndex, actionIndex: actionCardIndex})
                 this.selectCard(ROBOT_CARDS_NONE)
                 return
             }
             if (this.selected === ROBOT_CARDS_ACTION) {
                 if (actionCardIndex !== this.selectedIndex) {
-                    this.sendAction(robotRender, {action: "swapActions", firstActionIndex: actionCardIndex, secondActionIndex: this.selectedIndex})
+                    this.sendAction(cardsRender, {action: "swapActions", firstActionIndex: actionCardIndex, secondActionIndex: this.selectedIndex})
                 }
                 this.selectCard(ROBOT_CARDS_NONE)
                 return
@@ -49,15 +49,15 @@ export default class RemoteTransmitterController {
         })
 
         this.render.handCards.addEventListener("click", (event) => {
-            if (this.render.state.textContent !== ROBOT_STATE_CONTROL) return
+            if (this.render.robotInfo.state !== ROBOT_STATE_CONTROL) return
             if (event.target === this.render.handCards) return
 
             const handCardIndex = getChildIndex(this.render.handCards, event.target)
             if (this.selected === ROBOT_CARDS_ACTION) {
                 if (this.render.actionCards.children[this.selectedIndex].dataset.handCardIndex === handCardIndex) {
-                    this.sendAction(robotRender, {action: "discardAction", actionIndex: this.selectedIndex})
+                    this.sendAction(cardsRender, {action: "discardAction", actionIndex: this.selectedIndex})
                 } else {
-                    this.sendAction(robotRender, {action: "chooseAction", handCardIndex: handCardIndex, actionIndex: this.selectedIndex})
+                    this.sendAction(cardsRender, {action: "chooseAction", handCardIndex: handCardIndex, actionIndex: this.selectedIndex})
                 }
                 this.selectCard(ROBOT_CARDS_NONE)
                 return
@@ -70,8 +70,8 @@ export default class RemoteTransmitterController {
         })
 
         this.render.readyButton.addEventListener("click", () => {
-            if (this.render.state.textContent !== ROBOT_STATE_CONTROL) return
-            this.sendAction(robotRender, {action: "commit"})
+            if (this.render.robotInfo.state !== ROBOT_STATE_CONTROL) return
+            this.sendAction(cardsRender, {action: "commit"})
             this.selectCard(ROBOT_CARDS_NONE)
         })
     }
@@ -89,9 +89,9 @@ export default class RemoteTransmitterController {
             this.render.handCards.children[handCardIndex].classList.toggle("used", handCardUsed)
         }
 
-        this.render.actionCards.style.cursor = this.render.state.textContent === ROBOT_STATE_CONTROL ? "pointer" : ""
-        this.render.handCards.style.cursor = this.render.state.textContent === ROBOT_STATE_CONTROL ? "pointer" : ""
-        this.render.readyButton.classList.toggle("clickable", this.render.state.textContent === ROBOT_STATE_CONTROL)
+        this.render.actionCards.style.cursor = this.render.robotInfo.state === ROBOT_STATE_CONTROL ? "pointer" : ""
+        this.render.handCards.style.cursor = this.render.robotInfo.state === ROBOT_STATE_CONTROL ? "pointer" : ""
+        this.render.readyButton.classList.toggle("clickable", this.render.robotInfo.state === ROBOT_STATE_CONTROL)
     }
 
     selectCard(selected, selectedIndex) {

@@ -9,10 +9,7 @@ export default class RemoteReceiverController {
         listenerCallback((data) => this.onAction(data))
     }
 
-    /**
-     * @param {RobotRender} robotRender
-     */
-    initialize(robotRender) {
+    initialize() {
     }
 
     afterRender() {

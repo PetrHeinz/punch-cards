@@ -1,4 +1,5 @@
 import RobotRender from "./robotRender.js";
+import CardsRender from "./cardsRender.js";
 
 export default class GameRender {
     constructor(root, eventManager, leftController, rightController, tickTimeout) {
@@ -12,8 +13,19 @@ export default class GameRender {
         this.menu.classList.add("menu-upper")
         game.append(this.menu)
 
-        this.leftRobot = new RobotRender(game, 'left', leftController)
-        this.rightRobot = new RobotRender(game, 'right', rightController)
+        const leftSide = document.createElement('div')
+        leftSide.classList.add('side')
+        leftSide.classList.add("left")
+        this.leftRobot = new RobotRender(leftSide)
+        this.leftCardsRender = new CardsRender(leftSide, leftController)
+        game.append(leftSide)
+
+        const rightSide = document.createElement('div')
+        rightSide.classList.add('side')
+        rightSide.classList.add("right")
+        this.rightRobot = new RobotRender(rightSide)
+        this.rightCardsRender = new CardsRender(rightSide, rightController)
+        game.append(rightSide)
 
         this.messageOverlay = document.createElement("div")
         this.messageOverlay.classList.add("message-overlay")
@@ -23,10 +35,13 @@ export default class GameRender {
 
         eventManager.listen("messageOverlay", ({text}) => this.messageOverlay.textContent = text)
 
-        eventManager.listen("leftRobotInfoUpdate", leftRobotInfo => this.leftRobot.renderRobotInfo(leftRobotInfo))
-        eventManager.listen("rightRobotInfoUpdate", rightRobotInfo => this.rightRobot.renderRobotInfo(rightRobotInfo))
-        eventManager.listen("leftCardsInfoUpdate", leftCardsInfo => this.leftRobot.renderCardsInfo(leftCardsInfo))
-        eventManager.listen("rightCardsInfoUpdate", rightCardsInfo => this.rightRobot.renderCardsInfo(rightCardsInfo))
+        eventManager.listen("leftRobotInfoUpdate", leftRobotInfo => this.leftRobot.render(leftRobotInfo))
+        eventManager.listen("rightRobotInfoUpdate", rightRobotInfo => this.rightRobot.render(rightRobotInfo))
+
+        eventManager.listen("leftRobotInfoUpdate", leftRobotInfo => this.leftCardsRender.renderRobotInfo(leftRobotInfo))
+        eventManager.listen("rightRobotInfoUpdate", rightRobotInfo => this.rightCardsRender.renderRobotInfo(rightRobotInfo))
+        eventManager.listen("leftCardsInfoUpdate", leftCardsInfo => this.leftCardsRender.renderCardsInfo(leftCardsInfo))
+        eventManager.listen("rightCardsInfoUpdate", rightCardsInfo => this.rightCardsRender.renderCardsInfo(rightCardsInfo))
 
         let currentTickTimeout = 0
         eventManager.listen("actionPhaseInfoUpdate.prepare", ({leftRobotInfo, rightRobotInfo}) => {
@@ -43,14 +58,14 @@ export default class GameRender {
 
     _renderRobotsInfoWithTimeout(leftRobotInfo, rightRobotInfo, timeout = 0) {
         if (timeout === 0) {
-            this.leftRobot.renderRobotInfo(leftRobotInfo)
-            this.rightRobot.renderRobotInfo(rightRobotInfo)
+            this.leftRobot.render(leftRobotInfo)
+            this.rightRobot.render(rightRobotInfo)
             return
         }
 
         setTimeout(() => {
-            this.leftRobot.renderRobotInfo(leftRobotInfo)
-            this.rightRobot.renderRobotInfo(rightRobotInfo)
+            this.leftRobot.render(leftRobotInfo)
+            this.rightRobot.render(rightRobotInfo)
         }, timeout)
     }
 

@@ -17,11 +17,11 @@ export default class RandobotController {
     }
 
     /**
-     * @param {RobotRender} robotRender
+     * @param {CardsRender} cardsRender
      */
-    initialize(robotRender) {
+    initialize(cardsRender) {
         if (this.render !== undefined) throw "This controller has already been initialized"
-        this.render = robotRender
+        this.render = cardsRender
 
         const interval = setInterval(() => {
             if (this.robot.state === ROBOT_STATE_CONTROL) this.doAction()

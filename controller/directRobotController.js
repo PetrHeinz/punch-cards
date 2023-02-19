@@ -16,11 +16,11 @@ export default class DirectRobotController {
     }
 
     /**
-     * @param {RobotRender} robotRender
+     * @param {CardsRender} cardsRender
      */
-    initialize(robotRender) {
+    initialize(cardsRender) {
         if (this.render !== undefined) throw "This controller has already been initialized"
-        this.render = robotRender
+        this.render = cardsRender
 
         this.render.actionCards.addEventListener("click", (event) => {
             if (this.robot.state !== ROBOT_STATE_CONTROL) return

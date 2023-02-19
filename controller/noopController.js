@@ -1,5 +1,5 @@
 export default class NoopController {
-    initialize(robotRender) {
+    initialize() {
     }
 
     afterRender() {
