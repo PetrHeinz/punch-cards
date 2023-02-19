@@ -12,14 +12,17 @@ export default class AppServer {
     controllers = [
         {
             name: 'Direct control',
+            remoteControl: false,
             create: (robot) => new DirectRobotController(robot),
         },
         {
             name: 'Randobot',
+            remoteControl: false,
             create: (robot) => new RandobotController(robot, this.randomSeedString),
         },
         {
             name: 'Remote control',
+            remoteControl: true,
             create: (robot) => new RemoteReceiverController(robot, (listener) => this.controllerListeners.push(listener)),
         },
     ]
@@ -75,7 +78,11 @@ export default class AppServer {
             tickTimeout,
         )
 
-        eventManager.publish("gameStarted", {tickTimeout})
+        eventManager.publish("gameStarted", {
+            tickTimeout,
+            leftRemoteControl: this.controllers[this.leftControllerIndex].remoteControl,
+            rightRemoteControl: this.controllers[this.rightControllerIndex].remoteControl,
+        })
 
         gameRender.addMenuButton("BACK_TO_MENU", () => {
             eventManager.publish("gameEnded", {})

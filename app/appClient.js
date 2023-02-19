@@ -2,6 +2,7 @@ import EventManager from "../utils/events.js";
 import GameRender from "../render/gameRender.js";
 import {appendButton, appendHeading, appendLine, clear} from "./documentEdit.js";
 import RemoteTransmitterController from "../controller/remoteTransmitterController.js";
+import NoopController from "../controller/noopController.js";
 
 export default class AppClient {
     /**
@@ -65,7 +66,7 @@ export default class AppClient {
 
         this.root.append(menu)
 
-        this.eventManager.listen("gameStarted", ({tickTimeout}) => this.showGame(tickTimeout))
+        this.eventManager.listen("gameStarted", options => this.showGame(options))
         this.eventManager.listen("gameEnded", () => this.waitForAnotherGame())
     }
 
@@ -82,15 +83,19 @@ export default class AppClient {
         this.root.append(menu)
     }
 
-    showGame(tickTimeout) {
+    showGame(options) {
         clear(this.root)
 
         new GameRender(
             this.root,
             this.eventManager,
-            new RemoteTransmitterController((data) => this.serverConnection.send(data)),
-            new RemoteTransmitterController((data) => this.serverConnection.send(data)),
-            tickTimeout,
+            options.leftRemoteControl
+                ? new RemoteTransmitterController((data) => this.serverConnection.send(data))
+                : new NoopController(),
+            options.rightRemoteControl
+                ? new RemoteTransmitterController((data) => this.serverConnection.send(data))
+                : new NoopController(),
+            options.tickTimeout,
         )
     }
 }
