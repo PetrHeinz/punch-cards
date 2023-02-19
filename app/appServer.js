@@ -5,6 +5,7 @@ import Game from "../game/game.js";
 import GameRender from "../render/gameRender.js";
 import {appendButton, appendHeading, appendInput, appendLine, clear} from "./documentEdit.js";
 import RemoteReceiverController from "../controller/remoteReceiverController.js";
+import Timer from "../utils/timer.js";
 
 export default class AppServer {
     randomSeedString = "punch-cards"
@@ -36,6 +37,7 @@ export default class AppServer {
         this.root = root
         this.createInviteLink = createInviteLink
         this.peer = new Peer()
+        this.timer = new Timer()
         this.peer.on('open', (id) => {
             console.info('Peer.js is ready to connect. Peer ID is ' + id)
         })
@@ -75,7 +77,16 @@ export default class AppServer {
 
         gameRender.addMenuButton("BACK_TO_MENU", () => this.showMenu())
         gameRender.addMenuButton("RESTART_GAME", () => this.startGame())
-        this.gameTickInterval = setInterval(() => game.tick(), tickTimeout)
+
+        this.timer.doInSequence(tickTimeout,
+            () => eventManager.publish("messageOverlay", {text: "3…"}),
+            () => eventManager.publish("messageOverlay", {text: "2…"}),
+            () => eventManager.publish("messageOverlay", {text: "1…"}),
+            () => eventManager.publish("messageOverlay", {text: "GO!"}),
+            () => eventManager.publish("messageOverlay", {text: ""}),
+        )
+
+        this.timer.doPeriodically(() => game.tick(), tickTimeout, 3*tickTimeout)
     }
 
     showMenu() {
@@ -146,7 +157,7 @@ export default class AppServer {
     }
 
     clear() {
-        clearInterval(this.gameTickInterval)
+        this.timer.clear()
         clear(this.root)
     }
 }

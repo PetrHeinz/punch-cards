@@ -285,6 +285,17 @@ h1.line {
     color: var(--color-card-hand-text-hover);
 }
 
+.message-overlay {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    line-height: calc(2 * var(--unit));
+    font-weight: bold;
+    font-size: 600%;
+    top: calc(4 * var(--unit));
+    color: var(--color-active-text);
+}
+
 .button {
     width: fit-content;
     --button-height: calc(1.5 * var(--unit) - 2 * var(--border) - 2 * var(--margin) - 1px);
