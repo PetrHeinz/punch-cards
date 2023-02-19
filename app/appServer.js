@@ -58,10 +58,7 @@ export default class AppServer {
         this.clear()
 
         const eventManager = new EventManager()
-        eventManager.listenToAll((type, payload) => this.clientConnections.forEach((connection) => connection.send({
-            type,
-            payload
-        })))
+        eventManager.listenToAll((type, payload) => this.clientConnections.forEach((connection) => connection.send({type, payload})))
 
         let game = new Game(this.randomSeedString, eventManager)
         let gameRender = new GameRender(

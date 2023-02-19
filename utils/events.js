@@ -3,12 +3,12 @@ export default class EventManager {
     _callbacksByType = {}
     _callbacks = []
 
-    listen(type, callback, withReplay = true) {
+    listen(type, callback) {
         if (this._callbacksByType[type] === undefined) {
             this._callbacksByType[type] = []
         }
         this._callbacksByType[type].push(callback)
-        this._events.forEach(({eventType, payload}) => eventType === type && callback(payload))
+        this._events.forEach(event => event.type === type && callback(event.payload))
     }
 
     listenToAll(callback) {
@@ -19,7 +19,7 @@ export default class EventManager {
     publish(type, payload) {
         this._events.push({type, payload})
         this._call(type, payload)
-        console.debug(type, payload)
+        console.debug(`[${this._formatTime()}] Published event "${type}":` , payload)
     }
 
     _call(type, payload) {
@@ -27,5 +27,10 @@ export default class EventManager {
             this._callbacksByType[type].forEach(callback => callback(payload))
         }
         this._callbacks.forEach(callback => callback(type, payload))
+    }
+
+    _formatTime() {
+        const now = new Date();
+        return `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}.${now.getMilliseconds()}`
     }
 }

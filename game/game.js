@@ -14,6 +14,10 @@ export default class Game {
 
     constructor(randomSeedString, eventManager) {
         randomSeedString = randomSeedString ?? RandomGenerator.randomSeedString(32)
+
+        let tickCounter = 0
+        this._tickUpdate = () => eventManager.publish('tick', {tickCounter: tickCounter++})
+
         this.leftRobot = new Robot(
             createDeck(),
             new RandomGenerator(`${randomSeedString}-left`),
@@ -30,14 +34,12 @@ export default class Game {
             'actionPhaseInfoUpdate.' + phase,
             {leftRobotInfo: this.leftRobot.robotInfo, rightRobotInfo: this.rightRobot.robotInfo}
         )
-        let tickCounter = 0
-        this._tickUpdate = () => eventManager.publish('tick', {tickCounter: tickCounter++})
 
+        this._tickUpdate()
         this._leftRobotInfoUpdate()
         this._leftCardsInfoUpdate()
         this._rightRobotInfoUpdate()
         this._rightCardsInfoUpdate()
-        this._tickUpdate()
     }
 
     isOver() {
