@@ -22,6 +22,19 @@ export default class EventManager {
         console.debug(`[${this._formatTime()}] Published event "${type}":` , payload)
     }
 
+    hasEvent(type) {
+        this._events.forEach(event => {
+            if (event.type === type) {
+                return true
+            }
+        })
+        return false
+    }
+
+    clear() {
+        this._events = []
+    }
+
     _call(type, payload) {
         if (this._callbacksByType[type] !== undefined) {
             this._callbacksByType[type].forEach(callback => callback(payload))

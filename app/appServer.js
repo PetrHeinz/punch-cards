@@ -75,8 +75,16 @@ export default class AppServer {
             tickTimeout,
         )
 
-        gameRender.addMenuButton("BACK_TO_MENU", () => this.showMenu())
-        gameRender.addMenuButton("RESTART_GAME", () => this.startGame())
+        eventManager.publish("gameStarted", {tickTimeout})
+
+        gameRender.addMenuButton("BACK_TO_MENU", () => {
+            eventManager.publish("gameEnded", {})
+            this.showMenu()
+        })
+        gameRender.addMenuButton("RESTART_GAME", () => {
+            eventManager.publish("gameEnded", {})
+            this.startGame()
+        })
 
         this.timer.doInSequence(tickTimeout,
             () => eventManager.publish("messageOverlay", {text: "3…"}),
