@@ -76,6 +76,14 @@ export default class Game {
         )
     }
 
+    clearUpdateCache()
+    {
+        this._leftRobotInfoCache.clear()
+        this._leftCardsInfoCache.clear()
+        this._rightRobotInfoCache.clear()
+        this._rightCardsInfoCache.clear()
+    }
+
     isOver() {
         if (this.leftRobot.state === ROBOT_STATE_DEAD && this.rightRobot.state === ROBOT_STATE_DEAD) {
             return true
@@ -86,6 +94,7 @@ export default class Game {
 
     tick() {
         this._tickUpdate()
+        this._robotsUpdate()
 
         if (this.isOver()) {
             console.debug("Game is already over")

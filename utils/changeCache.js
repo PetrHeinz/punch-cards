@@ -1,6 +1,6 @@
 export default class ChangeCache {
     constructor(object) {
-        this.lastJson = object !== undefined ? JSON.stringify(object) : ''
+        this.lastJson = object !== undefined ? JSON.stringify(object) : null
     }
 
     ifChanged(object, callback) {
@@ -9,5 +9,9 @@ export default class ChangeCache {
             callback()
         }
         this.lastJson = json
+    }
+
+    clear() {
+        this.lastJson = null
     }
 }

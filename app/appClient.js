@@ -3,6 +3,7 @@ import GameRender from "../render/gameRender.js";
 import {appendButton, appendHeading, appendLine, clear} from "./documentEdit.js";
 import RemoteTransmitterController from "../controller/remoteTransmitterController.js";
 import NoopController from "../controller/noopController.js";
+import Timer from "../utils/timer.js";
 
 export default class AppClient {
     /**
@@ -13,11 +14,12 @@ export default class AppClient {
         this.root = root
         this.peer = new Peer()
         this.eventManager = new EventManager()
+        this.timer = new Timer()
         this.peer.on('open', id => {
             console.info('Peer.js is ready to connect. Peer ID is ' + id)
             this.serverConnection = this.peer.connect(serverPeerId, {serialization: "json"})
             this.serverConnection.on('data', data => {
-                console.debug('Received', data)
+                console.debug('Received data from server: ', data)
                 this.eventManager.publish(data.type, data.payload)
             })
             this.serverConnection.on("error", error => console.error(error))
@@ -66,6 +68,8 @@ export default class AppClient {
 
         this.root.append(menu)
 
+        this.timer.doPeriodically(() => this.serverConnection.send("ready"), 200, 0)
+
         this.eventManager.listen("gameStarted", options => this.showGame(options))
         this.eventManager.listen("gameEnded", () => this.waitForAnotherGame())
     }
@@ -80,11 +84,14 @@ export default class AppClient {
         appendLine(menu, "game ended")
         appendLine(menu, "waiting for another game to start...")
 
+        this.timer.doPeriodically(() => this.serverConnection.send("ready"), 200, 0)
+
         this.root.append(menu)
     }
 
     showGame(options) {
         clear(this.root)
+        this.timer.clear()
 
         new GameRender(
             this.root,

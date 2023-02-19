@@ -32,6 +32,8 @@ export default class AppServer {
     clientConnections = []
     controllerListeners = []
 
+    onRemoteReady = () => {}
+
     /**
      * @param {Element} root
      * @param {function(string):string} createInviteLink
@@ -50,7 +52,13 @@ export default class AppServer {
                 this.clientConnections.push(connection)
             })
             connection.on('data', (data) => {
-                console.debug('Received', data)
+                console.debug('Received data from client: ', data)
+
+                if (data === "ready") {
+                    this.onRemoteReady(connection)
+                    return
+                }
+
                 this.controllerListeners.forEach((listener) => listener(data))
             })
             connection.on("error", (error) => {
@@ -60,6 +68,27 @@ export default class AppServer {
         this.peer.on("error", (error) => {
             console.error(error)
         })
+    }
+
+    startGameWhenReady() {
+        if (!this.controllers[this.leftControllerIndex].remoteControl && !this.controllers[this.rightControllerIndex].remoteControl) {
+            this.startGame()
+            return
+        }
+        clear(this.root)
+
+        const menu = document.createElement('div')
+        menu.classList.add('menu')
+
+        appendHeading(menu)
+
+        this.appendInviteLinkInput(menu)
+
+        appendLine(menu, "waiting for friends...")
+
+        this.root.append(menu)
+
+        this.onRemoteReady = () => this.startGame()
     }
 
     startGame() {
@@ -78,19 +107,26 @@ export default class AppServer {
             tickTimeout,
         )
 
-        eventManager.publish("gameStarted", {
+        const gameStartedPayload = {
             tickTimeout,
             leftRemoteControl: this.controllers[this.leftControllerIndex].remoteControl,
             rightRemoteControl: this.controllers[this.rightControllerIndex].remoteControl,
-        })
+        };
+        eventManager.publish("gameStarted", gameStartedPayload)
+        this.onRemoteReady = connection => {
+            game.clearUpdateCache()
+            this.timer.doAfter(() => connection.send({type: "gameStarted", payload: gameStartedPayload}), tickTimeout)
+        }
 
         gameRender.addMenuButton("BACK_TO_MENU", () => {
             eventManager.publish("gameEnded", {})
+            this.onRemoteReady = () => {}
             this.showMenu()
         })
         gameRender.addMenuButton("RESTART_GAME", () => {
             eventManager.publish("gameEnded", {})
-            this.startGame()
+            this.onRemoteReady = () => {}
+            this.startGameWhenReady()
         })
 
         this.timer.doInSequence(tickTimeout,
@@ -118,21 +154,7 @@ export default class AppServer {
             this.randomSeedString = randomSeedString !== "" ? randomSeedString : null
         })
 
-        const inviteLinkDefaultText = "connecting to the network...";
-        const inviteLinkInput = appendInput(menu, "Invite friends via URL", this.peer.id ? this.createInviteLink(this.peer.id) : inviteLinkDefaultText)
-        inviteLinkInput.readOnly = true
-        this.peer.on('open', (peerId) => {
-            inviteLinkInput.value = this.createInviteLink(peerId)
-        })
-        inviteLinkInput.classList.add("status")
-        inviteLinkInput.addEventListener("click", () => {
-            if (inviteLinkInput.value === inviteLinkDefaultText) return
-            inviteLinkInput.select()
-            navigator.clipboard.writeText(inviteLinkInput.value).then(() => {
-                inviteLinkInput.classList.add("success")
-                setTimeout(() => inviteLinkInput.classList.remove("success"), 1000)
-            })
-        })
+        this.appendInviteLinkInput(menu)
 
         appendLine(menu, "Choose left controller:")
 
@@ -166,9 +188,27 @@ export default class AppServer {
             menu.append(element)
         })
 
-        appendButton(menu, "Fight!", () => this.startGame())
+        appendButton(menu, "Fight!", () => this.startGameWhenReady())
 
         this.root.append(menu)
+    }
+
+    appendInviteLinkInput(menu) {
+        const inviteLinkDefaultText = "connecting to the network...";
+        const inviteLinkInput = appendInput(menu, "Invite friends via URL", this.peer.id ? this.createInviteLink(this.peer.id) : inviteLinkDefaultText)
+        inviteLinkInput.readOnly = true
+        this.peer.on('open', (peerId) => {
+            inviteLinkInput.value = this.createInviteLink(peerId)
+        })
+        inviteLinkInput.classList.add("status")
+        inviteLinkInput.addEventListener("click", () => {
+            if (inviteLinkInput.value === inviteLinkDefaultText) return
+            inviteLinkInput.select()
+            navigator.clipboard.writeText(inviteLinkInput.value).then(() => {
+                inviteLinkInput.classList.add("success")
+                setTimeout(() => inviteLinkInput.classList.remove("success"), 1000)
+            })
+        })
     }
 
     clear() {
