@@ -232,6 +232,7 @@ export default class AppServer {
 
     clear() {
         this.timer.clear()
+        this.controllerListeners = []
         clear(this.root)
     }
 }
