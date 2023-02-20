@@ -75,10 +75,6 @@ export default class ControllableCardsRender extends CardsRender {
         return super.initAction(root, action)
     }
 
-    initCard(root, card, used = false) {
-        return super.initCard(root, card)
-    }
-
     render(cardsInfo) {
         this.cardsInfo = cardsInfo
 
@@ -110,7 +106,7 @@ export default class ControllableCardsRender extends CardsRender {
 function getChildIndex(element, childElement) {
     for (const childIndex in element.children) {
         if (element.children[childIndex] === childElement) {
-            return childIndex
+            return parseInt(childIndex)
         }
     }
     return getChildIndex(element, childElement.parentElement)

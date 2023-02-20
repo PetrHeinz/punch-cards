@@ -11,10 +11,6 @@ export default class HiddenCardsRender extends CardsRender {
         }
     }
 
-    initCard(root, card, used = false) {
-        return super.initCard(root, card, false)
-    }
-
     render(cardsInfo) {
         const newHiddenActions = cardsInfo.state === ROBOT_STATE_CONTROL || cardsInfo.state === ROBOT_STATE_COMMIT;
 
@@ -24,5 +20,9 @@ export default class HiddenCardsRender extends CardsRender {
         }
 
         return super.render(cardsInfo)
+    }
+
+    _enrichHandCardsInfo(cardsInfo) {
+        return cardsInfo
     }
 }

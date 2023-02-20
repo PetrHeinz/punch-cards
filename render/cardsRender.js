@@ -52,6 +52,8 @@ export default class CardsRender {
     }
 
     render(cardsInfo) {
+        cardsInfo = this._enrichHandCardsInfo(cardsInfo);
+
         this._actionCardsCache.ifChanged(cardsInfo.actions, () => {
             this.actionCards.innerHTML = ''
             cardsInfo.actions.forEach(action => {
@@ -59,14 +61,24 @@ export default class CardsRender {
             })
         })
 
-        const usedHandCardIndexes = cardsInfo.actions.map(action => action.handCardIndex);
         this._handCardsCache.ifChanged(cardsInfo.handCards, () => {
             this.handCards.innerHTML = ''
-            cardsInfo.handCards.forEach((handCard, handCardIndex) => {
-                this.initCard(this.handCards, handCard,usedHandCardIndexes.indexOf(handCardIndex) > -1)
+            cardsInfo.handCards.forEach((handCard) => {
+                this.initCard(this.handCards, handCard,handCard.used)
             })
         })
 
         this.readyButton.classList.toggle("pushed", cardsInfo.state !== ROBOT_STATE_CONTROL)
+    }
+
+    _enrichHandCardsInfo(cardsInfo) {
+        const usedHandCardIndexes = cardsInfo.actions.map(action => action.handCardIndex);
+
+        cardsInfo.handCards = cardsInfo.handCards.map((handCard, handCardIndex) => ({
+            ...handCard,
+            used: usedHandCardIndexes.indexOf(handCardIndex) > -1
+        }))
+
+        return cardsInfo
     }
 }
