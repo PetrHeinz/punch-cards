@@ -208,34 +208,6 @@ h1.line {
     --forward: 11.5;
 }
 
-.hand.position1 {
-    --up: 7;
-}
-
-.hand.position2 {
-    --up: 6;
-}
-
-.hand.position3 {
-    --up: 5;
-}
-
-.hand.position4 {
-    --up: 4;
-}
-
-.hand.position5 {
-    --up: 3;
-}
-
-.hand.position6 {
-    --up: 2;
-}
-
-.hand.position7 {
-    --up: 1;
-}
-
 .cards,
 .actions {
     display: flex;
