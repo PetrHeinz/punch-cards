@@ -129,6 +129,9 @@ export default class Robot {
         this.handCards = []
         for (let i = 0; i < this.drawnCardsCount; i++) {
             if (this.deckCards.length === 0) {
+                if (this.discardedCards.length === 0) {
+                    break
+                }
                 this.deckCards = this._shuffleCards(this.discardedCards)
                 this.discardedCards = []
             }
