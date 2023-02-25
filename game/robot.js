@@ -103,7 +103,8 @@ export default class Robot {
             case 7:
                 return this.heatsink
         }
-        throw "Unexpected position " + position
+        console.debug("Creating NULL bodypart for position " + position)
+        return new Bodypart(0)
     }
 
     getNeighboringBodyparts(bodypart) {

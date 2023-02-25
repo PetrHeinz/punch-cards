@@ -171,6 +171,54 @@ export class HandFlipCard extends Card {
     }
 }
 
+export class FlipPunchCard extends PunchCard {
+    icon = "👋👊"
+    name = "Flip Punch"
+
+    _prepare(hand) {
+        hand.position = hand.max - hand.position + hand.min
+        super._prepare(hand)
+    }
+}
+
+export class UpPunchCard extends PunchCard {
+    icon = "☝️👊"
+    name = "Up Punch"
+
+    _prepare(hand) {
+        hand.min--
+        hand.position--
+        super._prepare(hand)
+    }
+
+    _cleanup(hand) {
+        super._cleanup(hand)
+        hand.min++
+        if (hand.position < hand.min) {
+            hand.position = hand.min
+        }
+    }
+}
+
+export class DownPunchCard extends PunchCard {
+    icon = "👇👊"
+    name = "Down Punch"
+
+    _prepare(hand) {
+        hand.max++
+        hand.position++
+        super._prepare(hand)
+    }
+
+    _cleanup(hand) {
+        super._cleanup(hand)
+        hand.max--
+        if (hand.position > hand.max) {
+            hand.position = hand.max
+        }
+    }
+}
+
 export class RepairCard extends Card {
     icon = "🔧"
     name = "Repair"
@@ -217,7 +265,6 @@ export class BlankCard extends Card {
 
 const cards = {
     blank: () => new BlankCard(),
-    punch: () => new PunchCard(),
     up1: () => new Up1Card(),
     up2: () => new Up2Card(),
     up3: () => new Up3Card(),
@@ -225,6 +272,10 @@ const cards = {
     down2: () => new Down2Card(),
     down3: () => new Down3Card(),
     hand_flip: () => new HandFlipCard(),
+    punch: () => new PunchCard(),
+    up_flip: () => new UpPunchCard(),
+    down_flip: () => new DownPunchCard(),
+    flip_punch: () => new FlipPunchCard(),
     charge: () => new ChargeCard(),
     push_up: () => new PushUpCard(),
     push_down: () => new PushDownCard(),
