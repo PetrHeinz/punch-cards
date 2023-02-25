@@ -224,7 +224,6 @@ h1.line {
     margin: calc(.5 * var(--unit)) var(--margin);
     border: var(--border) solid var(--color-card-border);
     border-radius: calc(var(--unit) / 4);
-    line-height: calc(var(--card-height) / 3);
     text-align: center;
     background-color: var(--color-card-bg);
     color: var(--color-card-text);
@@ -236,6 +235,15 @@ h1.line {
 }
 .card.selected {
     border-color: var(--color-card-border-selected);
+}
+
+.icon {
+    --fontsize-multiplier: 1;
+    font-size: calc(var(--fontsize-multiplier) * var(--fontsize));
+    letter-spacing: calc(-1 * var(--fontsize-multiplier) * .4 * var(--fontsize));
+    padding-right: calc(var(--fontsize-multiplier) * .4 * var(--fontsize));
+    height: calc(var(--card-height) / 2);
+    line-height: calc(var(--card-height) / 2);
 }
 
 .hand-toggle {

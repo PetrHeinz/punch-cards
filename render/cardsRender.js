@@ -38,12 +38,16 @@ export default class CardsRender {
     initCard(root, card, used = false) {
         const cardElement = document.createElement('div')
         cardElement.classList.add('card')
-
         if (used) {
             cardElement.classList.add("used")
         }
-        cardElement.append(card.icon)
-        cardElement.append(document.createElement('br'))
+
+        const iconElement = document.createElement('div')
+        iconElement.classList.add("icon")
+        iconElement.style.setProperty("--fontsize-multiplier", 2 / Math.pow(card.icon.length, 0.4))
+        iconElement.append(card.icon)
+
+        cardElement.append(iconElement)
         cardElement.append(card.name)
 
         root.append(cardElement)
