@@ -61,7 +61,7 @@ export class PunchCard extends Card {
 }
 
 export class Up1Card extends Card {
-    icon = "👆"
+    icon = "☝️"
     name = "Up"
 
     _prepare(hand) {
@@ -70,7 +70,7 @@ export class Up1Card extends Card {
 }
 
 export class Up2Card extends Card {
-    icon = "👆👆"
+    icon = "☝️☝️"
     name = "Uup"
 
     _prepare(hand) {
@@ -79,7 +79,7 @@ export class Up2Card extends Card {
 }
 
 export class Up3Card extends Card {
-    icon = "👆👆👆"
+    icon = "☝️☝️☝️"
     name = "Uuup"
 
     _prepare(hand) {
@@ -124,6 +124,44 @@ export class ChargeCard extends Card {
     }
 }
 
+export class PushUpCard extends Card {
+    icon = "🖐️☝️"
+    name = "Push up"
+
+    _prepare(hand) {
+        hand.isBlocking = false
+        hand.isAttacking = true
+        hand.isBlocked = true
+    }
+    _do(hand, thisRobot, otherRobot) {
+        otherRobot.getHandsBlockingAt(hand.position).forEach(otherHand => otherHand.position--)
+    }
+    _cleanup(hand, thisRobot) {
+        hand.isBlocking = true
+        hand.isAttacking = false
+        hand.isBlocked = false
+    }
+}
+
+export class PushDownCard extends Card {
+    icon = "🖐️👇"
+    name = "Push down"
+
+    _prepare(hand) {
+        hand.isBlocking = false
+        hand.isAttacking = true
+        hand.isBlocked = true
+    }
+    _do(hand, thisRobot, otherRobot) {
+        otherRobot.getHandsBlockingAt(hand.position).forEach(otherHand => otherHand.position++)
+    }
+    _cleanup(hand, thisRobot) {
+        hand.isBlocking = true
+        hand.isAttacking = false
+        hand.isBlocked = false
+    }
+}
+
 export class BlankCard extends Card {
     icon = "📄"
     name = "Blank"
@@ -139,6 +177,8 @@ const cards = {
     down2: () => new Down2Card(),
     down3: () => new Down3Card(),
     charge: () => new ChargeCard(),
+    push_up: () => new PushUpCard(),
+    push_down: () => new PushDownCard(),
 }
 
 export function getAllTypes() {
