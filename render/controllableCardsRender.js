@@ -7,8 +7,11 @@ const ROBOT_CARDS_NONE = "NONE"
 
 
 export default class ControllableCardsRender extends CardsRender {
-    selected = ROBOT_CARDS_NONE
-    selectedIndex = 0
+    vars = {
+        selected: ROBOT_CARDS_NONE,
+        selectedIndex: 0,
+        isInInputState: false,
+    }
 
     constructor(robotControl) {
         super();
@@ -19,7 +22,7 @@ export default class ControllableCardsRender extends CardsRender {
         super.initialize(root);
 
         this.actionCards.addEventListener("click", (event) => {
-            if (this.cardsInfo.state !== ROBOT_STATE_INPUT) return
+            if (!this.vars.isInInputState) return
             if (event.target === this.actionCards) return
 
             const actionCardIndex = getChildIndex(this.actionCards, event.target)
@@ -28,14 +31,14 @@ export default class ControllableCardsRender extends CardsRender {
                 return
             }
 
-            if (this.selected === ROBOT_CARDS_HAND) {
-                this.robotControl.chooseAction(this.selectedIndex, actionCardIndex)
+            if (this.vars.selected === ROBOT_CARDS_HAND) {
+                this.robotControl.chooseAction(this.vars.selectedIndex, actionCardIndex)
                 this._selectCard(ROBOT_CARDS_NONE)
                 return
             }
-            if (this.selected === ROBOT_CARDS_ACTION) {
-                if (actionCardIndex !== this.selectedIndex) {
-                    this.robotControl.swapActions(actionCardIndex, this.selectedIndex)
+            if (this.vars.selected === ROBOT_CARDS_ACTION) {
+                if (actionCardIndex !== this.vars.selectedIndex) {
+                    this.robotControl.swapActions(actionCardIndex, this.vars.selectedIndex)
                 }
                 this._selectCard(ROBOT_CARDS_NONE)
                 return
@@ -44,20 +47,20 @@ export default class ControllableCardsRender extends CardsRender {
         })
 
         this.handCards.addEventListener("click", (event) => {
-            if (this.cardsInfo.state !== ROBOT_STATE_INPUT) return
+            if (!this.vars.isInInputState) return
             if (event.target === this.handCards) return
 
             const handCardIndex = getChildIndex(this.handCards, event.target)
-            if (this.selected === ROBOT_CARDS_ACTION) {
-                if (this.actionCards.children[this.selectedIndex].dataset.handCardIndex === handCardIndex) {
-                    this.robotControl.discardAction(this.selectedIndex)
+            if (this.vars.selected === ROBOT_CARDS_ACTION) {
+                if (this.actionCards.children[this.vars.selectedIndex].dataset.handCardIndex === handCardIndex) {
+                    this.robotControl.discardAction(this.vars.selectedIndex)
                 } else {
-                    this.robotControl.chooseAction(handCardIndex, this.selectedIndex)
+                    this.robotControl.chooseAction(handCardIndex, this.vars.selectedIndex)
                 }
                 this._selectCard(ROBOT_CARDS_NONE)
                 return
             }
-            if (this.selected === ROBOT_CARDS_HAND && handCardIndex === this.selectedIndex) {
+            if (this.vars.selected === ROBOT_CARDS_HAND && handCardIndex === this.vars.selectedIndex) {
                 this._selectCard(ROBOT_CARDS_NONE)
                 return
             }
@@ -65,7 +68,7 @@ export default class ControllableCardsRender extends CardsRender {
         })
 
         this.readyButton.addEventListener("click", () => {
-            if (this.cardsInfo.state !== ROBOT_STATE_INPUT) return
+            if (!this.vars.isInInputState) return
             this.robotControl.commit()
             this._selectCard(ROBOT_CARDS_NONE)
         })
@@ -76,13 +79,12 @@ export default class ControllableCardsRender extends CardsRender {
     }
 
     render(cardsInfo) {
-        this.cardsInfo = cardsInfo
-
         super.render(cardsInfo)
 
-        this.actionCards.classList.toggle("clickable", this.cardsInfo.state === ROBOT_STATE_INPUT)
-        this.handCards.classList.toggle("clickable", this.cardsInfo.state === ROBOT_STATE_INPUT)
-        this.readyButton.classList.toggle("clickable", this.cardsInfo.state === ROBOT_STATE_INPUT)
+        this.vars.isInInputState = cardsInfo.state === ROBOT_STATE_INPUT
+        this.actionCards.classList.toggle("clickable", this.vars.isInInputState)
+        this.handCards.classList.toggle("clickable", this.vars.isInInputState)
+        this.readyButton.classList.toggle("clickable", this.vars.isInInputState)
     }
 
     _selectCard(selected, selectedIndex) {
@@ -96,9 +98,9 @@ export default class ControllableCardsRender extends CardsRender {
         if (selected === ROBOT_CARDS_HAND) {
             this.handCards.children[selectedIndex].classList.add("selected")
         }
-        this.selected = selected
+        this.vars.selected = selected
         if (selectedIndex !== undefined) {
-            this.selectedIndex = selectedIndex
+            this.vars.selectedIndex = selectedIndex
         }
     }
 }

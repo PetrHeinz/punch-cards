@@ -59,6 +59,8 @@ export default class GameRender {
             this._renderRobotsInfoWithTimeout(leftRobotInfo, rightRobotInfo, .55 * currentTickTimeout)
         })
         currentTickTimeout = tickTimeout
+
+        Object.freeze(this)
     }
 
     _renderRobotsInfoWithTimeout(leftRobotInfo, rightRobotInfo, timeout = 0) {

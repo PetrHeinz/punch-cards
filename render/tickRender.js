@@ -22,6 +22,8 @@ export default class TickRender {
         this._tick.append(this._timeToInput)
 
         this._timer = new Timer()
+
+        Object.freeze(this)
     }
 
     renderTick(tickCounter) {

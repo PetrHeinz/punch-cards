@@ -21,6 +21,8 @@ export default class RobotRender {
         robot.append(this.state)
 
         root.append(robot)
+
+        Object.freeze(this)
     }
 
     initBodypart(root, extraClass) {

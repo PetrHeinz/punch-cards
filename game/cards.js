@@ -262,7 +262,7 @@ class BlankCard extends Card {
     name = "Blank"
 }
 
-const cards = {
+const CARDS = {
     blank: BlankCard,
     up1: Up1Card,
     up2: Up2Card,
@@ -287,7 +287,7 @@ export function createBlankCard() {
 }
 
 export function getAllTypes() {
-    return Object.keys(cards)
+    return Object.keys(CARDS)
 }
 
 export function createDeckByTypes(types) {
@@ -301,5 +301,5 @@ export function createDeckByTypes(types) {
 }
 
 export function createCardByType(type) {
-    return new cards[type](type)
+    return Object.freeze(new CARDS[type](type))
 }

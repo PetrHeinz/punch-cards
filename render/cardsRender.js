@@ -34,6 +34,8 @@ export default class CardsRender {
         this.readyButton.classList.add('button')
         this.readyButton.textContent = 'Ready'
         root.append(this.readyButton)
+
+        Object.freeze(this)
     }
 
     initAction(root, action) {
