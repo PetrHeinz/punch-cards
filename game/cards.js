@@ -129,8 +129,20 @@ export class BlankCard extends Card {
     name = "Blank"
 }
 
+const cards = {
+    blank: () => new BlankCard(),
+    punch: () => new PunchCard(),
+    up1: () => new Up1Card(),
+    up2: () => new Up2Card(),
+    up3: () => new Up3Card(),
+    down1: () => new Down1Card(),
+    down2: () => new Down2Card(),
+    down3: () => new Down3Card(),
+    charge: () => new ChargeCard(),
+}
+
 export function getAllTypes() {
-    return ["blank", "punch", "up1", "up2", "up3", "down1", "down2", "down3", "charge"]
+    return Object.keys(cards)
 }
 
 export function createDeckByTypes(types) {
@@ -144,25 +156,5 @@ export function createDeckByTypes(types) {
 }
 
 export function createCardByType(type) {
-    switch (type) {
-        case "blank":
-            return new BlankCard()
-        case "punch":
-            return new PunchCard()
-        case "up1":
-            return new Up1Card()
-        case "up2":
-            return new Up2Card()
-        case "up3":
-            return new Up3Card()
-        case "down1":
-            return new Down1Card()
-        case "down2":
-            return new Down2Card()
-        case "down3":
-            return new Down3Card()
-        case "charge":
-            return new ChargeCard()
-    }
-    throw `Unknown card type "${type}"`
+    return cards[type]()
 }
