@@ -17,11 +17,15 @@ export default class Game {
     _tickCounter = 0
 
     constructor(gameOptions, eventManager) {
+        this.eventManager = eventManager
+
         gameOptions = {
             randomSeedString: RandomGenerator.randomSeedString(32),
+            robotOptions: {},
+            leftRobotOptions: {},
+            rightRobotOptions: {},
             ...gameOptions,
         }
-        this.eventManager = eventManager
 
         this._leftRobotInfoCache = new ChangeCache()
         this._leftCardsInfoCache = new ChangeCache()
@@ -30,13 +34,13 @@ export default class Game {
 
         this.leftRobot = new Robot(
             ROBOT_SIDE_LEFT,
-            createDeck(),
+            {...gameOptions.robotOptions, ...gameOptions.leftRobotOptions},
             new RandomGenerator(`${gameOptions.randomSeedString}-left`),
             () => this._leftRobotUpdate(),
         )
         this.rightRobot = new Robot(
             ROBOT_SIDE_RIGHT,
-            createDeck(),
+            {...gameOptions.robotOptions, ...gameOptions.rightRobotOptions},
             new RandomGenerator(`${gameOptions.randomSeedString}-right`),
             () => this._rightRobotUpdate(),
         )

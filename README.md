@@ -6,7 +6,7 @@ Features:
 - two robots fist-fight each other to disassembly
 - tactical 1v1 card game
 - turn-based, both players play at the same time
-- quick play with optional timer _(not yet implemented)_
+- quick play with optional timer
 - cards in hand are known to both players
 - multiplayer on a shared screen controlled via phones _(not yet implemented)_
 - bot support

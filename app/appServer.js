@@ -11,6 +11,9 @@ import RemoteControl from "../controller/remoteControl.js";
 
 export default class AppServer {
     randomSeedString = "punch-cards"
+    maxTimeToInput = 5
+    tickInterval = 1000
+
     controllers = [
         {
             name: 'Direct control',
@@ -111,20 +114,23 @@ export default class AppServer {
         eventManager.listenToAll((type, payload) => this.clientConnections.forEach((connection) => connection.send({type, payload})))
 
         const gameOptions = {
-            randomSeedString: this.randomSeedString
+            randomSeedString: this.randomSeedString,
+            robotOptions: {
+                maxTimeToInput: this.maxTimeToInput,
+            }
         }
-        const tickTimeout = 1000;
+
         let game = new Game(gameOptions, eventManager)
         let gameRender = new GameRender(
             this.root,
             eventManager,
             this.controllers[this.leftControllerIndex].createCardsRender(game.leftRobot),
             this.controllers[this.rightControllerIndex].createCardsRender(game.rightRobot),
-            tickTimeout,
+            this.tickInterval,
         )
 
         const gameStartedPayload = {
-            tickTimeout,
+            tickTimeout: this.tickInterval,
             leftRemoteControl: this.controllers[this.leftControllerIndex].remoteControl,
             rightRemoteControl: this.controllers[this.rightControllerIndex].remoteControl,
         };
@@ -145,7 +151,7 @@ export default class AppServer {
             this.startGameWhenReady()
         })
 
-        this.timer.doInSequence(tickTimeout,
+        this.timer.doInSequence(this.tickInterval,
             () => eventManager.publish("messageOverlay", {text: "3…"}),
             () => eventManager.publish("messageOverlay", {text: "2…"}),
             () => eventManager.publish("messageOverlay", {text: "1…"}),
@@ -159,7 +165,7 @@ export default class AppServer {
                 eventManager.publish("messageOverlay", {text: "GAME OVER"})
                 this.timer.clear()
             }
-        }, tickTimeout, 3 * tickTimeout)
+        }, this.tickInterval, 3 * this.tickInterval)
     }
 
     showMenu() {
@@ -171,9 +177,25 @@ export default class AppServer {
         appendHeading(menu)
 
         const randomSeedStringInput = appendInput(menu, "Random seed string", this.randomSeedString)
+        randomSeedStringInput.style.width = "16em"
         randomSeedStringInput.addEventListener("input", () => {
             const randomSeedString = randomSeedStringInput.value.trim()
             this.randomSeedString = randomSeedString !== "" ? randomSeedString : null
+        })
+
+        const maxTimeToInputInput = appendInput(menu, "Time limit for card input (in ticks)", this.maxTimeToInput)
+        maxTimeToInputInput.style.width = "4em"
+        maxTimeToInputInput.type = "number"
+        maxTimeToInputInput.addEventListener("input", () => {
+            const maxTimeToInput = maxTimeToInputInput.value.trim()
+            this.maxTimeToInput = maxTimeToInput !== "" ? parseInt(maxTimeToInput) : null
+        })
+
+        const tickIntervalInput = appendInput(menu, "Tick interval (in ms)", this.tickInterval)
+        tickIntervalInput.style.width = "4em"
+        tickIntervalInput.type = "number"
+        tickIntervalInput.addEventListener("input", () => {
+            this.tickInterval = parseInt(tickIntervalInput.value.trim())
         })
 
         this.appendInviteLinkInput(menu)

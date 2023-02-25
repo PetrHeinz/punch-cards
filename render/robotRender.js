@@ -2,6 +2,8 @@ import TickRender from "./tickRender.js";
 
 export default class RobotRender {
     constructor(root, tickTimeout) {
+        this.tickTimeout = tickTimeout
+
         const robot = document.createElement('div')
         robot.classList.add('robot')
 
@@ -11,7 +13,7 @@ export default class RobotRender {
         this.rightHand = this.initHand(robot, 'right')
         this.leftHand = this.initHand(robot, 'left')
 
-        this.tickRender = new TickRender(tickTimeout)
+        this.tickRender = new TickRender(this.tickTimeout)
         this.tickRender.appendTo(this.torso)
 
         this.state = document.createElement('div')
@@ -23,8 +25,8 @@ export default class RobotRender {
 
     initBodypart(root, extraClass) {
         const bodypart = document.createElement('div')
-        bodypart.classList.add('bodypart')
-        bodypart.classList.add(extraClass)
+        bodypart.classList.add('bodypart', extraClass)
+        bodypart.style.transitionDuration = `${.45 * this.tickTimeout}ms`
 
         const health = document.createElement('div')
         health.classList.add('health')
@@ -36,14 +38,13 @@ export default class RobotRender {
     }
 
     initHand(root, extraClass) {
-        const bodypart = document.createElement('div')
-        bodypart.classList.add('bodypart')
-        bodypart.classList.add('hand')
-        bodypart.classList.add(extraClass)
+        const hand = document.createElement('div')
+        hand.classList.add('bodypart', 'hand', extraClass)
+        hand.style.transitionDuration = `${.45 * this.tickTimeout}ms`
 
-        root.append(bodypart)
+        root.append(hand)
 
-        return bodypart
+        return hand
     }
 
     render(robotInfo) {

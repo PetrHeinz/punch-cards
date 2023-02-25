@@ -163,11 +163,8 @@ h1.line {
     text-align: center;
     padding: var(--margin);
     font-size: 150%;
-    transition:
-        450ms ease-in-out left,
-        450ms ease-in-out right,
-        450ms ease-in-out top,
-        450ms ease-in-out bottom;
+    transition-property: left, right, top, bottom;
+    transition-timing-function: ease-in-out;
     color: var(--color-bodypart-text)
 }
 .side.right .bodypart {

@@ -1,6 +1,7 @@
 import Action from "./action.js";
 import Bodypart from "./bodypart.js";
 import Hand from "./hand.js";
+import {createDeck} from "./cards.js";
 
 export const ROBOT_STATE_INPUT = "WAITING_FOR_INPUT"
 export const ROBOT_STATE_COMMIT = "INPUT_ACCEPTED"
@@ -16,32 +17,48 @@ export const ROBOT_SIDE_LEFT = "ROBOT_LEFT"
 export default class Robot {
     state = ROBOT_STATE_PREPARING
 
-    maxTimeToInput = 5
-    timeToInput = this.maxTimeToInput
-    inputOvertimeTorsoDamage = 1
-
-    drawnCardsCount = 5
-    actionsCount = 3
     discardedCards = []
     handCards = []
     actions = []
 
-    constructor(side, cards, randomGenerator, robotUpdateCallback) {
+    constructor(side, robotOptions, randomGenerator, robotUpdateCallback) {
         if (side !== ROBOT_SIDE_RIGHT && side !== ROBOT_SIDE_LEFT) throw "Unknown side " + side
-
         this.side = side
         this._randomGenerator = randomGenerator
         this._robotUpdate = robotUpdateCallback
-        this.head = new Bodypart(40)
-        this.torso = new Bodypart(80)
-        this.heatsink = new Bodypart(60)
-        this.rightHand = new Hand(3, 1, 7)
-        this.leftHand = new Hand(5, 1, 7)
+
+        robotOptions = {
+            cards: createDeck(),
+            actionsCount: 3,
+            drawnCardsCount: 5,
+            maxTimeToInput: 5,
+            inputOvertimeTorsoDamage: 1,
+            headHealth: 40,
+            torsoHealth: 80,
+            heatsinkHealth: 60,
+            rightHandPosition: 3,
+            leftHandPosition: 5,
+            ...robotOptions,
+        }
+
+
+        this.deckCards = this._shuffleCards(robotOptions.cards)
+
+        this.actionsCount = robotOptions.actionsCount
+        this.drawnCardsCount = robotOptions.drawnCardsCount
+        this.maxTimeToInput = robotOptions.maxTimeToInput
+        this.timeToInput = this.maxTimeToInput
+        this.inputOvertimeTorsoDamage = robotOptions.inputOvertimeTorsoDamage
 
         for (let i = 0; i < this.actionsCount; i++) {
             this.actions.push(new Action())
         }
-        this.deckCards = this._shuffleCards(cards)
+
+        this.head = new Bodypart(robotOptions.headHealth)
+        this.torso = new Bodypart(robotOptions.torsoHealth)
+        this.heatsink = new Bodypart(robotOptions.heatsinkHealth)
+        this.rightHand = new Hand(robotOptions.rightHandPosition, 1, 7)
+        this.leftHand = new Hand(robotOptions.leftHandPosition, 1, 7)
     }
 
     get robotInfo() {
@@ -196,6 +213,7 @@ export default class Robot {
 
     tick() {
         if (this.state !== ROBOT_STATE_INPUT) return
+        if (this.timeToInput === null) return
 
         if (this.timeToInput <= 0) {
             this.torso.health -= this.inputOvertimeTorsoDamage
