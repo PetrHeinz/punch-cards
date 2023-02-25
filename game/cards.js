@@ -263,23 +263,23 @@ class BlankCard extends Card {
 }
 
 const cards = {
-    blank: () => new BlankCard(),
-    up1: () => new Up1Card(),
-    up2: () => new Up2Card(),
-    up3: () => new Up3Card(),
-    down1: () => new Down1Card(),
-    down2: () => new Down2Card(),
-    down3: () => new Down3Card(),
-    hand_flip: () => new HandFlipCard(),
-    punch: () => new PunchCard(),
-    up_flip: () => new UpPunchCard(),
-    down_flip: () => new DownPunchCard(),
-    flip_punch: () => new FlipPunchCard(),
-    charge: () => new ChargeCard(),
-    push_up: () => new PushUpCard(),
-    push_down: () => new PushDownCard(),
-    repair: () => new RepairCard(),
-    reinforce: () => new ReinforceCard(),
+    blank: BlankCard,
+    up1: Up1Card,
+    up2: Up2Card,
+    up3: Up3Card,
+    down1: Down1Card,
+    down2: Down2Card,
+    down3: Down3Card,
+    hand_flip: HandFlipCard,
+    punch: PunchCard,
+    up_flip: UpPunchCard,
+    down_flip: DownPunchCard,
+    flip_punch: FlipPunchCard,
+    charge: ChargeCard,
+    push_up: PushUpCard,
+    push_down: PushDownCard,
+    repair: RepairCard,
+    reinforce: ReinforceCard,
 }
 
 export function createBlankCard() {
@@ -301,5 +301,5 @@ export function createDeckByTypes(types) {
 }
 
 export function createCardByType(type) {
-    return cards[type](type)
+    return new cards[type](type)
 }
