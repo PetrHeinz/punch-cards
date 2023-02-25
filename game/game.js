@@ -10,6 +10,7 @@ import Robot, {
     ROBOT_STATE_PREPARING,
     ROBOT_STATE_WINNER
 } from "./robot.js";
+import EventManager from "../utils/events.js";
 
 export default class Game {
     currentAction = 0
@@ -44,8 +45,24 @@ export default class Game {
             () => this._rightRobotUpdate(),
         )
 
+        window.game = this
+
         this._tickUpdate()
         this._robotsUpdate()
+    }
+
+    copy() {
+        return Object.assign(Object.create(Game.prototype),{
+            ...this,
+            eventManager: new EventManager(),
+            _tickUpdate: () => {},
+            _robotsUpdate: () => {},
+            _leftRobotUpdate: () => {},
+            _rightRobotUpdate: () => {},
+            _actionPhaseInfoUpdate: () => {},
+            leftRobot: this.leftRobot.copy(),
+            rightRobot: this.rightRobot.copy(),
+        })
     }
 
     _tickUpdate() {

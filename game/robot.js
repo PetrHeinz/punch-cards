@@ -2,6 +2,7 @@ import Action from "./action.js";
 import Bodypart from "./bodypart.js";
 import Hand from "./hand.js";
 import {createDeckByTypes} from "./cards.js";
+import RandomGenerator from "../utils/randomGenerator.js";
 
 export const ROBOT_STATE_INPUT = "WAITING_FOR_INPUT"
 export const ROBOT_STATE_COMMIT = "INPUT_ACCEPTED"
@@ -58,6 +59,20 @@ export default class Robot {
         this.heatsink = new Bodypart(robotOptions.heatsinkHealth)
         this.rightHand = new Hand(robotOptions.rightHandPosition, 1, 7)
         this.leftHand = new Hand(robotOptions.leftHandPosition, 1, 7)
+    }
+
+    copy() {
+        return Object.assign(Object.create(Robot.prototype),{
+            ...this,
+            _randomGenerator: new RandomGenerator("copy"),
+            _robotUpdate: () => {},
+            actions: this.actions.map(action => Object.create(Action.prototype, Object.getOwnPropertyDescriptors(action))),
+            head: Object.create(Bodypart.prototype, Object.getOwnPropertyDescriptors(this.head)),
+            torso: Object.create(Bodypart.prototype, Object.getOwnPropertyDescriptors(this.torso)),
+            heatsink: Object.create(Bodypart.prototype, Object.getOwnPropertyDescriptors(this.heatsink)),
+            rightHand: Object.create(Hand.prototype, Object.getOwnPropertyDescriptors(this.rightHand)),
+            leftHand: Object.create(Hand.prototype, Object.getOwnPropertyDescriptors(this.leftHand)),
+        })
     }
 
     get robotInfo() {
