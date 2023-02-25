@@ -1,9 +1,9 @@
-import {BlankCard} from "./cards.js";
+import {createBlankCard} from "./cards.js";
 import {ROBOT_HAND_LEFT, ROBOT_HAND_RIGHT} from "./robot.js";
 
 export default class Action {
     /** @type {Card} */
-    _card = new BlankCard()
+    _card = createBlankCard()
     _hand = ROBOT_HAND_RIGHT
 
     get info() {
@@ -28,7 +28,7 @@ export default class Action {
     }
 
     discard() {
-        this._card = new BlankCard()
+        this._card = createBlankCard()
         this._handCardIndex = undefined
     }
 

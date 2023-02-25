@@ -98,6 +98,10 @@ export default class Game {
         return this.leftRobot.state === ROBOT_STATE_WINNER || this.rightRobot.state === ROBOT_STATE_WINNER
     }
 
+    isWaitingForInput() {
+        return this.leftRobot.state === ROBOT_STATE_INPUT || this.rightRobot.state === ROBOT_STATE_INPUT
+    }
+
     tick() {
         this._tickUpdate()
         this._robotsUpdate()
@@ -124,7 +128,7 @@ export default class Game {
             return
         }
 
-        if (this.leftRobot.state === ROBOT_STATE_INPUT || this.rightRobot.state === ROBOT_STATE_INPUT) {
+        if (this.isWaitingForInput()) {
             console.debug("Either robot is still waiting for input")
             return
         }

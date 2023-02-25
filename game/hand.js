@@ -4,6 +4,8 @@ export default class Hand {
     isBlocked = false
     isCharged = false
 
+    _allowPositionOutOfBounds = false
+
     constructor(position, min, max) {
         this.min = min
         this.max = max
@@ -20,11 +22,19 @@ export default class Hand {
         }
     }
 
+    set allowPositionOutOfBounds(allow) {
+        this._allowPositionOutOfBounds = allow
+
+        if (!this._allowPositionOutOfBounds) {
+            this.position = this._position
+        }
+    }
+
     get position() {
         return this._position
     }
 
     set position(position) {
-        this._position = Math.max(this.min, Math.min(position, this.max))
+        this._position = this._allowPositionOutOfBounds ? position : Math.max(this.min, Math.min(position, this.max))
     }
 }

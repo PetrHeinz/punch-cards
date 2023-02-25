@@ -2,8 +2,13 @@ class Card {
     icon = ""
     name = "N/A"
 
+    constructor(type) {
+        this._type = type
+    }
+
     get info() {
         return {
+            type: this._type,
             icon: this.icon,
             name: this.name,
         }
@@ -31,7 +36,7 @@ class Card {
     }
 }
 
-export class PunchCard extends Card {
+class PunchCard extends Card {
     icon = "👊"
     name = "Punch card"
 
@@ -60,7 +65,7 @@ export class PunchCard extends Card {
     }
 }
 
-export class Up1Card extends Card {
+class Up1Card extends Card {
     icon = "☝️"
     name = "Up"
 
@@ -69,7 +74,7 @@ export class Up1Card extends Card {
     }
 }
 
-export class Up2Card extends Card {
+class Up2Card extends Card {
     icon = "☝️❗"
     name = "Uup"
 
@@ -78,7 +83,7 @@ export class Up2Card extends Card {
     }
 }
 
-export class Up3Card extends Card {
+class Up3Card extends Card {
     icon = "☝️‼️"
     name = "Uuup"
 
@@ -87,7 +92,7 @@ export class Up3Card extends Card {
     }
 }
 
-export class Down1Card extends Card {
+class Down1Card extends Card {
     icon = "👇"
     name = "Down"
 
@@ -96,7 +101,7 @@ export class Down1Card extends Card {
     }
 }
 
-export class Down2Card extends Card {
+class Down2Card extends Card {
     icon = "👇❗"
     name = "Doown"
 
@@ -105,7 +110,7 @@ export class Down2Card extends Card {
     }
 }
 
-export class Down3Card extends Card {
+class Down3Card extends Card {
     icon = "👇‼️"
     name = "Dooown"
 
@@ -114,7 +119,7 @@ export class Down3Card extends Card {
     }
 }
 
-export class ChargeCard extends Card {
+class ChargeCard extends Card {
     icon = "💥"
     name = "Charge"
 
@@ -124,7 +129,7 @@ export class ChargeCard extends Card {
     }
 }
 
-export class PushUpCard extends Card {
+class PushUpCard extends Card {
     icon = "🖐️☝️"
     name = "Push up"
 
@@ -143,7 +148,7 @@ export class PushUpCard extends Card {
     }
 }
 
-export class PushDownCard extends Card {
+class PushDownCard extends Card {
     icon = "🖐️👇"
     name = "Push down"
 
@@ -162,7 +167,7 @@ export class PushDownCard extends Card {
     }
 }
 
-export class HandFlipCard extends Card {
+class HandFlipCard extends Card {
     icon = "👋"
     name = "Hand flip"
 
@@ -171,7 +176,7 @@ export class HandFlipCard extends Card {
     }
 }
 
-export class FlipPunchCard extends PunchCard {
+class FlipPunchCard extends PunchCard {
     icon = "👋👊"
     name = "Flip Punch"
 
@@ -181,45 +186,39 @@ export class FlipPunchCard extends PunchCard {
     }
 }
 
-export class UpPunchCard extends PunchCard {
+class UpPunchCard extends PunchCard {
     icon = "☝️👊"
     name = "Up Punch"
 
     _prepare(hand) {
-        hand.min--
+        hand.allowPositionOutOfBounds = true
         hand.position--
         super._prepare(hand)
     }
 
     _cleanup(hand) {
         super._cleanup(hand)
-        hand.min++
-        if (hand.position < hand.min) {
-            hand.position = hand.min
-        }
+        hand.allowPositionOutOfBounds = false
     }
 }
 
-export class DownPunchCard extends PunchCard {
+class DownPunchCard extends PunchCard {
     icon = "👇👊"
     name = "Down Punch"
 
     _prepare(hand) {
-        hand.max++
+        hand.allowPositionOutOfBounds = true
         hand.position++
         super._prepare(hand)
     }
 
     _cleanup(hand) {
         super._cleanup(hand)
-        hand.max--
-        if (hand.position > hand.max) {
-            hand.position = hand.max
-        }
+        hand.allowPositionOutOfBounds = false
     }
 }
 
-export class RepairCard extends Card {
+class RepairCard extends Card {
     icon = "🔧"
     name = "Repair"
 
@@ -235,7 +234,7 @@ export class RepairCard extends Card {
     }
 }
 
-export class ReinforceCard extends Card {
+class ReinforceCard extends Card {
     icon = "🛠️"
     name = "Reinforce"
 
@@ -258,7 +257,7 @@ export class ReinforceCard extends Card {
     }
 }
 
-export class BlankCard extends Card {
+class BlankCard extends Card {
     icon = "📄"
     name = "Blank"
 }
@@ -283,6 +282,10 @@ const cards = {
     reinforce: () => new ReinforceCard(),
 }
 
+export function createBlankCard() {
+    return createCardByType('blank')
+}
+
 export function getAllTypes() {
     return Object.keys(cards)
 }
@@ -298,5 +301,5 @@ export function createDeckByTypes(types) {
 }
 
 export function createCardByType(type) {
-    return cards[type]()
+    return cards[type](type)
 }
