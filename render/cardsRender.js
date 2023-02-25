@@ -14,6 +14,22 @@ export default class CardsRender {
         this.handCards.classList.add('cards')
         root.append(this.handCards)
 
+        const deckCards = document.createElement('div')
+        deckCards.classList.add('cards-count', 'in-deck')
+        deckCards.append("IN DECK")
+        deckCards.append(document.createElement('br'))
+        this.deckCardsCount = document.createElement('span')
+        deckCards.append(this.deckCardsCount)
+        root.append(deckCards)
+
+        const discardedCards = document.createElement('div')
+        discardedCards.classList.add('cards-count', 'discarded')
+        discardedCards.append("DISCARDED")
+        discardedCards.append(document.createElement('br'))
+        this.discardedCardsCount = document.createElement('span')
+        discardedCards.append(this.discardedCardsCount)
+        root.append(discardedCards)
+
         this.readyButton = document.createElement('div')
         this.readyButton.classList.add('button')
         this.readyButton.textContent = 'Ready'
@@ -71,6 +87,9 @@ export default class CardsRender {
                 this.initCard(this.handCards, handCard,handCard.used)
             })
         })
+
+        this.deckCardsCount.textContent = cardsInfo.deckCardsCount
+        this.discardedCardsCount.textContent = cardsInfo.discardedCardsCount
 
         this.readyButton.classList.toggle("pushed", cardsInfo.state !== ROBOT_STATE_INPUT)
     }

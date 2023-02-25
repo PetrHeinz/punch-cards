@@ -131,7 +131,9 @@ h1.line {
 .side {
     --selected-action-card-index: 1;
     --selected-hand-card-index: 1;
+    position: relative;
     flex: 50%;
+    padding-bottom: calc(2.5 * var(--unit));
 }
 
 .robot {
@@ -347,11 +349,14 @@ h1.line {
 }
 
 .button {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: calc(.75 * var(--unit));
     width: fit-content;
-    --button-height: calc(1.5 * var(--unit) - 2 * var(--border) - 2 * var(--margin) - 1px);
+    --button-height: calc(1.5 * var(--unit) - 2 * var(--border));
     height: var(--button-height);
     line-height: var(--button-height);
-    margin: calc(.75 * var(--unit)) auto;
     border: var(--border) solid var(--color-button-border);
     border-radius: var(--unit);
     font-size: 150%;
@@ -366,4 +371,23 @@ h1.line {
 }
 .button.clickable:hover {
     color: var(--color-button-text-hover);
+}
+
+.cards-count {
+    position: absolute;
+    left:0;
+    right: auto;
+    bottom:var(--unit);
+    text-align: center;
+    width: calc(3 * var(--unit));
+    height: var(--unit);
+    line-height: calc(var(--unit) / 2);
+}
+.side.left .cards-count.discarded {
+    left: auto;
+    right: 0;
+}
+.side.right .cards-count.in-deck {
+    left: auto;
+    right: 0;
 }
