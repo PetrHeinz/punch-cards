@@ -162,6 +162,15 @@ export class PushDownCard extends Card {
     }
 }
 
+export class HandFlipCard extends Card {
+    icon = "👋"
+    name = "Hand flip"
+
+    _prepare(hand) {
+        hand.position = hand.max - hand.position + hand.min
+    }
+}
+
 export class RepairCard extends Card {
     icon = "🔧"
     name = "Repair"
@@ -215,6 +224,7 @@ const cards = {
     down1: () => new Down1Card(),
     down2: () => new Down2Card(),
     down3: () => new Down3Card(),
+    hand_flip: () => new HandFlipCard(),
     charge: () => new ChargeCard(),
     push_up: () => new PushUpCard(),
     push_down: () => new PushDownCard(),
