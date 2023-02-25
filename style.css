@@ -324,9 +324,8 @@ h1.line {
 
 .icon {
     --fontsize-multiplier: 1;
+    font-family: initial;
     font-size: calc(var(--fontsize-multiplier) * var(--fontsize));
-    letter-spacing: calc(-1 * var(--fontsize-multiplier) * .4 * var(--fontsize));
-    padding-right: calc(var(--fontsize-multiplier) * .4 * var(--fontsize));
     height: calc(var(--card-height) / 2);
     line-height: calc(var(--card-height) / 2);
 }

@@ -67,7 +67,8 @@ export default class CardsRender {
 
         const iconElement = document.createElement('div')
         iconElement.classList.add("icon")
-        iconElement.style.setProperty("--fontsize-multiplier", 2 / Math.pow(card.icon.length, 0.4))
+        const emojiCount = card.icon.match(/\p{Emoji_Modifier_Base}\p{Emoji_Modifier}?|\p{Emoji_Presentation}|\p{Emoji}\uFE0F/gu).length
+        iconElement.style.setProperty("--fontsize-multiplier", 1.65 / emojiCount + 0.35)
         iconElement.append(card.icon)
 
         cardElement.append(iconElement)

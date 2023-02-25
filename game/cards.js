@@ -70,7 +70,7 @@ export class Up1Card extends Card {
 }
 
 export class Up2Card extends Card {
-    icon = "☝️☝️"
+    icon = "☝️❗"
     name = "Uup"
 
     _prepare(hand) {
@@ -79,7 +79,7 @@ export class Up2Card extends Card {
 }
 
 export class Up3Card extends Card {
-    icon = "☝️☝️☝️"
+    icon = "☝️‼️"
     name = "Uuup"
 
     _prepare(hand) {
@@ -97,7 +97,7 @@ export class Down1Card extends Card {
 }
 
 export class Down2Card extends Card {
-    icon = "👇👇"
+    icon = "👇❗"
     name = "Doown"
 
     _prepare(hand) {
@@ -106,7 +106,7 @@ export class Down2Card extends Card {
 }
 
 export class Down3Card extends Card {
-    icon = "👇👇👇"
+    icon = "👇‼️"
     name = "Dooown"
 
     _prepare(hand) {
