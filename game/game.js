@@ -101,22 +101,25 @@ export default class Game {
             return
         }
 
-        if (this.leftRobot.state === ROBOT_STATE_CONTROL || this.rightRobot.state === ROBOT_STATE_CONTROL) {
-            console.debug("Either robot is still waiting for input")
-            return
-        }
+        this.leftRobot.tick()
+        this.rightRobot.tick()
 
-        if (this.leftRobot.state === ROBOT_STATE_PREPARE && this.rightRobot.state === ROBOT_STATE_DEAD) {
+        if (this.rightRobot.state === ROBOT_STATE_DEAD) {
             console.info("Left robot won!")
             this.leftRobot.state = ROBOT_STATE_WINNER
             this._leftRobotUpdate()
             return
         }
 
-        if (this.leftRobot.state === ROBOT_STATE_DEAD && this.rightRobot.state === ROBOT_STATE_PREPARE) {
+        if (this.leftRobot.state === ROBOT_STATE_DEAD) {
             console.info("Right robot won!")
             this.rightRobot.state = ROBOT_STATE_WINNER
             this._rightRobotUpdate()
+            return
+        }
+
+        if (this.leftRobot.state === ROBOT_STATE_CONTROL || this.rightRobot.state === ROBOT_STATE_CONTROL) {
+            console.debug("Either robot is still waiting for input")
             return
         }
 

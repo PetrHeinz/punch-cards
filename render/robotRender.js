@@ -1,5 +1,7 @@
+import TickRender from "./tickRender.js";
+
 export default class RobotRender {
-    constructor(root) {
+    constructor(root, tickTimeout) {
         const robot = document.createElement('div')
         robot.classList.add('robot')
 
@@ -8,6 +10,9 @@ export default class RobotRender {
         this.heatsink = this.initBodypart(robot, 'heatsink')
         this.rightHand = this.initHand(robot, 'right')
         this.leftHand = this.initHand(robot, 'left')
+
+        this.tickRender = new TickRender(tickTimeout)
+        this.tickRender.appendTo(this.torso)
 
         this.state = document.createElement('div')
         this.state.classList.add('state')
@@ -20,6 +25,10 @@ export default class RobotRender {
         const bodypart = document.createElement('div')
         bodypart.classList.add('bodypart')
         bodypart.classList.add(extraClass)
+
+        const health = document.createElement('div')
+        health.classList.add('health')
+        bodypart.append(health)
 
         root.append(bodypart)
 
@@ -39,9 +48,10 @@ export default class RobotRender {
 
     render(robotInfo) {
         this.state.textContent = robotInfo.state
-        this.head.textContent = robotInfo.head.health
-        this.torso.textContent = robotInfo.torso.health
-        this.heatsink.textContent = robotInfo.heatsink.health
+        this.head.querySelector(".health").textContent = robotInfo.head.health
+        this.torso.querySelector(".health").textContent = robotInfo.torso.health
+        this.heatsink.querySelector(".health").textContent = robotInfo.heatsink.health
+        this.tickRender.renderTimeToInput(robotInfo.timeToInput, robotInfo.state)
         this.rightHand.style.setProperty('--up', 8 - robotInfo.rightHand.position)
         this.rightHand.classList.toggle('blocking', robotInfo.rightHand.isBlocking)
         this.rightHand.classList.toggle('attacking', robotInfo.rightHand.isAttacking)

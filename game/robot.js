@@ -15,6 +15,11 @@ export const ROBOT_SIDE_LEFT = "ROBOT_LEFT"
 
 export default class Robot {
     state = ROBOT_STATE_PREPARE
+
+    maxTimeToInput = 5
+    timeToInput = this.maxTimeToInput
+    inputOvertimeTorsoDamage = 1
+
     drawnCardsCount = 5
     actionsCount = 3
     discardedCards = []
@@ -48,6 +53,7 @@ export default class Robot {
             heatsink: this.heatsink.info,
             rightHand: this.rightHand.info,
             leftHand: this.leftHand.info,
+            timeToInput: this.timeToInput,
         }
     }
 
@@ -98,6 +104,8 @@ export default class Robot {
 
     drawHand() {
         if (this.state !== ROBOT_STATE_PREPARE) throw "Robot can draw hand only during " + ROBOT_STATE_PREPARE
+
+        this.timeToInput = this.maxTimeToInput
 
         this.actions.forEach(action => action.discard())
         this.discardedCards = this.discardedCards.concat(this.handCards)
@@ -183,6 +191,20 @@ export default class Robot {
         if (this.state !== ROBOT_STATE_CONTROL) throw "Robot can commit only during " + ROBOT_STATE_CONTROL
 
         this.state = ROBOT_STATE_COMMIT
+        this._robotUpdate()
+    }
+
+    tick() {
+        if (this.state !== ROBOT_STATE_CONTROL) return
+
+        if (this.timeToInput <= 0) {
+            this.torso.health -= this.inputOvertimeTorsoDamage
+            if (this.isDestroyed()) {
+                this.state = ROBOT_STATE_DEAD
+            }
+        }
+        this.timeToInput--
+
         this._robotUpdate()
     }
 

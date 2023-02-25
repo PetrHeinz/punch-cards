@@ -37,6 +37,8 @@
     --color-grid: silver;
     --color-header-menu-text-hover: hsl(var(--hue-selected), 100%, 50%);
     --color-header-menu-text: darkslategray;
+    --color-tick: grey;
+    --color-tick-active: red;
 }
 
 body {
@@ -168,10 +170,61 @@ h1.line {
         450ms ease-in-out bottom;
     color: var(--color-bodypart-text)
 }
-
 .side.right .bodypart {
     left: auto;
     right: calc(var(--forward) * var(--unit) + var(--margin));
+}
+
+.tick {
+    --tick-size: calc(var(--width) * var(--unit) - 2 * var(--border) - 2 * var(--margin));
+    position: absolute;
+    bottom: var(--margin);
+    left: 50%;
+    height: var(--tick-size);
+    width: var(--tick-size);
+    transform: translateX(-50%);
+    font-size: 50%;
+    color: var(--color-tick);
+}
+.tick .time-to-input {
+    position: absolute;
+    width: 100%;
+    top: 50%;
+    font-size: 200%;
+    transform: translateY(-50%);
+}
+.tick .time-to-input.active {
+    font-weight: bold;
+    color: var(--color-tick-active);
+}
+.tick .hand {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(180deg);
+    height: var(--tick-size);
+    transition-property: none;
+    transition-timing-function: linear;
+}
+.tick .hand:after {
+    content: "⬤";
+    opacity: .5;
+}
+.tick .hand.ticking {
+    transform: translate(-50%, -50%) rotate(540deg);
+    transition-property: transform;
+}
+.side.right .tick .hand.ticking {
+    transform: translate(-50%, -50%) rotate(-180deg);
+}
+.tick .count {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+}
+.side.right .tick .count {
+    left: auto;
+    right: 0;
 }
 
 .head {

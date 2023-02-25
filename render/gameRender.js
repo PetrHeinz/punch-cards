@@ -1,5 +1,4 @@
 import RobotRender from "./robotRender.js";
-import CardsRender from "./cardsRender.js";
 
 export default class GameRender {
     constructor(root, eventManager, leftCardRender, rightCardRender, tickTimeout) {
@@ -17,7 +16,7 @@ export default class GameRender {
         const leftSide = document.createElement('div')
         leftSide.classList.add('side')
         leftSide.classList.add("left")
-        this.leftRobot = new RobotRender(leftSide)
+        this.leftRobot = new RobotRender(leftSide, tickTimeout)
         leftCardRender.initialize(leftSide)
         game.append(leftSide)
 
@@ -25,7 +24,7 @@ export default class GameRender {
         const rightSide = document.createElement('div')
         rightSide.classList.add('side')
         rightSide.classList.add("right")
-        this.rightRobot = new RobotRender(rightSide)
+        this.rightRobot = new RobotRender(rightSide, tickTimeout)
         rightCardRender.initialize(rightSide)
         game.append(rightSide)
 
@@ -42,6 +41,12 @@ export default class GameRender {
 
         eventManager.listen("rightRobotInfoUpdate", rightRobotInfo => this.rightRobot.render(rightRobotInfo))
         eventManager.listen("rightCardsInfoUpdate", rightCardsInfo => this.rightCardsRender.render(rightCardsInfo))
+
+        eventManager.listen("tick", ({tickCounter}) =>
+        {
+            this.leftRobot.tickRender.renderTick(tickCounter)
+            this.rightRobot.tickRender.renderTick(tickCounter)
+        })
 
         let currentTickTimeout = 0
         eventManager.listen("actionPhaseInfoUpdate.prepare", ({leftRobotInfo, rightRobotInfo}) => {
