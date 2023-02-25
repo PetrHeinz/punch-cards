@@ -80,8 +80,8 @@ export default class ControllableCardsRender extends CardsRender {
 
         super.render(cardsInfo)
 
-        this.actionCards.style.cursor = this.cardsInfo.state === ROBOT_STATE_CONTROL ? "pointer" : ""
-        this.handCards.style.cursor = this.cardsInfo.state === ROBOT_STATE_CONTROL ? "pointer" : ""
+        this.actionCards.classList.toggle("clickable", this.cardsInfo.state === ROBOT_STATE_CONTROL)
+        this.handCards.classList.toggle("clickable", this.cardsInfo.state === ROBOT_STATE_CONTROL)
         this.readyButton.classList.toggle("clickable", this.cardsInfo.state === ROBOT_STATE_CONTROL)
     }
 

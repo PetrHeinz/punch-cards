@@ -16,10 +16,12 @@
     --color-button-text: black;
     --color-card-bg: white;
     --color-card-border-selected: red;
-    --color-card-border-used: darkgrey;
-    --color-card-border: grey;
-    --color-card-hand-left-text: navy;
-    --color-card-hand-right-text: maroon;
+    --color-card-border-used: hsl(0, 0%, 65%);
+    --color-card-border: hsl(0, 0%, 50%);
+    --color-card-left-border: hsl(240, 25%, 50%);
+    --color-card-right-border: hsl(0, 25%, 50%);
+    --color-card-left-text: hsl(240, 100%, 25%);
+    --color-card-right-text: hsl(0, 100%, 25%);
     --color-card-hand-text-hover: black;
     --color-card-text-used: grey;
     --color-card-text: black;
@@ -27,8 +29,8 @@
     --color-game-border: black;
     --color-grid-bg: white;
     --color-grid: silver;
-    --color-hand-left-border: navy;
-    --color-hand-right-border: maroon;
+    --color-hand-left-border: hsl(240, 100%, 25%);
+    --color-hand-right-border: hsl(0, 100%, 25%);
     --color-header-menu-text-hover: red;
     --color-header-menu-text: darkslategray;
 }
@@ -208,6 +210,10 @@ h1.line {
     --forward: 11.5;
 }
 
+.clickable {
+    cursor: pointer;
+}
+
 .cards,
 .actions {
     display: flex;
@@ -233,8 +239,16 @@ h1.line {
     color: var(--color-card-text-used);
     border-color: var(--color-card-border-used);
 }
+.card:has(.right) {
+    border-color: var(--color-card-right-border);
+    color: var(--color-card-right-text);
+}
+.card:has(.left) {
+    border-color: var(--color-card-left-border);
+    color: var(--color-card-left-text);
+}
 .card.selected {
-    border-color: var(--color-card-border-selected);
+    border-color: var(--color-card-border-selected) !important;
 }
 
 .icon {
@@ -248,21 +262,19 @@ h1.line {
 
 .hand-toggle {
     position: absolute;
-    bottom: calc(-.8 * var(--fontsize) - var(--border));
+    top: calc(var(--card-height) + var(--border));
+    height: calc(var(--card-height) / 3);
     width: 100%;
     line-height: 1;
     font-size: 80%;
     font-weight: bold;
     text-align: center;
 }
-.hand-toggle.right {
-    color: var(--color-card-hand-right-text);
-}
-.hand-toggle.left {
-    color: var(--color-card-hand-left-text);
-}
-.hand-toggle:hover {
+.clickable .hand-toggle:hover {
     color: var(--color-card-hand-text-hover);
+}
+.clickable .hand-toggle:hover:before {
+    content: "TOGGLE ";
 }
 
 .message-overlay {
@@ -293,9 +305,6 @@ h1.line {
     color: var(--color-button-text-inactive);
     border-color: var(--color-button-border-inactive);
     cursor: inherit;
-}
-.button.clickable {
-    cursor: pointer;
 }
 .button.clickable:hover {
     color: var(--color-button-text-hover);
