@@ -110,8 +110,11 @@ export default class AppServer {
         const eventManager = new EventManager()
         eventManager.listenToAll((type, payload) => this.clientConnections.forEach((connection) => connection.send({type, payload})))
 
+        const gameOptions = {
+            randomSeedString: this.randomSeedString
+        }
         const tickTimeout = 1000;
-        let game = new Game(this.randomSeedString, eventManager)
+        let game = new Game(gameOptions, eventManager)
         let gameRender = new GameRender(
             this.root,
             eventManager,

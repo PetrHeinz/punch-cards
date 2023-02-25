@@ -16,8 +16,11 @@ export default class Game {
     currentAction = 0
     _tickCounter = 0
 
-    constructor(randomSeedString, eventManager) {
-        randomSeedString = randomSeedString ?? RandomGenerator.randomSeedString(32)
+    constructor(gameOptions, eventManager) {
+        gameOptions = {
+            randomSeedString: RandomGenerator.randomSeedString(32),
+            ...gameOptions,
+        }
         this.eventManager = eventManager
 
         this._leftRobotInfoCache = new ChangeCache()
@@ -28,13 +31,13 @@ export default class Game {
         this.leftRobot = new Robot(
             ROBOT_SIDE_LEFT,
             createDeck(),
-            new RandomGenerator(`${randomSeedString}-left`),
+            new RandomGenerator(`${gameOptions.randomSeedString}-left`),
             () => this._leftRobotUpdate(),
         )
         this.rightRobot = new Robot(
             ROBOT_SIDE_RIGHT,
             createDeck(),
-            new RandomGenerator(`${randomSeedString}-right`),
+            new RandomGenerator(`${gameOptions.randomSeedString}-right`),
             () => this._rightRobotUpdate(),
         )
 
