@@ -42,12 +42,12 @@ export default class RobotRender {
         this.head.textContent = robotInfo.head.health
         this.torso.textContent = robotInfo.torso.health
         this.heatsink.textContent = robotInfo.heatsink.health
-        this.rightHand.style.setProperty('--up', 8 - robotInfo.rightHand.position + "px")
+        this.rightHand.style.setProperty('--up', 8 - robotInfo.rightHand.position)
         this.rightHand.classList.toggle('blocking', robotInfo.rightHand.isBlocking)
         this.rightHand.classList.toggle('attacking', robotInfo.rightHand.isAttacking)
         this.rightHand.classList.toggle('blocked', robotInfo.rightHand.isBlocked)
         this.rightHand.classList.toggle('charged', robotInfo.rightHand.isCharged)
-        this.leftHand.style.setProperty('--up', 8 - robotInfo.leftHand.position + "px")
+        this.leftHand.style.setProperty('--up', 8 - robotInfo.leftHand.position)
         this.leftHand.classList.toggle('blocking', robotInfo.leftHand.isBlocking)
         this.leftHand.classList.toggle('attacking', robotInfo.leftHand.isAttacking)
         this.leftHand.classList.toggle('blocked', robotInfo.leftHand.isBlocked)
