@@ -15,9 +15,11 @@ export const ROBOT_SIDE_LEFT = "ROBOT_LEFT"
 
 export default class Robot {
     state = ROBOT_STATE_PREPARE
+    drawnCardsCount = 5
+    actionsCount = 3
     discardedCards = []
     handCards = []
-    actions = [new Action(), new Action(), new Action()]
+    actions = []
 
     constructor(side, cards, randomGenerator, robotUpdateCallback) {
         if (side !== ROBOT_SIDE_RIGHT && side !== ROBOT_SIDE_LEFT) throw "Unknown side " + side
@@ -30,6 +32,10 @@ export default class Robot {
         this.heatsink = new Bodypart(60)
         this.rightHand = new Hand(3, 1, 7)
         this.leftHand = new Hand(5, 1, 7)
+
+        for (let i = 0; i < this.actionsCount; i++) {
+            this.actions.push(new Action())
+        }
         this.deckCards = this._shuffleCards(cards)
     }
 
@@ -96,7 +102,7 @@ export default class Robot {
         this.actions.forEach(action => action.discard())
         this.discardedCards = this.discardedCards.concat(this.handCards)
         this.handCards = []
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < this.drawnCardsCount; i++) {
             if (this.deckCards.length === 0) {
                 this.deckCards = this._shuffleCards(this.discardedCards)
                 this.discardedCards = []

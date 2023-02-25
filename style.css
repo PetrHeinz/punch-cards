@@ -45,7 +45,7 @@ body {
 
 .menu, .game {
     position: relative;
-    height: calc(20 * var(--unit));
+    min-height: calc(20 * var(--unit));
     width: calc(20 * var(--unit));
     margin: 5vh auto;
     border: calc(2 * var(--border)) solid var(--color-game-border);
@@ -218,10 +218,11 @@ h1.line {
     cursor: pointer;
 }
 
-.cards,
-.actions {
+.cards, .actions {
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
+    margin: calc(.5 * var(--unit)) 0;
 }
 
 .card {
@@ -231,7 +232,7 @@ h1.line {
     --card-height: calc(2.5 * var(--unit) - 2 * var(--border) - 2 * var(--margin) - 1px);
     height: var(--card-height);
     width: calc(1.8 * var(--unit) - 2 * var(--border) - 2 * var(--margin) - 1px);
-    margin: calc(.5 * var(--unit)) var(--margin);
+    margin: var(--margin);
     border: var(--border) solid var(--color-card-border);
     border-radius: calc(var(--unit) / 4);
     text-align: center;
@@ -239,6 +240,9 @@ h1.line {
     color: var(--color-card-text);
 }
 
+.actions .card {
+    margin-bottom: calc(var(--card-height) / 3 + var(--margin));
+}
 .card.used {
     color: var(--color-card-text-used);
     border-color: var(--color-card-border-used);
@@ -297,7 +301,7 @@ h1.line {
     --button-height: calc(1.5 * var(--unit) - 2 * var(--border) - 2 * var(--margin) - 1px);
     height: var(--button-height);
     line-height: var(--button-height);
-    margin: calc(.5 * var(--unit)) auto;
+    margin: calc(.75 * var(--unit)) auto;
     border: var(--border) solid var(--color-button-border);
     border-radius: var(--unit);
     font-size: 150%;
