@@ -137,7 +137,7 @@ export class PushUpCard extends Card {
         otherRobot.getHandsBlockingAt(hand.position).forEach(otherHand => otherHand.position--)
     }
     _cleanup(hand, thisRobot) {
-        hand.isBlocking = true
+        hand.isBlocking = !hand.isCharged
         hand.isAttacking = false
         hand.isBlocked = false
     }
@@ -156,9 +156,48 @@ export class PushDownCard extends Card {
         otherRobot.getHandsBlockingAt(hand.position).forEach(otherHand => otherHand.position++)
     }
     _cleanup(hand, thisRobot) {
-        hand.isBlocking = true
+        hand.isBlocking = !hand.isCharged
         hand.isAttacking = false
         hand.isBlocked = false
+    }
+}
+
+export class RepairCard extends Card {
+    icon = "🔧"
+    name = "Repair"
+
+    _prepare(hand) {
+        hand.isCharged = false
+        hand.isBlocking = false
+    }
+    _do(hand, thisRobot, otherRobot) {
+        thisRobot.getBodypartAt(hand.position).health += 10
+    }
+    _cleanup(hand, thisRobot) {
+        hand.isBlocking = true
+    }
+}
+
+export class ReinforceCard extends Card {
+    icon = "🛠️"
+    name = "Reinforce"
+
+    _prepare(hand) {
+        hand.isCharged = false
+        hand.isBlocking = false
+    }
+    _do(hand, thisRobot, otherRobot) {
+        const thisBodypart = thisRobot.getBodypartAt(hand.position);
+        thisBodypart.maxHealth += 10
+        thisBodypart.health += 15
+
+        const neighboringBodyparts = thisRobot.getNeighboringBodyparts(thisBodypart)
+        neighboringBodyparts.forEach((bodypart) => {
+            bodypart.health -= 10 / neighboringBodyparts.length
+        })
+    }
+    _cleanup(hand, thisRobot) {
+        hand.isBlocking = true
     }
 }
 
@@ -179,6 +218,8 @@ const cards = {
     charge: () => new ChargeCard(),
     push_up: () => new PushUpCard(),
     push_down: () => new PushDownCard(),
+    repair: () => new RepairCard(),
+    reinforce: () => new ReinforceCard(),
 }
 
 export function getAllTypes() {

@@ -106,6 +106,18 @@ export default class Robot {
         throw "Unexpected position " + position
     }
 
+    getNeighboringBodyparts(bodypart) {
+        switch (bodypart) {
+            case this.head:
+                return [this.torso]
+            case this.torso:
+                return [this.head, this.heatsink]
+            case this.heatsink:
+                return [this.torso]
+        }
+        throw "Unexpected bodypart"
+    }
+
     getHandsBlockingAt(position) {
         return [this.rightHand, this.leftHand]
             .filter(hand => hand.isBlocking)

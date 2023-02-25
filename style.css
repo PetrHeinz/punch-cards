@@ -242,7 +242,7 @@ h1.line {
 .hand {
     --height: 1;
     --width: 1;
-    --forward: 7;
+    --forward: 6;
 }
 
 .hand.right {
@@ -253,6 +253,7 @@ h1.line {
 }
 
 .hand.blocking {
+    --forward: 7;
     --height: 2;
     --width: .5;
 }
