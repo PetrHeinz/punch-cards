@@ -4,34 +4,38 @@
     --margin: .2vmin;
     --fontsize: 1.5vmin;
 
-    --color-active-text: red;
+    --hue-selected: 0;
+    --hue-left: 240;
+    --hue-right: 0;
+
+    --color-active-text: hsl(var(--hue-selected), 100%, 50%);
     --color-bg: lightslategray;
-    --color-bodypart-border: black;
+    --color-bodypart-border: hsl(0, 0%, 30%);
     --color-bodypart-text: black;
+    --color-bodypart-hand-left-border: hsl(var(--hue-left), 100%, 30%);
+    --color-bodypart-hand-right-border: hsl(var(--hue-right), 100%, 30%);
     --color-button-bg: white;
     --color-button-border-inactive: darkgrey;
     --color-button-border: black;
-    --color-button-text-hover: red;
+    --color-button-text-hover: hsl(var(--hue-selected), 100%, 50%);
     --color-button-text-inactive: grey;
     --color-button-text: black;
     --color-card-bg: white;
-    --color-card-border-selected: red;
+    --color-card-border-selected: hsl(var(--hue-selected), 100%, 50%);
     --color-card-border-used: hsl(0, 0%, 65%);
     --color-card-border: hsl(0, 0%, 50%);
-    --color-card-left-border: hsl(240, 25%, 50%);
-    --color-card-right-border: hsl(0, 25%, 50%);
-    --color-card-left-text: hsl(240, 100%, 25%);
-    --color-card-right-text: hsl(0, 100%, 25%);
+    --color-card-left-border: hsl(var(--hue-left), 25%, 50%);
+    --color-card-right-border: hsl(var(--hue-right), 25%, 50%);
+    --color-card-left-text: hsl(var(--hue-left), 100%, 25%);
+    --color-card-right-text: hsl(var(--hue-right), 100%, 25%);
     --color-card-hand-text-hover: black;
     --color-card-text-used: grey;
     --color-card-text: black;
-    --color-clickable-text-hover: red;
+    --color-clickable-text-hover: hsl(var(--hue-selected), 100%, 50%);
     --color-game-border: black;
     --color-grid-bg: white;
     --color-grid: silver;
-    --color-hand-left-border: hsl(240, 100%, 25%);
-    --color-hand-right-border: hsl(0, 100%, 25%);
-    --color-header-menu-text-hover: red;
+    --color-header-menu-text-hover: hsl(var(--hue-selected), 100%, 50%);
     --color-header-menu-text: darkslategray;
 }
 
@@ -190,10 +194,10 @@ h1.line {
 }
 
 .hand.right {
-    border-color: var(--color-hand-right-border);
+    border-color: var(--color-bodypart-hand-right-border);
 }
 .hand.left {
-    border-color: var(--color-hand-left-border);
+    border-color: var(--color-bodypart-hand-left-border);
 }
 
 .hand.blocking {
