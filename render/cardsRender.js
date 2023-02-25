@@ -1,5 +1,5 @@
 import ChangeCache from "../utils/changeCache.js";
-import {ROBOT_HAND_RIGHT, ROBOT_STATE_CONTROL} from "../game/robot.js";
+import {ROBOT_HAND_RIGHT, ROBOT_STATE_INPUT} from "../game/robot.js";
 
 export default class CardsRender {
     initialize(root) {
@@ -72,7 +72,7 @@ export default class CardsRender {
             })
         })
 
-        this.readyButton.classList.toggle("pushed", cardsInfo.state !== ROBOT_STATE_CONTROL)
+        this.readyButton.classList.toggle("pushed", cardsInfo.state !== ROBOT_STATE_INPUT)
     }
 
     _enrichHandCardsInfo(cardsInfo) {

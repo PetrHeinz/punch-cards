@@ -1,4 +1,4 @@
-import {ROBOT_STATE_COMMIT, ROBOT_STATE_CONTROL} from "../game/robot.js";
+import {ROBOT_STATE_COMMIT, ROBOT_STATE_INPUT} from "../game/robot.js";
 import CardsRender from "./cardsRender.js";
 
 export default class HiddenCardsRender extends CardsRender {
@@ -12,7 +12,7 @@ export default class HiddenCardsRender extends CardsRender {
     }
 
     render(cardsInfo) {
-        const newHiddenActions = cardsInfo.state === ROBOT_STATE_CONTROL || cardsInfo.state === ROBOT_STATE_COMMIT;
+        const newHiddenActions = cardsInfo.state === ROBOT_STATE_INPUT || cardsInfo.state === ROBOT_STATE_COMMIT;
 
         if (newHiddenActions !== this.hiddenActions) {
             this._actionCardsCache.clear()

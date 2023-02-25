@@ -6,7 +6,7 @@ import Robot, {
     ROBOT_SIDE_RIGHT,
     ROBOT_STATE_ACTION,
     ROBOT_STATE_COMMIT,
-    ROBOT_STATE_CONTROL,
+    ROBOT_STATE_INPUT,
     ROBOT_STATE_DEAD,
     ROBOT_STATE_PREPARE,
     ROBOT_STATE_WINNER
@@ -118,7 +118,7 @@ export default class Game {
             return
         }
 
-        if (this.leftRobot.state === ROBOT_STATE_CONTROL || this.rightRobot.state === ROBOT_STATE_CONTROL) {
+        if (this.leftRobot.state === ROBOT_STATE_INPUT || this.rightRobot.state === ROBOT_STATE_INPUT) {
             console.debug("Either robot is still waiting for input")
             return
         }

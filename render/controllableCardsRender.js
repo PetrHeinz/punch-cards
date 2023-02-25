@@ -1,5 +1,5 @@
 import CardsRender from "./cardsRender.js";
-import {ROBOT_STATE_CONTROL} from "../game/robot.js";
+import {ROBOT_STATE_INPUT} from "../game/robot.js";
 
 const ROBOT_CARDS_ACTION = "ACTION"
 const ROBOT_CARDS_HAND = "HAND"
@@ -19,7 +19,7 @@ export default class ControllableCardsRender extends CardsRender {
         super.initialize(root);
 
         this.actionCards.addEventListener("click", (event) => {
-            if (this.cardsInfo.state !== ROBOT_STATE_CONTROL) return
+            if (this.cardsInfo.state !== ROBOT_STATE_INPUT) return
             if (event.target === this.actionCards) return
 
             const actionCardIndex = getChildIndex(this.actionCards, event.target)
@@ -44,7 +44,7 @@ export default class ControllableCardsRender extends CardsRender {
         })
 
         this.handCards.addEventListener("click", (event) => {
-            if (this.cardsInfo.state !== ROBOT_STATE_CONTROL) return
+            if (this.cardsInfo.state !== ROBOT_STATE_INPUT) return
             if (event.target === this.handCards) return
 
             const handCardIndex = getChildIndex(this.handCards, event.target)
@@ -65,7 +65,7 @@ export default class ControllableCardsRender extends CardsRender {
         })
 
         this.readyButton.addEventListener("click", () => {
-            if (this.cardsInfo.state !== ROBOT_STATE_CONTROL) return
+            if (this.cardsInfo.state !== ROBOT_STATE_INPUT) return
             this.robotControl.commit()
             this._selectCard(ROBOT_CARDS_NONE)
         })
@@ -80,9 +80,9 @@ export default class ControllableCardsRender extends CardsRender {
 
         super.render(cardsInfo)
 
-        this.actionCards.classList.toggle("clickable", this.cardsInfo.state === ROBOT_STATE_CONTROL)
-        this.handCards.classList.toggle("clickable", this.cardsInfo.state === ROBOT_STATE_CONTROL)
-        this.readyButton.classList.toggle("clickable", this.cardsInfo.state === ROBOT_STATE_CONTROL)
+        this.actionCards.classList.toggle("clickable", this.cardsInfo.state === ROBOT_STATE_INPUT)
+        this.handCards.classList.toggle("clickable", this.cardsInfo.state === ROBOT_STATE_INPUT)
+        this.readyButton.classList.toggle("clickable", this.cardsInfo.state === ROBOT_STATE_INPUT)
     }
 
     _selectCard(selected, selectedIndex) {

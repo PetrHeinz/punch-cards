@@ -2,7 +2,7 @@ import Action from "./action.js";
 import Bodypart from "./bodypart.js";
 import Hand from "./hand.js";
 
-export const ROBOT_STATE_CONTROL = "WAITING_FOR_INPUT"
+export const ROBOT_STATE_INPUT = "WAITING_FOR_INPUT"
 export const ROBOT_STATE_COMMIT = "INPUT_ACCEPTED"
 export const ROBOT_STATE_ACTION = "ACTION"
 export const ROBOT_STATE_PREPARE = "PREPARING"
@@ -118,7 +118,7 @@ export default class Robot {
             this.handCards.push(this.deckCards.shift())
         }
 
-        this.state = ROBOT_STATE_CONTROL
+        this.state = ROBOT_STATE_INPUT
 
         this._robotUpdate()
 
@@ -126,7 +126,7 @@ export default class Robot {
     }
 
     chooseAction(handCardIndex, actionIndex) {
-        if (this.state !== ROBOT_STATE_CONTROL) throw "Robot can choose action only during " + ROBOT_STATE_CONTROL
+        if (this.state !== ROBOT_STATE_INPUT) throw "Robot can choose action only during " + ROBOT_STATE_INPUT
 
         if (this.actions[actionIndex] === undefined) {
             console.debug('actions:', this.actions)
@@ -148,7 +148,7 @@ export default class Robot {
     }
 
     swapActions(firstActionIndex, secondActionIndex) {
-        if (this.state !== ROBOT_STATE_CONTROL) throw "Robot can swap actions only during " + ROBOT_STATE_CONTROL
+        if (this.state !== ROBOT_STATE_INPUT) throw "Robot can swap actions only during " + ROBOT_STATE_INPUT
 
         if (this.actions[firstActionIndex] === undefined) {
             console.debug('actions:', this.actions)
@@ -167,7 +167,7 @@ export default class Robot {
     }
 
     toggleActionHand(actionIndex) {
-        if (this.state !== ROBOT_STATE_CONTROL) throw "Robot can choose action hand only during " + ROBOT_STATE_CONTROL
+        if (this.state !== ROBOT_STATE_INPUT) throw "Robot can choose action hand only during " + ROBOT_STATE_INPUT
 
         if (this.actions[actionIndex] === undefined) {
             console.debug('actions:', this.actions)
@@ -180,7 +180,7 @@ export default class Robot {
     }
 
     discardAction(actionIndex) {
-        if (this.state !== ROBOT_STATE_CONTROL) throw "Robot can discard action only during " + ROBOT_STATE_CONTROL
+        if (this.state !== ROBOT_STATE_INPUT) throw "Robot can discard action only during " + ROBOT_STATE_INPUT
 
         this.actions[actionIndex].discard()
 
@@ -188,14 +188,14 @@ export default class Robot {
     }
 
     commit() {
-        if (this.state !== ROBOT_STATE_CONTROL) throw "Robot can commit only during " + ROBOT_STATE_CONTROL
+        if (this.state !== ROBOT_STATE_INPUT) throw "Robot can commit only during " + ROBOT_STATE_INPUT
 
         this.state = ROBOT_STATE_COMMIT
         this._robotUpdate()
     }
 
     tick() {
-        if (this.state !== ROBOT_STATE_CONTROL) return
+        if (this.state !== ROBOT_STATE_INPUT) return
 
         if (this.timeToInput <= 0) {
             this.torso.health -= this.inputOvertimeTorsoDamage

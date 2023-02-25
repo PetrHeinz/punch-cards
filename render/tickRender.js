@@ -1,5 +1,5 @@
 import Timer from "../utils/timer.js";
-import {ROBOT_STATE_CONTROL} from "../game/robot.js";
+import {ROBOT_STATE_INPUT} from "../game/robot.js";
 
 export default class TickRender {
     constructor(tickTimeout) {
@@ -35,7 +35,7 @@ export default class TickRender {
     }
 
     renderTimeToInput(timeToInput, state) {
-        this._timeToInput.classList.toggle("active", state === ROBOT_STATE_CONTROL)
+        this._timeToInput.classList.toggle("active", state === ROBOT_STATE_INPUT)
         this._timeToInput.textContent = timeToInput
     }
 
