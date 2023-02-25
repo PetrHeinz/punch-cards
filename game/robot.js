@@ -1,7 +1,7 @@
 import Action from "./action.js";
 import Bodypart from "./bodypart.js";
 import Hand from "./hand.js";
-import {createDeck} from "./cards.js";
+import {createDeckByTypes} from "./cards.js";
 
 export const ROBOT_STATE_INPUT = "WAITING_FOR_INPUT"
 export const ROBOT_STATE_COMMIT = "INPUT_ACCEPTED"
@@ -28,7 +28,7 @@ export default class Robot {
         this._robotUpdate = robotUpdateCallback
 
         robotOptions = {
-            cards: createDeck(),
+            cards: {punch: 6, up1: 3, up2: 2, up3: 1, down1: 3, down2: 2, down3: 1, charge: 2},
             actionsCount: 3,
             drawnCardsCount: 5,
             maxTimeToInput: 5,
@@ -41,8 +41,7 @@ export default class Robot {
             ...robotOptions,
         }
 
-
-        this.deckCards = this._shuffleCards(robotOptions.cards)
+        this.deckCards = this._shuffleCards(createDeckByTypes(robotOptions.cards))
 
         this.actionsCount = robotOptions.actionsCount
         this.drawnCardsCount = robotOptions.drawnCardsCount

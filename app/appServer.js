@@ -8,11 +8,14 @@ import ControllableCardsRender from "../render/controllableCardsRender.js";
 import DirectControl from "../controller/directControl.js";
 import HiddenCardsRender from "../render/hiddenCardsRender.js";
 import RemoteControl from "../controller/remoteControl.js";
+import {createCardByType, getAllTypes} from "../game/cards.js";
+import CardsRender from "../render/cardsRender.js";
 
 export default class AppServer {
     randomSeedString = "punch-cards"
     maxTimeToInput = 5
     tickInterval = 1000
+    cards = {punch: 6, up1: 3, up2: 2, up3: 1, down1: 3, down2: 2, down3: 1, charge: 2}
 
     controllers = [
         {
@@ -116,6 +119,7 @@ export default class AppServer {
         const gameOptions = {
             randomSeedString: this.randomSeedString,
             robotOptions: {
+                cards: this.cards,
                 maxTimeToInput: this.maxTimeToInput,
             }
         }
@@ -232,7 +236,50 @@ export default class AppServer {
             menu.append(element)
         })
 
+        const deckCustomizationButton = appendLine(menu, "Customize cards in deck")
+        deckCustomizationButton.classList.add("clickable", "with-hover")
+        deckCustomizationButton.addEventListener("click", () => this.showDeckCustomization())
+
         appendButton(menu, "Fight!", () => this.startGameWhenReady())
+
+        this.root.append(menu)
+    }
+
+    showDeckCustomization() {
+        this.clear()
+
+        const menu = document.createElement('div')
+        menu.classList.add('menu')
+
+        appendHeading(menu)
+
+        for (const cardType of getAllTypes()) {
+            const cardSettings = document.createElement('div')
+            cardSettings.classList.add("card-settings")
+
+            const cardCountInput = document.createElement("input")
+            cardCountInput.classList.add("input")
+            cardCountInput.min = 0
+            cardCountInput.value = this.cards[cardType] ?? 0
+            cardCountInput.style.width = "2em"
+            cardCountInput.type = "number"
+            cardCountInput.style.textAlign = "right"
+            cardCountInput.addEventListener("input", () => {
+                this.cards[cardType] = parseInt(cardCountInput.value.trim())
+            })
+            cardSettings.append(cardCountInput)
+            cardSettings.append("✖️")
+
+            const cardElement = document.createElement("div")
+            cardElement.style.display = "inline-block"
+            cardElement.style.verticalAlign = "middle"
+            cardElement.append(CardsRender.createCard(createCardByType(cardType)))
+            cardSettings.append(cardElement)
+
+            menu.append(cardSettings)
+        }
+
+        appendButton(menu, "Save", () => this.showMenu())
 
         this.root.append(menu)
     }

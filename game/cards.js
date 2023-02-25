@@ -129,28 +129,40 @@ export class BlankCard extends Card {
     name = "Blank"
 }
 
-/** @return {Card[]} */
-export function createDeck() {
-    return [
-        new PunchCard(),
-        new PunchCard(),
-        new PunchCard(),
-        new PunchCard(),
-        new PunchCard(),
-        new PunchCard(),
-        new Up1Card(),
-        new Up1Card(),
-        new Up1Card(),
-        new Up2Card(),
-        new Up2Card(),
-        new Up3Card(),
-        new Down1Card(),
-        new Down1Card(),
-        new Down1Card(),
-        new Down2Card(),
-        new Down2Card(),
-        new Down3Card(),
-        new ChargeCard(),
-        new ChargeCard(),
-    ]
+export function getAllTypes() {
+    return ["blank", "punch", "up1", "up2", "up3", "down1", "down2", "down3", "charge"]
+}
+
+export function createDeckByTypes(types) {
+    const deck = []
+    for (const type in types) {
+        for (let i = 0; i < types[type]; i++) {
+            deck.push(createCardByType(type))
+        }
+    }
+    return deck
+}
+
+export function createCardByType(type) {
+    switch (type) {
+        case "blank":
+            return new BlankCard()
+        case "punch":
+            return new PunchCard()
+        case "up1":
+            return new Up1Card()
+        case "up2":
+            return new Up2Card()
+        case "up3":
+            return new Up3Card()
+        case "down1":
+            return new Down1Card()
+        case "down2":
+            return new Down2Card()
+        case "down3":
+            return new Down3Card()
+        case "charge":
+            return new ChargeCard()
+    }
+    throw `Unknown card type "${type}"`
 }

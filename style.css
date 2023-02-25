@@ -269,6 +269,10 @@ h1.line {
 .clickable {
     cursor: pointer;
 }
+.clickable.with-hover:hover {
+    color: var(--color-clickable-text-hover);
+    font-weight: bold;
+}
 
 .cards, .actions {
     display: flex;
@@ -287,9 +291,15 @@ h1.line {
     margin: var(--margin);
     border: var(--border) solid var(--color-card-border);
     border-radius: calc(var(--unit) / 4);
+    font-size: var(--fontsize);
     text-align: center;
     background-color: var(--color-card-bg);
     color: var(--color-card-text);
+}
+.card-settings {
+    display: inline-block;
+    font-size: calc(2 * var(--fontsize));
+    margin: calc(var(--unit) / 4);
 }
 
 .actions .card {

@@ -52,11 +52,18 @@ export default class CardsRender {
     }
 
     initCard(root, card, used = false) {
-        const cardElement = document.createElement('div')
-        cardElement.classList.add('card')
+        const cardElement = CardsRender.createCard(card)
         if (used) {
             cardElement.classList.add("used")
         }
+        root.append(cardElement)
+
+        return cardElement
+    }
+
+    static createCard(card) {
+        const cardElement = document.createElement('div')
+        cardElement.classList.add('card')
 
         const iconElement = document.createElement('div')
         iconElement.classList.add("icon")
@@ -65,8 +72,6 @@ export default class CardsRender {
 
         cardElement.append(iconElement)
         cardElement.append(card.name)
-
-        root.append(cardElement)
 
         return cardElement
     }
