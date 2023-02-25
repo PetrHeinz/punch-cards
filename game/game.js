@@ -7,8 +7,8 @@ import Robot, {
     ROBOT_STATE_ACTION,
     ROBOT_STATE_COMMIT,
     ROBOT_STATE_INPUT,
-    ROBOT_STATE_DEAD,
-    ROBOT_STATE_PREPARE,
+    ROBOT_STATE_DESTROYED,
+    ROBOT_STATE_PREPARING,
     ROBOT_STATE_WINNER
 } from "./robot.js";
 
@@ -85,7 +85,7 @@ export default class Game {
     }
 
     isOver() {
-        if (this.leftRobot.state === ROBOT_STATE_DEAD && this.rightRobot.state === ROBOT_STATE_DEAD) {
+        if (this.leftRobot.state === ROBOT_STATE_DESTROYED && this.rightRobot.state === ROBOT_STATE_DESTROYED) {
             return true
         }
 
@@ -104,14 +104,14 @@ export default class Game {
         this.leftRobot.tick()
         this.rightRobot.tick()
 
-        if (this.rightRobot.state === ROBOT_STATE_DEAD) {
+        if (this.rightRobot.state === ROBOT_STATE_DESTROYED) {
             console.info("Left robot won!")
             this.leftRobot.state = ROBOT_STATE_WINNER
             this._leftRobotUpdate()
             return
         }
 
-        if (this.leftRobot.state === ROBOT_STATE_DEAD) {
+        if (this.leftRobot.state === ROBOT_STATE_DESTROYED) {
             console.info("Right robot won!")
             this.rightRobot.state = ROBOT_STATE_WINNER
             this._rightRobotUpdate()
@@ -123,7 +123,7 @@ export default class Game {
             return
         }
 
-        if (this.leftRobot.state === ROBOT_STATE_PREPARE && this.rightRobot.state === ROBOT_STATE_PREPARE) {
+        if (this.leftRobot.state === ROBOT_STATE_PREPARING && this.rightRobot.state === ROBOT_STATE_PREPARING) {
             console.info("Preparing for new round!")
             this.currentAction = 0
             this.leftRobot.drawHand()
@@ -144,7 +144,7 @@ export default class Game {
             if (this.leftRobot.actions[this.currentAction] !== undefined) {
                 actions.push(this.leftRobot.actions[this.currentAction].getAction(this.leftRobot, this.rightRobot))
             } else {
-                this.leftRobot.state = this.leftRobot.isDestroyed() ? ROBOT_STATE_DEAD : ROBOT_STATE_PREPARE
+                this.leftRobot.state = this.leftRobot.isDestroyed() ? ROBOT_STATE_DESTROYED : ROBOT_STATE_PREPARING
                 this._leftRobotUpdate()
             }
         }
@@ -153,7 +153,7 @@ export default class Game {
             if (this.rightRobot.actions[this.currentAction] !== undefined) {
                 actions.push(this.rightRobot.actions[this.currentAction].getAction(this.rightRobot, this.leftRobot))
             } else {
-                this.rightRobot.state = this.rightRobot.isDestroyed() ? ROBOT_STATE_DEAD : ROBOT_STATE_PREPARE
+                this.rightRobot.state = this.rightRobot.isDestroyed() ? ROBOT_STATE_DESTROYED : ROBOT_STATE_PREPARING
                 this._rightRobotUpdate()
             }
         }

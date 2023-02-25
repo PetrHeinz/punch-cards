@@ -5,8 +5,8 @@ import Hand from "./hand.js";
 export const ROBOT_STATE_INPUT = "WAITING_FOR_INPUT"
 export const ROBOT_STATE_COMMIT = "INPUT_ACCEPTED"
 export const ROBOT_STATE_ACTION = "ACTION"
-export const ROBOT_STATE_PREPARE = "PREPARING"
-export const ROBOT_STATE_DEAD = "DISASSEMBLED"
+export const ROBOT_STATE_PREPARING = "PREPARING"
+export const ROBOT_STATE_DESTROYED = "DISASSEMBLED"
 export const ROBOT_STATE_WINNER = "WINNER"
 export const ROBOT_HAND_RIGHT = "RIGHT"
 export const ROBOT_HAND_LEFT = "LEFT"
@@ -14,7 +14,7 @@ export const ROBOT_SIDE_RIGHT = "ROBOT_RIGHT"
 export const ROBOT_SIDE_LEFT = "ROBOT_LEFT"
 
 export default class Robot {
-    state = ROBOT_STATE_PREPARE
+    state = ROBOT_STATE_PREPARING
 
     maxTimeToInput = 5
     timeToInput = this.maxTimeToInput
@@ -103,7 +103,7 @@ export default class Robot {
     }
 
     drawHand() {
-        if (this.state !== ROBOT_STATE_PREPARE) throw "Robot can draw hand only during " + ROBOT_STATE_PREPARE
+        if (this.state !== ROBOT_STATE_PREPARING) throw "Robot can draw hand only during " + ROBOT_STATE_PREPARING
 
         this.timeToInput = this.maxTimeToInput
 
@@ -200,7 +200,7 @@ export default class Robot {
         if (this.timeToInput <= 0) {
             this.torso.health -= this.inputOvertimeTorsoDamage
             if (this.isDestroyed()) {
-                this.state = ROBOT_STATE_DEAD
+                this.state = ROBOT_STATE_DESTROYED
             }
         }
         this.timeToInput--

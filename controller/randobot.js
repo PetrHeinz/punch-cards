@@ -1,5 +1,5 @@
 import RandomGenerator from "../utils/randomGenerator.js";
-import {ROBOT_STATE_INPUT, ROBOT_STATE_DEAD, ROBOT_STATE_WINNER} from "../game/robot.js";
+import {ROBOT_STATE_INPUT, ROBOT_STATE_DESTROYED, ROBOT_STATE_WINNER} from "../game/robot.js";
 
 export default class Randobot {
     currentActionIndex = 0
@@ -19,7 +19,7 @@ export default class Randobot {
     start() {
         this.interval = setInterval(() => {
             if (this.robot.state === ROBOT_STATE_INPUT) this.doAction()
-            if (this.robot.state === ROBOT_STATE_WINNER || this.robot.state === ROBOT_STATE_DEAD) this.stop()
+            if (this.robot.state === ROBOT_STATE_WINNER || this.robot.state === ROBOT_STATE_DESTROYED) this.stop()
         }, 200)
     }
 
