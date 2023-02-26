@@ -10,12 +10,15 @@ import HiddenCardsRender from "../render/hiddenCardsRender.js";
 import RemoteControl from "../controller/remoteControl.js";
 import {createCardByType, getAllTypes} from "../game/cards.js";
 import CardsRender from "../render/cardsRender.js";
+import Cleverbot from "../controller/cleverbot.js";
 
 export default class AppServer {
     randomSeedString = "punch-cards"
+    cards = {punch: 6, up1: 3, up2: 2, up3: 1, down1: 3, down2: 2, down3: 1, charge: 2}
+    actionsCount = 3
+    drawnCardsCount = 5
     maxTimeToInput = 5
     tickInterval = 1000
-    cards = {punch: 6, up1: 3, up2: 2, up3: 1, down1: 3, down2: 2, down3: 1, charge: 2}
 
     controllers = [
         {
@@ -36,6 +39,16 @@ export default class AppServer {
             },
         },
         {
+            name: 'Cleverbot',
+            remoteControl: false,
+            createCardsRender: (robot, getGameCopyCallback) => {
+                const cleverbot = new Cleverbot(robot, getGameCopyCallback, this.randomSeedString)
+                cleverbot.start()
+
+                return new HiddenCardsRender()
+            },
+        },
+        {
             name: 'Remote control',
             remoteControl: true,
             createCardsRender: (robot) => {
@@ -46,7 +59,7 @@ export default class AppServer {
         },
     ]
     leftControllerIndex = 0
-    rightControllerIndex = 1
+    rightControllerIndex = 2
 
     clientConnections = []
     controllerListeners = []
@@ -117,19 +130,23 @@ export default class AppServer {
         eventManager.listenToAll((type, payload) => this.clientConnections.forEach((connection) => connection.send({type, payload})))
 
         const gameOptions = {
-            randomSeedString: this.randomSeedString,
             robotOptions: {
                 cards: this.cards,
+                actionsCount: this.actionsCount,
+                drawnCardsCount: this.drawnCardsCount,
                 maxTimeToInput: this.maxTimeToInput,
             }
+        }
+        if (this.randomSeedString !== null) {
+            gameOptions.randomSeedString = this.randomSeedString
         }
 
         let game = new Game(gameOptions, eventManager)
         let gameRender = new GameRender(
             this.root,
             eventManager,
-            this.controllers[this.leftControllerIndex].createCardsRender(game.leftRobot),
-            this.controllers[this.rightControllerIndex].createCardsRender(game.rightRobot),
+            this.controllers[this.leftControllerIndex].createCardsRender(game.leftRobot, () => game.copy()),
+            this.controllers[this.rightControllerIndex].createCardsRender(game.rightRobot, () => game.copy()),
             this.tickInterval,
         )
 
@@ -141,7 +158,7 @@ export default class AppServer {
         eventManager.publish("gameStarted", gameStartedPayload)
         this.onRemoteReady = connection => {
             game.clearUpdateCache()
-            this.timer.doAfter(() => connection.send({type: "gameStarted", payload: gameStartedPayload}), tickTimeout)
+            this.timer.doAfter(() => connection.send({type: "gameStarted", payload: gameStartedPayload}), this.tickInterval)
         }
 
         gameRender.addMenuButton("BACK_TO_MENU", () => {
@@ -185,6 +202,20 @@ export default class AppServer {
         randomSeedStringInput.addEventListener("input", () => {
             const randomSeedString = randomSeedStringInput.value.trim()
             this.randomSeedString = randomSeedString !== "" ? randomSeedString : null
+        })
+
+        const actionsCountInput = appendInput(menu, "Number of possible actions", this.actionsCount)
+        actionsCountInput.style.width = "4em"
+        actionsCountInput.type = "number"
+        actionsCountInput.addEventListener("input", () => {
+            this.actionsCount = parseInt(actionsCountInput.value.trim())
+        })
+
+        const drawnCardsCountInput = appendInput(menu, "Number of cards drawn each turn", this.drawnCardsCount)
+        drawnCardsCountInput.style.width = "4em"
+        drawnCardsCountInput.type = "number"
+        drawnCardsCountInput.addEventListener("input", () => {
+            this.drawnCardsCount = parseInt(drawnCardsCountInput.value.trim())
         })
 
         const maxTimeToInputInput = appendInput(menu, "Time limit for card input (in ticks)", this.maxTimeToInput)

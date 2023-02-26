@@ -18,9 +18,9 @@ export const ROBOT_SIDE_LEFT = "ROBOT_LEFT"
 export default class Robot {
     state = ROBOT_STATE_PREPARING
 
-    discardedCards = []
-    handCards = []
     actions = []
+    handCards = []
+    discardedCards = []
 
     constructor(side, robotOptions, randomGenerator, robotUpdateCallback) {
         if (side !== ROBOT_SIDE_RIGHT && side !== ROBOT_SIDE_LEFT) throw "Unknown side " + side
@@ -67,6 +67,9 @@ export default class Robot {
             _randomGenerator: new RandomGenerator("copy"),
             _robotUpdate: () => {},
             actions: this.actions.map(action => Object.create(Action.prototype, Object.getOwnPropertyDescriptors(action))),
+            handCards: [...this.handCards],
+            deckCards: [...this.deckCards],
+            discardedCards: [...this.discardedCards],
             head: Object.create(Bodypart.prototype, Object.getOwnPropertyDescriptors(this.head)),
             torso: Object.create(Bodypart.prototype, Object.getOwnPropertyDescriptors(this.torso)),
             heatsink: Object.create(Bodypart.prototype, Object.getOwnPropertyDescriptors(this.heatsink)),

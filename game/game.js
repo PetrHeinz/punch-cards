@@ -119,6 +119,10 @@ export default class Game {
         return this.leftRobot.state === ROBOT_STATE_INPUT || this.rightRobot.state === ROBOT_STATE_INPUT
     }
 
+    isEvaluating() {
+        return !this.isOver() && !this.isWaitingForInput()
+    }
+
     tick() {
         this._tickUpdate()
         this._robotsUpdate()
