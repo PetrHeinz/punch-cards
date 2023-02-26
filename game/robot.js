@@ -1,7 +1,7 @@
 import Action from "./action.js";
 import Bodypart from "./bodypart.js";
 import Hand from "./hand.js";
-import {createDeckByTypes} from "./cards.js";
+import {createBlankCard, createDeckByTypes} from "./cards.js";
 import RandomGenerator from "../utils/randomGenerator.js";
 
 export const ROBOT_STATE_INPUT = "WAITING_FOR_INPUT"
@@ -61,10 +61,10 @@ export default class Robot {
         this.leftHand = new Hand(robotOptions.leftHandPosition, 1, 7)
     }
 
-    copy() {
-        return Object.assign(Object.create(Robot.prototype),{
+    copy(safe = false) {
+        const copy = Object.assign(Object.create(Robot.prototype),{
             ...this,
-            _randomGenerator: new RandomGenerator("copy"),
+            _randomGenerator: Object.create(RandomGenerator.prototype, Object.getOwnPropertyDescriptors(this._randomGenerator)),
             _robotUpdate: () => {},
             actions: this.actions.map(action => Object.create(Action.prototype, Object.getOwnPropertyDescriptors(action))),
             handCards: [...this.handCards],
@@ -76,6 +76,17 @@ export default class Robot {
             rightHand: Object.create(Hand.prototype, Object.getOwnPropertyDescriptors(this.rightHand)),
             leftHand: Object.create(Hand.prototype, Object.getOwnPropertyDescriptors(this.leftHand)),
         })
+
+        if (safe) {
+            copy._randomGenerator = new RandomGenerator("copy")
+            if (copy.state === ROBOT_STATE_INPUT) {
+                copy.actions = copy.actions.map(() => new Action())
+            }
+            copy.deckCards = copy.deckCards.map(() => createBlankCard())
+            copy.discardedCards = copy.discardedCards.map(() => createBlankCard())
+        }
+
+        return copy
     }
 
     get robotInfo() {

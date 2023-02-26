@@ -51,7 +51,12 @@ export default class Game {
         this._robotsUpdate()
     }
 
-    copy() {
+    copy(safe = false) {
+        const isLeftInput = this.leftRobot.state === ROBOT_STATE_INPUT;
+        const isRightInput = this.rightRobot.state === ROBOT_STATE_INPUT;
+        if (safe && !(isLeftInput && isRightInput || !isLeftInput && !isRightInput)) {
+            throw "Game state is inconsistent, cannot revert current actions and one robot may use that information"
+        }
         return Object.assign(Object.create(Game.prototype),{
             ...this,
             eventManager: new EventManager(),
@@ -60,8 +65,8 @@ export default class Game {
             _leftRobotUpdate: () => {},
             _rightRobotUpdate: () => {},
             _actionPhaseInfoUpdate: () => {},
-            leftRobot: this.leftRobot.copy(),
-            rightRobot: this.rightRobot.copy(),
+            leftRobot: this.leftRobot.copy(safe),
+            rightRobot: this.rightRobot.copy(safe),
         })
     }
 

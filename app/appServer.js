@@ -69,7 +69,7 @@ export default class AppServer {
         this.gameType = "against_bot"
 
         this.setupGame = (game) => {
-            const bot = new Bot(game.rightRobot, () => game.copy(), this.randomSeedString)
+            const bot = new Bot(game.rightRobot, () => game.copy(true), this.randomSeedString)
             bot.start()
 
             return {
@@ -199,8 +199,8 @@ export default class AppServer {
         this.gameType = "with_two_bots"
 
         this.setupGame = (game) => {
-            const leftBot = new Bot(game.leftRobot, () => game.copy(), `${this.randomSeedString}-left`)
-            const rightBot = new Bot(game.rightRobot, () => game.copy(), `${this.randomSeedString}-left`)
+            const leftBot = new Bot(game.leftRobot, () => game.copy(true), `${this.randomSeedString}-left`)
+            const rightBot = new Bot(game.rightRobot, () => game.copy(true), `${this.randomSeedString}-left`)
 
             leftBot.start()
             rightBot.start()
