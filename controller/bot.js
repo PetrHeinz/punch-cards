@@ -2,7 +2,7 @@ import RandomGenerator from "../utils/randomGenerator.js";
 import {ROBOT_STATE_INPUT, ROBOT_STATE_DESTROYED, ROBOT_STATE_WINNER, ROBOT_SIDE_LEFT} from "../game/robot.js";
 import Timer from "../utils/timer.js";
 
-export default class Cleverbot {
+export default class Bot {
     /**
      * @param {Robot} robot
      * @param {function():Game} getGameCopyCallback

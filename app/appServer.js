@@ -9,7 +9,7 @@ import HiddenCardsRender from "../render/hiddenCardsRender.js";
 import RemoteControl from "../controller/remoteControl.js";
 import {createCardByType, getAllTypes} from "../game/cards.js";
 import CardsRender from "../render/cardsRender.js";
-import Cleverbot from "../controller/cleverbot.js";
+import Bot from "../controller/bot.js";
 import {ROBOT_SIDE_LEFT, ROBOT_SIDE_RIGHT} from "../game/robot.js";
 
 export default class AppServer {
@@ -65,7 +65,7 @@ export default class AppServer {
 
     setupGameAgainstBot() {
         this.setupGame = (game) => {
-            const bot = new Cleverbot(game.rightRobot, () => game.copy(), this.randomSeedString)
+            const bot = new Bot(game.rightRobot, () => game.copy(), this.randomSeedString)
             bot.start()
 
             return {
@@ -120,8 +120,8 @@ export default class AppServer {
 
     setupGameWithTwoBots() {
         this.setupGame = (game) => {
-            const leftBot = new Cleverbot(game.leftRobot, () => game.copy(), `${this.randomSeedString}-left`)
-            const rightBot = new Cleverbot(game.rightRobot, () => game.copy(), `${this.randomSeedString}-left`)
+            const leftBot = new Bot(game.leftRobot, () => game.copy(), `${this.randomSeedString}-left`)
+            const rightBot = new Bot(game.rightRobot, () => game.copy(), `${this.randomSeedString}-left`)
 
             leftBot.start()
             rightBot.start()
