@@ -8,7 +8,7 @@ Features:
 - turn-based, both players play at the same time
 - quick play with optional timer
 - cards in hand are known to both players
-- multiplayer on a shared screen controlled via phones _(not yet implemented)_
+- multiplayer on a shared screen controlled via phones
 - bot support
 
 **Play at [petrheinz.github.io/punch-cards](https://petrheinz.github.io/punch-cards/)!**

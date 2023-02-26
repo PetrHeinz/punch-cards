@@ -63,6 +63,12 @@ body {
 .game {
     display: flex;
 }
+.menu .side {
+    display: inline-block;
+    width: 50%;
+    margin-top: var(--unit);
+    text-align: center;
+}
 
 .mobile {
     --unit: 10vmin;
@@ -80,6 +86,14 @@ body {
     font-size: var(--fontsize);
     user-select: none;
     -webkit-tap-highlight-color: transparent;
+}
+
+.qr-code {
+    width: 60%;
+    margin: calc(var(--unit) / 2) auto;
+}
+.qr-code > * {
+    width: 100%;
 }
 
 .menu-upper {

@@ -84,8 +84,39 @@ export default class AppServer {
         const menu = document.createElement('div')
         menu.classList.add('menu')
 
-        this.appendInviteLinkInput(menu, "Left controller", ROBOT_SIDE_LEFT)
-        this.appendInviteLinkInput(menu, "Right controller", ROBOT_SIDE_RIGHT)
+        appendHeading(menu)
+
+        appendLine(menu, "Control the robots via mobile phones...")
+
+        const leftSide = document.createElement('div')
+        leftSide.classList.add("side")
+        appendLine(leftSide, "Left robot")
+        const leftQrCode = document.createElement('div')
+        leftQrCode.classList.add("qr-code")
+        leftSide.append(leftQrCode)
+        this.appendInviteLinkInput(leftSide, "...or send the link", ROBOT_SIDE_LEFT)
+
+        const rightSide = document.createElement('div')
+        rightSide.classList.add("side")
+        appendLine(rightSide, "Right robot")
+        const rightQrCode = document.createElement('div')
+        rightQrCode.classList.add("qr-code")
+        rightSide.append(rightQrCode)
+        this.appendInviteLinkInput(rightSide, "...or send the link", ROBOT_SIDE_RIGHT)
+
+        const createQrCode = (peerId, element, side) => new QRCode(element,  this.createInviteLink(peerId, side))
+        const renderQrCodes = (peerId) => {
+            createQrCode(peerId, leftQrCode, ROBOT_SIDE_LEFT)
+            createQrCode(peerId, rightQrCode, ROBOT_SIDE_RIGHT)
+        }
+
+        this.peer.on('open', (peerId) => renderQrCodes(peerId))
+        if (this.peer.id) {
+            renderQrCodes(this.peer.id)
+        }
+
+        menu.append(leftSide)
+        menu.append(rightSide)
 
         this.root.append(menu)
 
@@ -100,7 +131,7 @@ export default class AppServer {
             }
         }
 
-        appendButton(menu, "Save", () => this.startGame())
+        appendButton(menu, "Start", () => this.startGame())
     }
 
     setupGameAgainstRemoteFriend() {
