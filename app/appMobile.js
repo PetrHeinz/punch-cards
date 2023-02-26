@@ -74,7 +74,10 @@ export default class AppMobile {
 
         this.timer.doPeriodically(() => this.serverConnection.send({message: "ready", side: this.side}), 200, 0)
 
-        this.eventManager.listen("gameStarted", options => this.showGame(options))
+        this.eventManager.listen("gameStarted", gameStartedPayload => {
+            if (gameStartedPayload.gameType !== "against_local_friend") return
+            this.showGame(gameStartedPayload)
+        })
         this.eventManager.listen("gameEnded", () => this.waitForAnotherGame())
     }
 
@@ -93,14 +96,14 @@ export default class AppMobile {
         this.root.append(mobile)
     }
 
-    showGame(options) {
+    showGame(gameStartedPayload) {
         clear(this.root)
         this.timer.clear()
 
         const mobile = document.createElement('div')
         mobile.classList.add('mobile')
 
-        const tickRender = new TickRender(options.tickTimeout)
+        const tickRender = new TickRender(gameStartedPayload.tickTimeout)
         const cardsRender = new ControllableCardsRender(new RemoteControl(this.side, this.serverConnection))
 
         tickRender.appendTo(mobile)

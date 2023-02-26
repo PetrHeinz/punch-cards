@@ -22,6 +22,7 @@ export default class AppServer {
 
     clientConnections = []
     controllerListeners = []
+    gameType = "unknown"
 
     setupGame = () => { throw "No game setup initialized!" }
     restartGame = () => this.startGame()
@@ -65,6 +66,8 @@ export default class AppServer {
     }
 
     setupGameAgainstBot() {
+        this.gameType = "against_bot"
+
         this.setupGame = (game) => {
             const bot = new Bot(game.rightRobot, () => game.copy(), this.randomSeedString)
             bot.start()
@@ -80,6 +83,8 @@ export default class AppServer {
     }
 
     setupGameAgainstLocalFriend() {
+        this.gameType = "against_local_friend"
+
         clear(this.root)
 
         const menu = document.createElement('div')
@@ -160,6 +165,8 @@ export default class AppServer {
     }
 
     setupGameAgainstRemoteFriend() {
+        this.gameType = "against_remote_friend"
+
         clear(this.root)
 
         const menu = document.createElement('div')
@@ -192,6 +199,8 @@ export default class AppServer {
     }
 
     setupGameWithTwoBots() {
+        this.gameType = "with_two_bots"
+
         this.setupGame = (game) => {
             const leftBot = new Bot(game.leftRobot, () => game.copy(), `${this.randomSeedString}-left`)
             const rightBot = new Bot(game.rightRobot, () => game.copy(), `${this.randomSeedString}-left`)
@@ -233,6 +242,7 @@ export default class AppServer {
 
         const gameStartedPayload = {
             tickTimeout: this.tickInterval,
+            gameType: this.gameType,
             leftRemoteControl: gameSetup.remoteControllable.indexOf(ROBOT_SIDE_LEFT) > -1,
             rightRemoteControl: gameSetup.remoteControllable.indexOf(ROBOT_SIDE_RIGHT) > -1,
         };

@@ -73,7 +73,7 @@ export default class AppClient {
 
         this.timer.doPeriodically(() => this.serverConnection.send({message: "ready", side: "remote"}), 200, 0)
 
-        this.eventManager.listen("gameStarted", options => this.showGame(options))
+        this.eventManager.listen("gameStarted", gameStartedPayload => this.showGame(gameStartedPayload))
         this.eventManager.listen("gameEnded", () => this.waitForAnotherGame())
     }
 
@@ -92,19 +92,19 @@ export default class AppClient {
         this.root.append(menu)
     }
 
-    showGame(options) {
+    showGame(gameStartedPayload) {
         clear(this.root)
         this.timer.clear()
 
-        const leftCardsRender = this._createCardsRender(ROBOT_SIDE_LEFT, options.leftRemoteControl, options.rightRemoteControl)
-        const rightCardsRender = this._createCardsRender(ROBOT_SIDE_RIGHT, options.rightRemoteControl, options.leftRemoteControl)
+        const leftCardsRender = this._createCardsRender(ROBOT_SIDE_LEFT, gameStartedPayload.leftRemoteControl, gameStartedPayload.rightRemoteControl)
+        const rightCardsRender = this._createCardsRender(ROBOT_SIDE_RIGHT, gameStartedPayload.rightRemoteControl, gameStartedPayload.leftRemoteControl)
 
         new GameRender(
             this.root,
             this.eventManager,
             leftCardsRender,
             rightCardsRender,
-            options.tickTimeout,
+            gameStartedPayload.tickTimeout,
         )
     }
 
