@@ -72,7 +72,7 @@ export default class AppMobile {
 
         this.root.append(mobile)
 
-        this.timer.doPeriodically(() => this.serverConnection.send("ready"), 200, 0)
+        this.timer.doPeriodically(() => this.serverConnection.send({message: "ready", side: this.side}), 200, 0)
 
         this.eventManager.listen("gameStarted", options => this.showGame(options))
         this.eventManager.listen("gameEnded", () => this.waitForAnotherGame())
@@ -88,7 +88,7 @@ export default class AppMobile {
         appendLine(mobile, "game ended")
         appendLine(mobile, "waiting for another game to start...")
 
-        this.timer.doPeriodically(() => this.serverConnection.send("ready"), 200, 0)
+        this.timer.doPeriodically(() => this.serverConnection.send({message: "ready", side: this.side}), 200, 0)
 
         this.root.append(mobile)
     }

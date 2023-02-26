@@ -71,7 +71,7 @@ export default class AppClient {
 
         this.root.append(menu)
 
-        this.timer.doPeriodically(() => this.serverConnection.send("ready"), 200, 0)
+        this.timer.doPeriodically(() => this.serverConnection.send({message: "ready", side: "remote"}), 200, 0)
 
         this.eventManager.listen("gameStarted", options => this.showGame(options))
         this.eventManager.listen("gameEnded", () => this.waitForAnotherGame())
@@ -87,7 +87,7 @@ export default class AppClient {
         appendLine(menu, "game ended")
         appendLine(menu, "waiting for another game to start...")
 
-        this.timer.doPeriodically(() => this.serverConnection.send("ready"), 200, 0)
+        this.timer.doPeriodically(() => this.serverConnection.send({message: "ready", side: "remote"}), 200, 0)
 
         this.root.append(menu)
     }

@@ -47,8 +47,9 @@ export default class AppServer {
             connection.on('data', (data) => {
                 console.debug('Received data from client: ', data)
 
-                if (data === "ready") {
-                    this.onRemoteReady(connection)
+                if (data.message === "ready") {
+                    console.debug("Client is ready: ", {connection, side: data.side})
+                    this.onRemoteReady({connection, side: data.side})
                     return
                 }
 
@@ -131,7 +132,29 @@ export default class AppServer {
             }
         }
 
-        appendButton(menu, "Start", () => this.startGame())
+        let leftReady = false
+        let rightReady = false
+
+        this.onRemoteReady = ({side}) => {
+            if (side === "remote") return
+
+            let sideElement
+            if (side === ROBOT_SIDE_LEFT) {
+                leftReady = true
+                sideElement = leftSide
+            }
+            if (side === ROBOT_SIDE_RIGHT) {
+                rightReady = true
+                sideElement = rightSide
+            }
+            sideElement.innerHTML = ""
+            appendLine(sideElement, side)
+            appendLine(sideElement, "CONNECTED")
+
+            if (leftReady && rightReady) {
+                this.startGame()
+            }
+        }
     }
 
     setupGameAgainstRemoteFriend() {
@@ -159,7 +182,9 @@ export default class AppServer {
         }
 
         this.restartGame = () => this.setupGameAgainstRemoteFriend()
-        this.onRemoteReady = () => this.startGame()
+        this.onRemoteReady = ({side}) => {
+            if (side === "remote") this.startGame()
+        }
     }
 
     setupGameWithTwoBots() {
@@ -208,7 +233,7 @@ export default class AppServer {
             rightRemoteControl: gameSetup.remoteControllable.indexOf(ROBOT_SIDE_RIGHT) > -1,
         };
         eventManager.publish("gameStarted", gameStartedPayload)
-        this.onRemoteReady = connection => {
+        this.onRemoteReady = ({connection}) => {
             game.clearUpdateCache()
             this.timer.doAfter(() => connection.send({type: "gameStarted", payload: gameStartedPayload}), this.tickInterval)
         }
