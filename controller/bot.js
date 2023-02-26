@@ -115,7 +115,7 @@ export default class Bot {
             if (minHealth > 10) score += 50
 
             // Bonus for effective blocking
-            for (let position = 0; position < 10; position++) {
+            for (let position = 1; position <= 7; position++) {
                 const isBlocked = robot.getHandsBlockingAt(position).length > 0
                 const blockingLowHealthBonus = Math.max(0, 40 - robot.getBodypartAt(position).health) / 2
                 score += isBlocked ? blockingLowHealthBonus : 0
