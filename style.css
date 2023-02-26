@@ -63,7 +63,7 @@ body {
 .game {
     display: flex;
 }
-.menu .side {
+.menu-half {
     display: inline-block;
     width: 50%;
     margin-top: var(--unit);

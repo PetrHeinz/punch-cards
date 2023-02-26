@@ -90,7 +90,7 @@ export default class AppServer {
         appendLine(menu, "Control the robots via mobile phones...")
 
         const leftSide = document.createElement('div')
-        leftSide.classList.add("side")
+        leftSide.classList.add("menu-half")
         appendLine(leftSide, "Left robot")
         const leftQrCode = document.createElement('div')
         leftQrCode.classList.add("qr-code")
@@ -98,28 +98,25 @@ export default class AppServer {
         this.appendInviteLinkInput(leftSide, "...or send the link", ROBOT_SIDE_LEFT)
 
         const rightSide = document.createElement('div')
-        rightSide.classList.add("side")
+        rightSide.classList.add("menu-half")
         appendLine(rightSide, "Right robot")
         const rightQrCode = document.createElement('div')
         rightQrCode.classList.add("qr-code")
         rightSide.append(rightQrCode)
         this.appendInviteLinkInput(rightSide, "...or send the link", ROBOT_SIDE_RIGHT)
-
         const createQrCode = (peerId, element, side) => new QRCode(element,  this.createInviteLink(peerId, side))
         const renderQrCodes = (peerId) => {
             createQrCode(peerId, leftQrCode, ROBOT_SIDE_LEFT)
             createQrCode(peerId, rightQrCode, ROBOT_SIDE_RIGHT)
         }
-
         this.peer.on('open', (peerId) => renderQrCodes(peerId))
         if (this.peer.id) {
             renderQrCodes(this.peer.id)
         }
-
         menu.append(leftSide)
         menu.append(rightSide)
 
-        this.root.append(menu)
+        appendLine(menu, "waiting for both of you to connect...")
 
         this.setupGame = (game) => {
             this.controllerListeners.push(RemoteControl.createReceiver(game.leftRobot))
@@ -135,6 +132,7 @@ export default class AppServer {
         let leftReady = false
         let rightReady = false
 
+        this.restartGame = () => this.setupGameAgainstRemoteFriend()
         this.onRemoteReady = ({side}) => {
             if (side === "remote") return
 
@@ -155,6 +153,10 @@ export default class AppServer {
                 this.startGame()
             }
         }
+
+        appendButton(menu, "Back", () => this.showMenu())
+
+        this.root.append(menu)
     }
 
     setupGameAgainstRemoteFriend() {
@@ -168,8 +170,6 @@ export default class AppServer {
         this.appendInviteLinkInput(menu, "Invite friends via URL")
 
         appendLine(menu, "waiting for a friend...")
-
-        this.root.append(menu)
 
         this.setupGame = (game) => {
             this.controllerListeners.push(RemoteControl.createReceiver(game.rightRobot))
@@ -185,6 +185,10 @@ export default class AppServer {
         this.onRemoteReady = ({side}) => {
             if (side === "remote") this.startGame()
         }
+
+        appendButton(menu, "Back", () => this.showMenu())
+
+        this.root.append(menu)
     }
 
     setupGameWithTwoBots() {
