@@ -6,7 +6,7 @@ import CardsRender from "../render/cardsRender.js";
 import HiddenCardsRender from "../render/hiddenCardsRender.js";
 import ControllableCardsRender from "../render/controllableCardsRender.js";
 import RemoteControl from "../controller/remoteControl.js";
-import {ROBOT_SIDE_LEFT, ROBOT_SIDE_RIGHT} from "../game/robot.js";
+import {ROBOT_SIDE_RIGHT} from "../game/robot.js";
 
 export default class AppClient {
     /**
@@ -96,27 +96,16 @@ export default class AppClient {
         clear(this.root)
         this.timer.clear()
 
-        const leftCardsRender = this._createCardsRender(ROBOT_SIDE_LEFT, gameStartedPayload.leftRemoteControl, gameStartedPayload.rightRemoteControl)
-        const rightCardsRender = this._createCardsRender(ROBOT_SIDE_RIGHT, gameStartedPayload.rightRemoteControl, gameStartedPayload.leftRemoteControl)
-
         new GameRender(
             this.root,
             this.eventManager,
-            leftCardsRender,
-            rightCardsRender,
+            gameStartedPayload.gameType === "against_remote_friend"
+                ? new HiddenCardsRender()
+                : new CardsRender(),
+            gameStartedPayload.gameType === "against_remote_friend"
+                ? new ControllableCardsRender(new RemoteControl(ROBOT_SIDE_RIGHT, this.serverConnection))
+                : new CardsRender(),
             gameStartedPayload.tickTimeout,
         )
-    }
-
-    _createCardsRender(side, thisRemoteControl, otherRemoteControl) {
-        if (!thisRemoteControl && !otherRemoteControl) {
-            return new CardsRender()
-        }
-
-        if (thisRemoteControl) {
-            return new ControllableCardsRender(new RemoteControl(side, this.serverConnection))
-        }
-
-        return new HiddenCardsRender()
     }
 }

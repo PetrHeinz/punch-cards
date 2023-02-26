@@ -75,7 +75,6 @@ export default class AppServer {
             return {
                 leftCardsRender: new ControllableCardsRender(new DirectControl(game.leftRobot)),
                 rightCardsRender: new HiddenCardsRender(),
-                remoteControllable: [],
             }
         }
 
@@ -130,7 +129,6 @@ export default class AppServer {
             return {
                 leftCardsRender: new HiddenCardsRender(),
                 rightCardsRender: new HiddenCardsRender(),
-                remoteControllable: [],
             }
         }
 
@@ -184,7 +182,6 @@ export default class AppServer {
             return {
                 leftCardsRender: new ControllableCardsRender(new DirectControl(game.leftRobot)),
                 rightCardsRender: new HiddenCardsRender(),
-                remoteControllable: [ROBOT_SIDE_RIGHT],
             }
         }
 
@@ -211,7 +208,6 @@ export default class AppServer {
             return {
                 leftCardsRender: new CardsRender(),
                 rightCardsRender: new CardsRender(),
-                remoteControllable: [],
             }
         }
 
@@ -243,8 +239,6 @@ export default class AppServer {
         const gameStartedPayload = {
             tickTimeout: this.tickInterval,
             gameType: this.gameType,
-            leftRemoteControl: gameSetup.remoteControllable.indexOf(ROBOT_SIDE_LEFT) > -1,
-            rightRemoteControl: gameSetup.remoteControllable.indexOf(ROBOT_SIDE_RIGHT) > -1,
         };
         eventManager.publish("gameStarted", gameStartedPayload)
         this.onRemoteReady = ({connection}) => {
