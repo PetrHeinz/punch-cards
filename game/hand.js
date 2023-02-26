@@ -13,13 +13,13 @@ export default class Hand {
     }
 
     get info() {
-        return {
+        return Object.freeze({
             position: this.position,
             isBlocking: this.isBlocking,
             isAttacking: this.isAttacking,
             isBlocked: this.isBlocked,
             isCharged: this.isCharged,
-        }
+        })
     }
 
     set allowPositionOutOfBounds(allow) {

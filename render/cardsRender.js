@@ -105,11 +105,12 @@ export default class CardsRender {
     _enrichHandCardsInfo(cardsInfo) {
         const usedHandCardIndexes = cardsInfo.actions.map(action => action.handCardIndex);
 
-        cardsInfo.handCards = cardsInfo.handCards.map((handCard, handCardIndex) => ({
-            ...handCard,
-            used: usedHandCardIndexes.indexOf(handCardIndex) > -1
-        }))
-
-        return cardsInfo
+        return Object.freeze({
+            ...cardsInfo,
+            handCards: cardsInfo.handCards.map((handCard, handCardIndex) => ({
+                ...handCard,
+                used: usedHandCardIndexes.indexOf(handCardIndex) > -1
+            }))
+        })
     }
 }

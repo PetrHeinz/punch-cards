@@ -7,11 +7,11 @@ class Card {
     }
 
     get info() {
-        return {
+        return Object.freeze({
             type: this._type,
             icon: this.icon,
             name: this.name,
-        }
+        })
     }
 
     getAction(hand, thisRobot, otherRobot) {

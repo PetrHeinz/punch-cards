@@ -79,7 +79,7 @@ export default class Robot {
     }
 
     get robotInfo() {
-        return {
+        return Object.freeze({
             side: this.side,
             state: this.state,
             head: this.head.info,
@@ -88,18 +88,18 @@ export default class Robot {
             rightHand: this.rightHand.info,
             leftHand: this.leftHand.info,
             timeToInput: this.timeToInput,
-        }
+        })
     }
 
     get cardsInfo() {
-        return {
+        return Object.freeze({
             side: this.side,
             state: this.state,
-            actions: this.actions.map(action => action.info),
-            handCards: this.handCards.map(card => card.info),
+            actions: Object.freeze(this.actions.map(action => action.info)),
+            handCards: Object.freeze(this.handCards.map(card => card.info)),
             deckCardsCount: this.deckCards.length,
             discardedCardsCount: this.discardedCards.length,
-        }
+        })
     }
 
     getHand(hand) {

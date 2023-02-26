@@ -5,10 +5,10 @@ export default class Bodypart {
     }
 
     get info() {
-        return {
+        return Object.freeze({
             health: this.health,
             maxHealth: this.maxHealth,
-        }
+        })
     }
 
     get health() {

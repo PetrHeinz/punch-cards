@@ -7,11 +7,11 @@ export default class Action {
     _hand = ROBOT_HAND_RIGHT
 
     get info() {
-        return {
+        return Object.freeze({
             card: this.card.info,
             hand: this._hand,
             handCardIndex: this._handCardIndex
-        }
+        })
     }
 
     get card() {
