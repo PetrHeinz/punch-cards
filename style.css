@@ -89,6 +89,10 @@ body {
     margin: 0 calc(1.25 * var(--unit));
     font-size: 150%;
 }
+.line.indented {
+    margin-left: calc(2.25 * var(--unit));
+    cursor: pointer;
+}
 h1.line {
     margin: 0;
     line-height: calc(3 * var(--unit));
@@ -117,15 +121,6 @@ h1.line {
 }
 .line:has(.input.status.success):after {
     transform: scale(1.25);
-}
-
-.controller-left, .controller-right {
-    margin-left: calc(2.25 * var(--unit));
-    cursor: pointer;
-}
-.controller-left.selected, .controller-right.selected {
-    font-weight: bold;
-    color: var(--color-active-text);
 }
 
 .side {

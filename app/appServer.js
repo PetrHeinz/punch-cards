@@ -1,4 +1,3 @@
-import Randobot from "../controller/randobot.js";
 import EventManager from "../utils/events.js";
 import Game from "../game/game.js";
 import GameRender from "../render/gameRender.js";
@@ -11,6 +10,7 @@ import RemoteControl from "../controller/remoteControl.js";
 import {createCardByType, getAllTypes} from "../game/cards.js";
 import CardsRender from "../render/cardsRender.js";
 import Cleverbot from "../controller/cleverbot.js";
+import {ROBOT_SIDE_LEFT, ROBOT_SIDE_RIGHT} from "../game/robot.js";
 
 export default class AppServer {
     randomSeedString = "punch-cards"
@@ -20,50 +20,11 @@ export default class AppServer {
     maxTimeToInput = 5
     tickInterval = 1000
 
-    controllers = [
-        {
-            name: 'Direct control',
-            remoteControl: false,
-            createCardsRender: (robot) => {
-                return new ControllableCardsRender(new DirectControl(robot))
-            },
-        },
-        {
-            name: 'Randobot',
-            remoteControl: false,
-            createCardsRender: (robot) => {
-                const randobot = new Randobot(robot, this.randomSeedString)
-                randobot.start()
-
-                return new HiddenCardsRender()
-            },
-        },
-        {
-            name: 'Cleverbot',
-            remoteControl: false,
-            createCardsRender: (robot, getGameCopyCallback) => {
-                const cleverbot = new Cleverbot(robot, getGameCopyCallback, this.randomSeedString)
-                cleverbot.start()
-
-                return new HiddenCardsRender()
-            },
-        },
-        {
-            name: 'Remote control',
-            remoteControl: true,
-            createCardsRender: (robot) => {
-                this.controllerListeners.push(RemoteControl.createReceiver(robot))
-
-                return new HiddenCardsRender()
-            },
-        },
-    ]
-    leftControllerIndex = 0
-    rightControllerIndex = 2
-
     clientConnections = []
     controllerListeners = []
 
+    setupGame = () => { throw "No game setup initialized!" }
+    restartGame = () => this.startGame()
     onRemoteReady = () => {}
 
     /**
@@ -102,11 +63,34 @@ export default class AppServer {
         })
     }
 
-    startGameWhenReady() {
-        if (!this.controllers[this.leftControllerIndex].remoteControl && !this.controllers[this.rightControllerIndex].remoteControl) {
-            this.startGame()
-            return
+    setupGameAgainstBot() {
+        this.setupGame = (game) => {
+            const bot = new Cleverbot(game.rightRobot, () => game.copy(), this.randomSeedString)
+            bot.start()
+
+            return {
+                leftCardsRender: new ControllableCardsRender(new DirectControl(game.leftRobot)),
+                rightCardsRender: new HiddenCardsRender(),
+                remoteControllable: [],
+            }
         }
+
+        this.startGame()
+    }
+
+    setupGameAgainstLocalFriend() {
+        this.setupGame = (game) => {
+            return {
+                leftCardsRender: new ControllableCardsRender(new DirectControl(game.leftRobot)),
+                rightCardsRender: new ControllableCardsRender(new DirectControl(game.rightRobot)),
+                remoteControllable: [],
+            }
+        }
+
+        this.startGame()
+    }
+
+    setupGameAgainstRemoteFriend() {
         clear(this.root)
 
         const menu = document.createElement('div')
@@ -116,11 +100,40 @@ export default class AppServer {
 
         this.appendInviteLinkInput(menu)
 
-        appendLine(menu, "waiting for friends...")
+        appendLine(menu, "waiting for a friend...")
 
         this.root.append(menu)
 
+        this.setupGame = (game) => {
+            this.controllerListeners.push(RemoteControl.createReceiver(game.rightRobot))
+
+            return {
+                leftCardsRender: new ControllableCardsRender(new DirectControl(game.leftRobot)),
+                rightCardsRender: new HiddenCardsRender(),
+                remoteControllable: [ROBOT_SIDE_RIGHT],
+            }
+        }
+
+        this.restartGame = () => this.setupGameAgainstRemoteFriend()
         this.onRemoteReady = () => this.startGame()
+    }
+
+    setupGameWithTwoBots() {
+        this.setupGame = (game) => {
+            const leftBot = new Cleverbot(game.leftRobot, () => game.copy(), `${this.randomSeedString}-left`)
+            const rightBot = new Cleverbot(game.rightRobot, () => game.copy(), `${this.randomSeedString}-left`)
+
+            leftBot.start()
+            rightBot.start()
+
+            return {
+                leftCardsRender: new CardsRender(),
+                rightCardsRender: new CardsRender(),
+                remoteControllable: [],
+            }
+        }
+
+        this.startGame()
     }
 
     startGame() {
@@ -141,19 +154,14 @@ export default class AppServer {
             gameOptions.randomSeedString = this.randomSeedString
         }
 
-        let game = new Game(gameOptions, eventManager)
-        let gameRender = new GameRender(
-            this.root,
-            eventManager,
-            this.controllers[this.leftControllerIndex].createCardsRender(game.leftRobot, () => game.copy()),
-            this.controllers[this.rightControllerIndex].createCardsRender(game.rightRobot, () => game.copy()),
-            this.tickInterval,
-        )
+        const game = new Game(gameOptions, eventManager)
+        const gameSetup = this.setupGame(game)
+        const gameRender = new GameRender(this.root, eventManager, gameSetup.leftCardsRender, gameSetup.rightCardsRender, this.tickInterval)
 
         const gameStartedPayload = {
             tickTimeout: this.tickInterval,
-            leftRemoteControl: this.controllers[this.leftControllerIndex].remoteControl,
-            rightRemoteControl: this.controllers[this.rightControllerIndex].remoteControl,
+            leftRemoteControl: gameSetup.remoteControllable.indexOf(ROBOT_SIDE_LEFT) > -1,
+            rightRemoteControl: gameSetup.remoteControllable.indexOf(ROBOT_SIDE_RIGHT) > -1,
         };
         eventManager.publish("gameStarted", gameStartedPayload)
         this.onRemoteReady = connection => {
@@ -169,7 +177,7 @@ export default class AppServer {
         gameRender.addMenuButton("RESTART_GAME", () => {
             eventManager.publish("gameEnded", {})
             this.onRemoteReady = () => {}
-            this.startGameWhenReady()
+            this.restartGame()
         })
 
         this.timer.doInSequence(this.tickInterval,
@@ -191,6 +199,8 @@ export default class AppServer {
 
     showMenu() {
         this.clear()
+        this.setupGame = () => { throw "No game setup initialized!" }
+        this.restartGame = () => this.startGame()
 
         const menu = document.createElement('div')
         menu.classList.add('menu')
@@ -235,43 +245,29 @@ export default class AppServer {
 
         this.appendInviteLinkInput(menu)
 
-        appendLine(menu, "Choose left controller:")
+        appendLine(menu, "Choose game mode:")
 
-        this.controllers.forEach((controller, index) => {
-            const element = document.createElement('div')
-            element.classList.add('line')
-            element.classList.add("controller-left")
-            element.append(controller.name)
-            element.classList.toggle("selected", this.leftControllerIndex === index)
-            element.addEventListener("click", () => {
-                this.leftControllerIndex = index
-                menu.querySelectorAll(".controller-left")
-                    .forEach((e, i) => e.classList.toggle("selected", i === index))
-            })
-            menu.append(element)
-        })
+        const gameAgainstBotButton = appendLine(menu, "Battle a bot")
+        gameAgainstBotButton.classList.add("clickable", "with-hover", "indented")
+        gameAgainstBotButton.addEventListener("click", () => this.setupGameAgainstBot())
 
-        appendLine(menu, "Choose right controller:")
+        const gameAgainstLocalFriendButton = appendLine(menu, "Fight with a friend locally")
+        gameAgainstLocalFriendButton.classList.add("clickable", "with-hover", "indented")
+        gameAgainstLocalFriendButton.addEventListener("click", () => this.setupGameAgainstLocalFriend())
 
-        this.controllers.forEach((controller, index) => {
-            const element = document.createElement('div')
-            element.classList.add('line')
-            element.classList.add("controller-right")
-            element.append(controller.name)
-            element.classList.toggle("selected", this.rightControllerIndex === index)
-            element.addEventListener("click", () => {
-                this.rightControllerIndex = index
-                menu.querySelectorAll(".controller-right")
-                    .forEach((e, i) => e.classList.toggle("selected", i === index))
-            })
-            menu.append(element)
-        })
+        const gameAgainstRemoteFriendButton = appendLine(menu, "Dominate a friend over network")
+        gameAgainstRemoteFriendButton.classList.add("clickable", "with-hover", "indented")
+        gameAgainstRemoteFriendButton.addEventListener("click", () => this.setupGameAgainstRemoteFriend())
+
+        const gameWithTwoBotsButton = appendLine(menu, "Watch two bots fight")
+        gameWithTwoBotsButton.classList.add("clickable", "with-hover", "indented")
+        gameWithTwoBotsButton.addEventListener("click", () => this.setupGameWithTwoBots())
+
+        appendLine(menu, "Advanced options:")
 
         const deckCustomizationButton = appendLine(menu, "Customize cards in deck")
-        deckCustomizationButton.classList.add("clickable", "with-hover")
+        deckCustomizationButton.classList.add("clickable", "with-hover", "indented")
         deckCustomizationButton.addEventListener("click", () => this.showDeckCustomization())
-
-        appendButton(menu, "Fight!", () => this.startGameWhenReady())
 
         this.root.append(menu)
     }
