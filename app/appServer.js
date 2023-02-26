@@ -327,6 +327,8 @@ export default class AppServer {
     appendInviteLinkInput(menu, labelText, side) {
         const inviteLinkDefaultText = "connecting to the network...";
         const inviteLinkInput = appendInput(menu, labelText, this.peer.id ? this.createInviteLink(this.peer.id, side) : inviteLinkDefaultText)
+        inviteLinkInput.style.fontSize = "60%"
+        inviteLinkInput.style.letterSpacing = "calc(-.1 * var(--fontsize))"
         inviteLinkInput.readOnly = true
         this.peer.on('open', (peerId) => {
             inviteLinkInput.value = this.createInviteLink(peerId, side)

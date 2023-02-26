@@ -36,41 +36,41 @@ export default class AppMobile {
     showLoading() {
         clear(this.root)
 
-        const menu = document.createElement('div')
-        menu.classList.add('menu')
+        const mobile = document.createElement('div')
+        mobile.classList.add('mobile')
 
-        appendHeading(menu)
+        appendHeading(mobile)
 
-        appendLine(menu, "connecting to the network...")
+        appendLine(mobile, "connecting to the network...")
 
-        this.peer.on("error", () => appendLine(menu, 'NETWORK CONNECTION ERROR'))
+        this.peer.on("error", () => appendLine(mobile, 'NETWORK CONNECTION ERROR'))
 
         this.peer.on('open', () => {
-            appendLine(menu, 'connection to the network opened')
-            appendLine(menu, "connecting to the server...")
+            appendLine(mobile, 'connection to the network opened')
+            appendLine(mobile, "connecting to the server...")
 
             this.serverConnection.on('open', () => {
-                appendLine(menu, "connection to the server opened")
+                appendLine(mobile, "connection to the server opened")
 
-                appendButton(menu, 'Ready!', () => this.waitForGame())
+                appendButton(mobile, 'Ready!', () => this.waitForGame())
             })
 
-            this.serverConnection.on("error", () => appendLine(menu, 'SERVER CONNECTION ERROR'))
+            this.serverConnection.on("error", () => appendLine(mobile, 'SERVER CONNECTION ERROR'))
         })
 
-        this.root.append(menu)
+        this.root.append(mobile)
     }
 
     waitForGame() {
         clear(this.root)
 
-        const menu = document.createElement('div')
-        menu.classList.add('menu')
+        const mobile = document.createElement('div')
+        mobile.classList.add('mobile')
 
-        appendHeading(menu)
-        appendLine(menu, "waiting for a game to start...")
+        appendHeading(mobile)
+        appendLine(mobile, "waiting for a game to start...")
 
-        this.root.append(menu)
+        this.root.append(mobile)
 
         this.timer.doPeriodically(() => this.serverConnection.send("ready"), 200, 0)
 
@@ -81,27 +81,30 @@ export default class AppMobile {
     waitForAnotherGame() {
         clear(this.root)
 
-        const menu = document.createElement('div')
-        menu.classList.add('menu')
+        const mobile = document.createElement('div')
+        mobile.classList.add('mobile')
 
-        appendHeading(menu)
-        appendLine(menu, "game ended")
-        appendLine(menu, "waiting for another game to start...")
+        appendHeading(mobile)
+        appendLine(mobile, "game ended")
+        appendLine(mobile, "waiting for another game to start...")
 
         this.timer.doPeriodically(() => this.serverConnection.send("ready"), 200, 0)
 
-        this.root.append(menu)
+        this.root.append(mobile)
     }
 
     showGame(options) {
         clear(this.root)
         this.timer.clear()
 
+        const mobile = document.createElement('div')
+        mobile.classList.add('mobile')
+
         const tickRender = new TickRender(options.tickTimeout)
         const cardsRender = new ControllableCardsRender(new RemoteControl(this.side, this.serverConnection))
 
-        tickRender.appendTo(this.root)
-        cardsRender.initialize(this.root)
+        tickRender.appendTo(mobile)
+        cardsRender.initialize(mobile)
 
         const robotInfoUpdateEvent = this.side === ROBOT_SIDE_LEFT ? "leftRobotInfoUpdate" : "rightRobotInfoUpdate";
         const cardsInfoUpdateEvent = this.side === ROBOT_SIDE_LEFT ? "leftCardsInfoUpdate" : "rightCardsInfoUpdate";
@@ -109,5 +112,7 @@ export default class AppMobile {
         this.eventManager.listen(robotInfoUpdateEvent, ({timeToInput, state}) => tickRender.renderTimeToInput(timeToInput, state))
         this.eventManager.listen(cardsInfoUpdateEvent, cardsInfo => cardsRender.render(cardsInfo))
         this.eventManager.listen("tick", ({tickCounter}) => tickRender.renderTick(tickCounter))
+
+        this.root.append(mobile)
     }
 };
