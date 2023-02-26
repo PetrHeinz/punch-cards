@@ -29,7 +29,7 @@ export default class AppServer {
 
     /**
      * @param {Element} root
-     * @param {function(string):string} createInviteLink
+     * @param {function(string,?string):string} createInviteLink
      */
     constructor(root, createInviteLink) {
         this.root = root
@@ -79,15 +79,28 @@ export default class AppServer {
     }
 
     setupGameAgainstLocalFriend() {
+        clear(this.root)
+
+        const menu = document.createElement('div')
+        menu.classList.add('menu')
+
+        this.appendInviteLinkInput(menu, "Left controller", ROBOT_SIDE_LEFT)
+        this.appendInviteLinkInput(menu, "Right controller", ROBOT_SIDE_RIGHT)
+
+        this.root.append(menu)
+
         this.setupGame = (game) => {
+            this.controllerListeners.push(RemoteControl.createReceiver(game.leftRobot))
+            this.controllerListeners.push(RemoteControl.createReceiver(game.rightRobot))
+
             return {
-                leftCardsRender: new ControllableCardsRender(new DirectControl(game.leftRobot)),
-                rightCardsRender: new ControllableCardsRender(new DirectControl(game.rightRobot)),
+                leftCardsRender: new HiddenCardsRender(),
+                rightCardsRender: new HiddenCardsRender(),
                 remoteControllable: [],
             }
         }
 
-        this.startGame()
+        appendButton(menu, "Save", () => this.startGame())
     }
 
     setupGameAgainstRemoteFriend() {
@@ -98,7 +111,7 @@ export default class AppServer {
 
         appendHeading(menu)
 
-        this.appendInviteLinkInput(menu)
+        this.appendInviteLinkInput(menu, "Invite friends via URL")
 
         appendLine(menu, "waiting for a friend...")
 
@@ -243,7 +256,7 @@ export default class AppServer {
             this.tickInterval = parseInt(tickIntervalInput.value.trim())
         })
 
-        this.appendInviteLinkInput(menu)
+        this.appendInviteLinkInput(menu, "Invite friends via URL")
 
         appendLine(menu, "Choose game mode:")
 
@@ -311,12 +324,12 @@ export default class AppServer {
         this.root.append(menu)
     }
 
-    appendInviteLinkInput(menu) {
+    appendInviteLinkInput(menu, labelText, side) {
         const inviteLinkDefaultText = "connecting to the network...";
-        const inviteLinkInput = appendInput(menu, "Invite friends via URL", this.peer.id ? this.createInviteLink(this.peer.id) : inviteLinkDefaultText)
+        const inviteLinkInput = appendInput(menu, labelText, this.peer.id ? this.createInviteLink(this.peer.id, side) : inviteLinkDefaultText)
         inviteLinkInput.readOnly = true
         this.peer.on('open', (peerId) => {
-            inviteLinkInput.value = this.createInviteLink(peerId)
+            inviteLinkInput.value = this.createInviteLink(peerId, side)
         })
         inviteLinkInput.classList.add("status")
         inviteLinkInput.addEventListener("click", () => {

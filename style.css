@@ -64,6 +64,23 @@ body {
     display: flex;
 }
 
+.mobile {
+    --unit: 10vmin;
+    --border: 1.25vmin;
+    --margin: 1vmin;
+    --fontsize: 3.5vmin;
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    background-size: var(--unit) var(--unit);
+    background-image:
+        linear-gradient(to right, var(--color-grid) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--color-grid) 1px, var(--color-grid-bg) 1px);
+    font-family: monospace;
+    font-size: var(--fontsize);
+    user-select: none;
+}
+
 .menu-upper {
     z-index: 10;
     position: absolute;
@@ -180,10 +197,18 @@ h1.line {
     font-size: 50%;
     color: var(--color-tick);
 }
+.mobile .tick {
+    --tick-size: calc(3 * var(--unit));
+    bottom: auto;
+    margin: var(--unit) 0;
+    position: relative;
+    font-size: 100%;
+}
 .tick .time-to-input {
     position: absolute;
     width: 100%;
     top: 50%;
+    text-align: center;
     font-size: 200%;
     transform: translateY(-50%);
 }
@@ -219,6 +244,10 @@ h1.line {
 .side.right .tick .count {
     left: auto;
     right: 0;
+}
+.mobile .tick .count {
+    top: 0;
+    bottom: auto;
 }
 
 .head {
@@ -380,7 +409,7 @@ h1.line {
 
 .cards-count {
     position: absolute;
-    left:0;
+    left: 0;
     right: auto;
     bottom:var(--unit);
     text-align: center;
@@ -388,11 +417,15 @@ h1.line {
     height: var(--unit);
     line-height: calc(var(--unit) / 2);
 }
-.side.left .cards-count.discarded {
+.cards-count.discarded {
     left: auto;
     right: 0;
 }
 .side.right .cards-count.in-deck {
     left: auto;
     right: 0;
+}
+.side.right .cards-count.discarded {
+    left: 0;
+    right: auto;
 }
