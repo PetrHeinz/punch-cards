@@ -37,10 +37,9 @@ export default class Bot {
 
     _chooseBestActions() {
         const timeStart = Date.now()
-        const otherRobot = this._getOtherRobot();
 
-        let thisActionSets = this._getPossibleActionSets(this._robot.actions.length, this._robot.handCards.length)
-        let otherActionSets = this._getPossibleActionSets(otherRobot.actions.length, otherRobot.handCards.length)
+        let thisActionSets = this._getAllPossibleActionSets(this._getThisRobot())
+        let otherActionSets = this._getAllPossibleActionSets(this._getOtherRobot())
 
         console.log("Number of found possible action sets: ", thisActionSets.length)
 
@@ -126,7 +125,14 @@ export default class Bot {
         })
     }
 
-    _getPossibleActionSets(remainingActionsCount, handCardsCount, actionIndex = 0, usedHandCardIndexes = []) {
+    _getAllPossibleActionSets(robot) {
+        return this._getPossibleActionSets(robot.actions.length, robot.handCards.length, 0, [])
+            .map(actionSet => ({actionSet: actionSet, sort: this._randomGenerator.nextRandom()}))
+            .sort((a, b) => a.sort - b.sort)
+            .map(({actionSet}) => actionSet)
+    }
+
+    _getPossibleActionSets(remainingActionsCount, handCardsCount, actionIndex, usedHandCardIndexes) {
         const possibleActionSets = [[(robot) => robot.commit()]]
 
         if (remainingActionsCount <= 0) {
