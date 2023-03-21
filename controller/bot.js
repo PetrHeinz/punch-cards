@@ -1,5 +1,12 @@
 import RandomGenerator from "../utils/randomGenerator.js";
-import {ROBOT_STATE_INPUT, ROBOT_STATE_DESTROYED, ROBOT_STATE_WINNER, ROBOT_SIDE_LEFT} from "../game/robot.js";
+import {
+    ROBOT_STATE_INPUT,
+    ROBOT_STATE_DESTROYED,
+    ROBOT_STATE_WINNER,
+    ROBOT_SIDE_LEFT,
+    HAND_POSITION_MIN,
+    HAND_POSITION_MAX,
+} from "../game/robot.js";
 import Timer from "../utils/timer.js";
 
 export default class Bot {
@@ -115,7 +122,7 @@ export default class Bot {
             if (minHealth > 10) score += 50
 
             // Bonus for effective blocking
-            for (let position = 1; position <= 7; position++) {
+            for (let position = HAND_POSITION_MIN; position <= HAND_POSITION_MAX; position++) {
                 const isBlocked = robot.getHandsBlockingAt(position).length > 0
                 const blockingLowHealthBonus = Math.max(0, 40 - robot.getBodypartAt(position).health) / 2
                 score += isBlocked ? blockingLowHealthBonus : 0

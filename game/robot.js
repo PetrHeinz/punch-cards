@@ -17,6 +17,9 @@ export const ROBOT_SIDE_LEFT = "ROBOT_LEFT"
 
 export const RANDOM_CARD = "_random_card_from_deck_"
 
+export const HAND_POSITION_MIN = 1;
+export const HAND_POSITION_MAX = 7;
+
 export default class Robot {
     state = ROBOT_STATE_PREPARING
 
@@ -58,8 +61,8 @@ export default class Robot {
         this.head = new Bodypart(robotOptions.headHealth)
         this.torso = new Bodypart(robotOptions.torsoHealth)
         this.heatsink = new Bodypart(robotOptions.heatsinkHealth)
-        this.rightHand = new Hand(robotOptions.rightHandPosition, 1, 7)
-        this.leftHand = new Hand(robotOptions.leftHandPosition, 1, 7)
+        this.rightHand = new Hand(robotOptions.rightHandPosition, HAND_POSITION_MIN, HAND_POSITION_MAX)
+        this.leftHand = new Hand(robotOptions.leftHandPosition, HAND_POSITION_MIN, HAND_POSITION_MAX)
     }
 
     copy(safe = false) {

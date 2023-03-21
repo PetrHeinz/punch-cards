@@ -270,6 +270,7 @@ export default class AppServer {
 
         this.appendInviteLinkInput(menu, "Invite friends via URL")
 
+        appendLine(menu, " ")
         appendLine(menu, "Choose game mode:")
 
         const gameAgainstBotButton = appendLine(menu, "Battle a bot")
@@ -288,6 +289,7 @@ export default class AppServer {
         gameWithTwoBotsButton.classList.add("clickable", "with-hover", "indented")
         gameWithTwoBotsButton.addEventListener("click", () => this.setupGameWithTwoBots())
 
+        appendLine(menu, " ")
         appendLine(menu, "Advanced options:")
 
         const robotCustomizationButton = appendLine(menu, "Robot settings")
