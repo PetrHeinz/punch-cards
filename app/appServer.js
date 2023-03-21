@@ -359,6 +359,8 @@ export default class AppServer {
 
         const cardsMenu = document.createElement('div')
         cardsMenu.style.flex = 1
+        cardsMenu.style.position = "relative"
+        appendLine(cardsMenu, " ")
         appendLine(cardsMenu, "THE CARDS").style.fontWeight = "bold"
         for (let i = 0; i < this.cardsCount; i++) {
             const line = document.createElement('div')
@@ -386,10 +388,12 @@ export default class AppServer {
             line.append(cardSelect)
             cardsMenu.append(line)
         }
+        appendButton(cardsMenu, "Save", () => this.showMenu())
         menu.append(cardsMenu)
 
         const deckMenu = document.createElement('div')
         deckMenu.style.flex = 1
+        appendLine(deckMenu, " ")
         appendLine(deckMenu, "THE DECK").style.fontWeight = "bold"
         for (const cardType of getAllTypes()) {
             const cardSettings = document.createElement('div')
@@ -422,8 +426,6 @@ export default class AppServer {
             deckMenu.append(cardSettings)
         }
         menu.append(deckMenu)
-
-        appendButton(menu, "Save", () => this.showMenu())
 
         this.root.append(menu)
     }
