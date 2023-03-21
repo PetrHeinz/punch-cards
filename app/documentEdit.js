@@ -24,6 +24,10 @@ export function appendLine(element, text) {
     return message
 }
 
+export function appendBlankLine(element) {
+    appendLine(element, " ")
+}
+
 export function appendInput(element, labelText, value) {
     const input = document.createElement("input")
     input.classList.add("input")

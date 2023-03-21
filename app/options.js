@@ -1,4 +1,4 @@
-import {appendButton, appendInput, appendLine, clear} from "./documentEdit.js";
+import {appendBlankLine, appendButton, appendInput, appendLine, clear} from "./documentEdit.js";
 import {createCardByType, getAllTypes} from "../game/cards.js";
 import {HAND_POSITION_MAX, HAND_POSITION_MIN, RANDOM_CARD} from "../game/robot.js";
 
@@ -90,7 +90,7 @@ export default class Options {
         const menu = document.createElement('div')
         menu.classList.add('menu')
 
-        appendLine(menu, " ")
+        appendBlankLine(menu)
         appendLine(menu, "THE ROBOT").style.fontWeight = "bold"
 
         const actionsCountInput = appendInput(menu, "Actions per turn", this.settings.actionsCount)
@@ -181,7 +181,7 @@ export default class Options {
             this.settings.rightHandPosition = rightHandPosition !== "" ? parseInt(rightHandPosition) : null
         })
 
-        appendLine(menu, " ")
+        appendBlankLine(menu)
 
         const cardsCustomizationButton = appendLine(menu, "Customize cards")
         cardsCustomizationButton.classList.add("clickable", "with-hover")
@@ -202,7 +202,7 @@ export default class Options {
         const cardsMenu = document.createElement('div')
         cardsMenu.style.flex = 1
         cardsMenu.style.position = "relative"
-        appendLine(cardsMenu, " ")
+        appendBlankLine(cardsMenu)
         appendLine(cardsMenu, "THE CARDS").style.fontWeight = "bold"
         for (let i = 0; i < this.settings.cardsCount; i++) {
             const line = document.createElement('div')
@@ -235,7 +235,7 @@ export default class Options {
 
         const deckMenu = document.createElement('div')
         deckMenu.style.flex = 1
-        appendLine(deckMenu, " ")
+        appendBlankLine(deckMenu)
         appendLine(deckMenu, "THE DECK").style.fontWeight = "bold"
         for (const cardType of getAllTypes()) {
             const cardSettings = document.createElement('div')
