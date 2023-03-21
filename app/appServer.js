@@ -355,12 +355,13 @@ export default class AppServer {
         const menu = document.createElement('div')
         menu.classList.add('menu')
 
-        appendHeading(menu)
+        appendLine(menu, "THE DECK")
 
         for (const cardType of getAllTypes()) {
             const cardSettings = document.createElement('div')
-            cardSettings.classList.add("card-settings")
+            const card = createCardByType(cardType)
 
+            cardSettings.classList.add("line")
             const cardCountInput = document.createElement("input")
             cardCountInput.classList.add("input")
             cardCountInput.min = 0
@@ -371,15 +372,19 @@ export default class AppServer {
             cardCountInput.addEventListener("input", () => {
                 this.cards[cardType] = parseInt(cardCountInput.value.trim())
             })
-            cardSettings.append(cardCountInput)
-            cardSettings.append("✖️")
 
-            const cardElement = document.createElement("div")
-            cardElement.style.display = "inline-block"
-            cardElement.style.verticalAlign = "middle"
-            cardElement.append(CardsRender.createCard(createCardByType(cardType)))
+            const cardElement = document.createElement('span')
+            cardElement.append(cardCountInput)
+            cardElement.append(card.name)
+            cardElement.title = card.description
+
+            const iconElement = document.createElement('span')
+            iconElement.textContent = card.icon
+            iconElement.style.paddingLeft = "0.5rem"
+            iconElement.style.fontFamily = "initial"
+            cardElement.append(iconElement)
+
             cardSettings.append(cardElement)
-
             menu.append(cardSettings)
         }
 
