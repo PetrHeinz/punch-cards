@@ -1,8 +1,8 @@
 :root {
-    --unit: 4vmin;
-    --border: .5vmin;
-    --margin: .2vmin;
-    --fontsize: 1.5vmin;
+    --unit: 4.5vmin;
+    --border: .75vmin;
+    --margin: .1vmin;
+    --fontsize: 1.65vmin;
 
     --hue-selected: 0;
     --hue-left: 240;
@@ -49,7 +49,7 @@ body {
     position: relative;
     min-height: calc(20 * var(--unit));
     width: calc(20 * var(--unit));
-    margin: 5vh auto;
+    margin: calc(5vh - var(--border)) auto;
     border: calc(2 * var(--border)) solid var(--color-game-border);
     border-radius: calc(var(--unit) / 2);
     background-size: var(--unit) var(--unit);
@@ -191,8 +191,8 @@ h1.line {
     left: calc(var(--forward) * var(--unit) + var(--margin) + 1px);
     --height: 2;
     --width: 2;
-    height: calc(var(--height) * var(--unit) - 2 * var(--border) - 2 * var(--margin) - 1px);
-    width: calc(var(--width) * var(--unit) - 2 * var(--border) - 2 * var(--margin) - 1px);
+    height: calc(var(--height) * var(--unit) - 2 * var(--border) - 4 * var(--margin) - 1px);
+    width: calc(var(--width) * var(--unit) - 2 * var(--border) - 4 * var(--margin) - 1px);
     border: var(--border) solid var(--color-bodypart-border);
     border-radius: calc(var(--unit) / 4);
     text-align: center;
