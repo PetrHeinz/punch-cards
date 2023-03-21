@@ -9,8 +9,6 @@ class Card {
     get info() {
         return Object.freeze({
             type: this._type,
-            icon: this.icon,
-            name: this.name,
         })
     }
 

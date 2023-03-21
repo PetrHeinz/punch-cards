@@ -1,5 +1,6 @@
 import ChangeCache from "../utils/changeCache.js";
 import {ROBOT_HAND_RIGHT, ROBOT_STATE_INPUT} from "../game/robot.js";
+import {createCardByType} from "../game/cards.js";
 
 export default class CardsRender {
     initialize(root) {
@@ -39,7 +40,7 @@ export default class CardsRender {
     }
 
     initAction(root, action) {
-        const cardElement = this.initCard(root, action.card)
+        const cardElement = this.initCard(root, action.card.type)
         cardElement.dataset.handCardIndex = action.handCardIndex
 
         const handElement = document.createElement("div")
@@ -53,8 +54,8 @@ export default class CardsRender {
         return cardElement
     }
 
-    initCard(root, card, used = false) {
-        const cardElement = CardsRender.createCard(card)
+    initCard(root, cardType, used = false) {
+        const cardElement = CardsRender.createCard(createCardByType(cardType))
         if (used) {
             cardElement.classList.add("used")
         }
@@ -93,7 +94,7 @@ export default class CardsRender {
         this._handCardsCache.ifChanged(cardsInfo.handCards, () => {
             this.handCards.innerHTML = ''
             cardsInfo.handCards.forEach((handCard) => {
-                this.initCard(this.handCards, handCard,handCard.used)
+                this.initCard(this.handCards, handCard.type, handCard.used)
             })
         })
 
