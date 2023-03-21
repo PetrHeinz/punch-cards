@@ -14,7 +14,7 @@ import {ROBOT_SIDE_LEFT, ROBOT_SIDE_RIGHT} from "../game/robot.js";
 
 export default class AppServer {
     randomSeedString = "punch-cards"
-    cards = {punch: 6, up1: 3, up2: 2, up3: 1, down1: 3, down2: 2, down3: 1, charge: 2}
+    deckCards = {punch: 6, up1: 3, up2: 2, up3: 1, down1: 3, down2: 2, down3: 1, charge: 2}
     actionsCount = 3
     drawnCardsCount = 5
     maxTimeToInput = 5
@@ -222,7 +222,7 @@ export default class AppServer {
 
         const gameOptions = {
             robotOptions: {
-                cards: this.cards,
+                deckCards: this.deckCards,
                 actionsCount: this.actionsCount,
                 drawnCardsCount: this.drawnCardsCount,
                 maxTimeToInput: this.maxTimeToInput,
@@ -365,12 +365,12 @@ export default class AppServer {
             const cardCountInput = document.createElement("input")
             cardCountInput.classList.add("input")
             cardCountInput.min = 0
-            cardCountInput.value = this.cards[cardType] ?? 0
+            cardCountInput.value = this.deckCards[cardType] ?? 0
             cardCountInput.style.width = "2em"
             cardCountInput.type = "number"
             cardCountInput.style.textAlign = "right"
             cardCountInput.addEventListener("input", () => {
-                this.cards[cardType] = parseInt(cardCountInput.value.trim())
+                this.deckCards[cardType] = parseInt(cardCountInput.value.trim())
             })
 
             const cardElement = document.createElement('span')

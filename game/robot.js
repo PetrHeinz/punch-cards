@@ -1,7 +1,7 @@
 import Action from "./action.js";
 import Bodypart from "./bodypart.js";
 import Hand from "./hand.js";
-import {createBlankCard, createDeckByTypes} from "./cards.js";
+import {createBlankCard, createCardByType, createDeckByTypes} from "./cards.js";
 import RandomGenerator from "../utils/randomGenerator.js";
 
 export const ROBOT_STATE_INPUT = "WAITING_FOR_INPUT"
@@ -15,11 +15,14 @@ export const ROBOT_HAND_LEFT = "LEFT"
 export const ROBOT_SIDE_RIGHT = "ROBOT_RIGHT"
 export const ROBOT_SIDE_LEFT = "ROBOT_LEFT"
 
+export const RANDOM_CARD = "_random_card_from_deck_"
+
 export default class Robot {
     state = ROBOT_STATE_PREPARING
 
     actions = []
     handCards = []
+    cards = []
     discardedCards = []
 
     constructor(side, robotOptions, randomGenerator, robotUpdateCallback) {
@@ -29,9 +32,9 @@ export default class Robot {
         this._robotUpdate = robotUpdateCallback
 
         robotOptions = {
-            cards: {punch: 6, up1: 3, up2: 2, up3: 1, down1: 3, down2: 2, down3: 1, charge: 2},
+            deckCards: {punch: 6, up1: 3, up2: 2, up3: 1, down1: 3, down2: 2, down3: 1, charge: 2},
+            cards: [RANDOM_CARD, RANDOM_CARD, RANDOM_CARD, RANDOM_CARD, RANDOM_CARD],
             actionsCount: 3,
-            drawnCardsCount: 5,
             maxTimeToInput: 5,
             inputOvertimeTorsoDamage: 1,
             headHealth: 40,
@@ -41,15 +44,13 @@ export default class Robot {
             leftHandPosition: 5,
             ...robotOptions,
         }
-
-        this.deckCards = this._shuffleCards(createDeckByTypes(robotOptions.cards))
-
+        this.deckCards = this._shuffleCards(createDeckByTypes(robotOptions.deckCards))
         this.actionsCount = robotOptions.actionsCount
-        this.drawnCardsCount = robotOptions.drawnCardsCount
+
+        this.cards = robotOptions.cards
         this.maxTimeToInput = robotOptions.maxTimeToInput
         this.timeToInput = this.maxTimeToInput
         this.inputOvertimeTorsoDamage = robotOptions.inputOvertimeTorsoDamage
-
         for (let i = 0; i < this.actionsCount; i++) {
             this.actions.push(new Action())
         }
@@ -166,17 +167,12 @@ export default class Robot {
         this.timeToInput = this.maxTimeToInput
 
         this.actions.forEach(action => action.discard())
-        this.discardedCards = this.discardedCards.concat(this.handCards)
-        this.handCards = []
-        for (let i = 0; i < this.drawnCardsCount; i++) {
-            if (this.deckCards.length === 0) {
-                if (this.discardedCards.length === 0) {
-                    break
-                }
-                this.deckCards = this._shuffleCards(this.discardedCards)
-                this.discardedCards = []
+        for (let handCardIndex in this.cards) {
+            if (this.cards[handCardIndex] === RANDOM_CARD) {
+                this.drawCardFromDeck(handCardIndex)
+            } else {
+                this.handCards[handCardIndex] = createCardByType(this.cards[handCardIndex])
             }
-            this.handCards.push(this.deckCards.shift())
         }
 
         this.state = ROBOT_STATE_INPUT
@@ -184,6 +180,20 @@ export default class Robot {
         this._robotUpdate()
 
         return this.handCards
+    }
+
+    drawCardFromDeck(handCardIndex) {
+        if (this.handCards[handCardIndex] !== undefined) {
+            this.discardedCards.push(this.handCards[handCardIndex])
+        }
+        if (this.deckCards.length === 0) {
+            if (this.discardedCards.length === 0) {
+                throw "Not enough cards in deck!"
+            }
+            this.deckCards = this._shuffleCards(this.discardedCards)
+            this.discardedCards = []
+        }
+        this.handCards[handCardIndex] = this.deckCards.shift()
     }
 
     chooseAction(handCardIndex, actionIndex) {
