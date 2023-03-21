@@ -62,12 +62,14 @@ export default class Options {
             this.randomSeedString = randomSeedString !== "" ? randomSeedString : null
         })
 
-        const tickIntervalInput = appendInput(menu, "Tick interval (in ms)", this.tickInterval)
+        const tickIntervalInput = appendInput(menu, "Tick interval", this.tickInterval)
         tickIntervalInput.style.width = "4em"
+        tickIntervalInput.style.textAlign = "right"
         tickIntervalInput.type = "number"
         tickIntervalInput.addEventListener("input", () => {
             this.tickInterval = parseInt(tickIntervalInput.value.trim())
         })
+        tickIntervalInput.parentNode.append(" ms")
     }
 
     showRobotMenu() {
@@ -79,27 +81,29 @@ export default class Options {
         appendLine(menu, " ")
         appendLine(menu, "THE ROBOT").style.fontWeight = "bold"
 
-        const actionsCountInput = appendInput(menu, "Number of possible actions", this.settings.actionsCount)
-        actionsCountInput.style.width = "4em"
+        const actionsCountInput = appendInput(menu, "Actions per turn", this.settings.actionsCount)
+        actionsCountInput.style.width = "2em"
         actionsCountInput.type = "number"
         actionsCountInput.addEventListener("input", () => {
             this.settings.actionsCount = parseInt(actionsCountInput.value.trim())
         })
 
-        const cardsCountInput = appendInput(menu, "Number of cards to choose from each turn", this.settings.cardsCount)
-        cardsCountInput.style.width = "4em"
+        const cardsCountInput = appendInput(menu, "Cards to choose from", this.settings.cardsCount)
+        cardsCountInput.style.width = "2em"
         cardsCountInput.type = "number"
         cardsCountInput.addEventListener("input", () => {
             this.settings.cardsCount = parseInt(cardsCountInput.value.trim())
         })
 
-        const maxTimeToInputInput = appendInput(menu, "Time limit for card input (in ticks)", this.settings.maxTimeToInput)
-        maxTimeToInputInput.style.width = "4em"
+        const maxTimeToInputInput = appendInput(menu, "Time limit for card input", this.settings.maxTimeToInput)
+        maxTimeToInputInput.style.width = "2em"
+        maxTimeToInputInput.style.textAlign = "right"
         maxTimeToInputInput.type = "number"
         maxTimeToInputInput.addEventListener("input", () => {
             const maxTimeToInput = maxTimeToInputInput.value.trim()
             this.settings.maxTimeToInput = maxTimeToInput !== "" ? parseInt(maxTimeToInput) : null
         })
+        maxTimeToInputInput.parentNode.append(" ticks")
 
         appendButton(menu, "Save", () => this.backToMainMenu())
 
