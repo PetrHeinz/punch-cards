@@ -10,15 +10,16 @@ import RemoteControl from "../controller/remoteControl.js";
 import {createCardByType, getAllTypes} from "../game/cards.js";
 import CardsRender from "../render/cardsRender.js";
 import Bot from "../controller/bot.js";
-import {ROBOT_SIDE_LEFT, ROBOT_SIDE_RIGHT} from "../game/robot.js";
+import {RANDOM_CARD, ROBOT_SIDE_LEFT, ROBOT_SIDE_RIGHT} from "../game/robot.js";
 
 export default class AppServer {
     randomSeedString = "punch-cards"
-    deckCards = {punch: 6, up1: 3, up2: 2, up3: 1, down1: 3, down2: 2, down3: 1, charge: 2}
     actionsCount = 3
-    drawnCardsCount = 5
+    cardsCount = 5
     maxTimeToInput = 5
     tickInterval = 1000
+    deckCards = {punch: 6, up1: 3, up2: 2, up3: 1, down1: 3, down2: 2, down3: 1, charge: 2}
+    cards = []
 
     clientConnections = []
     controllerListeners = []
@@ -224,7 +225,7 @@ export default class AppServer {
             robotOptions: {
                 deckCards: this.deckCards,
                 actionsCount: this.actionsCount,
-                drawnCardsCount: this.drawnCardsCount,
+                cards: Array.from(new Array(this.cardsCount), (_, i) => this.cards[i] ?? RANDOM_CARD),
                 maxTimeToInput: this.maxTimeToInput,
             }
         }
@@ -298,11 +299,11 @@ export default class AppServer {
             this.actionsCount = parseInt(actionsCountInput.value.trim())
         })
 
-        const drawnCardsCountInput = appendInput(menu, "Number of cards drawn each turn", this.drawnCardsCount)
-        drawnCardsCountInput.style.width = "4em"
-        drawnCardsCountInput.type = "number"
-        drawnCardsCountInput.addEventListener("input", () => {
-            this.drawnCardsCount = parseInt(drawnCardsCountInput.value.trim())
+        const cardsCountInput = appendInput(menu, "Number of cards to choose from each turn", this.cardsCount)
+        cardsCountInput.style.width = "4em"
+        cardsCountInput.type = "number"
+        cardsCountInput.addEventListener("input", () => {
+            this.cardsCount = parseInt(cardsCountInput.value.trim())
         })
 
         const maxTimeToInputInput = appendInput(menu, "Time limit for card input (in ticks)", this.maxTimeToInput)
@@ -342,7 +343,7 @@ export default class AppServer {
 
         appendLine(menu, "Advanced options:")
 
-        const deckCustomizationButton = appendLine(menu, "Customize cards in deck")
+        const deckCustomizationButton = appendLine(menu, "Customize cards")
         deckCustomizationButton.classList.add("clickable", "with-hover", "indented")
         deckCustomizationButton.addEventListener("click", () => this.showDeckCustomization())
 
@@ -354,9 +355,42 @@ export default class AppServer {
 
         const menu = document.createElement('div')
         menu.classList.add('menu')
+        menu.style.display = "flex"
 
-        appendLine(menu, "THE DECK")
+        const cardsMenu = document.createElement('div')
+        cardsMenu.style.flex = 1
+        appendLine(cardsMenu, "THE CARDS").style.fontWeight = "bold"
+        for (let i = 0; i < this.cardsCount; i++) {
+            const line = document.createElement('div')
+            line.classList.add("line")
+            const cardSelect = document.createElement("select")
+            cardSelect.classList.add("input")
+            cardSelect.style.color = "inherit"
+            cardSelect.style.cursor = "pointer"
+            cardSelect.style.fontWeight = "normal"
+            const randomOption = document.createElement("option")
+            randomOption.value = RANDOM_CARD
+            randomOption.textContent = "Random (the deck) 🎲"
+            cardSelect.append(randomOption)
+            for (let cardType of getAllTypes()) {
+                const card = createCardByType(cardType)
+                const cardOption = document.createElement("option")
+                cardOption.value = cardType
+                cardOption.textContent = card.name + " " + card.icon
+                cardOption.selected = cardType === this.cards[i]
+                cardSelect.append(cardOption)
+            }
+            cardSelect.addEventListener("change", () => {
+                this.cards[i] = cardSelect.value
+            })
+            line.append(cardSelect)
+            cardsMenu.append(line)
+        }
+        menu.append(cardsMenu)
 
+        const deckMenu = document.createElement('div')
+        deckMenu.style.flex = 1
+        appendLine(deckMenu, "THE DECK").style.fontWeight = "bold"
         for (const cardType of getAllTypes()) {
             const cardSettings = document.createElement('div')
             const card = createCardByType(cardType)
@@ -385,8 +419,9 @@ export default class AppServer {
             cardElement.append(iconElement)
 
             cardSettings.append(cardElement)
-            menu.append(cardSettings)
+            deckMenu.append(cardSettings)
         }
+        menu.append(deckMenu)
 
         appendButton(menu, "Save", () => this.showMenu())
 
