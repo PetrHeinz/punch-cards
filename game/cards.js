@@ -39,6 +39,9 @@ class Card {
 class PunchCard extends Card {
     icon = "👊"
     name = "Punch card"
+    damage = 10
+    blockedDamage = 8
+    description = `Punch the opposing robot. Punch it. That's what it's all about. Deals ${this.damage} damage. Blocking hand will lower the resulting damage by ${this.blockedDamage}.`
 
     _prepare(hand) {
         hand.isBlocking = false
@@ -50,11 +53,9 @@ class PunchCard extends Card {
     }
 
     _do(hand, thisRobot, otherRobot) {
-        const baseDamage = 10
-        const blockedDamage = 8
         const blockingHandsCount = otherRobot.getHandsBlockingAt(hand.position).length
-        const damage = Math.max(0, baseDamage - blockingHandsCount * blockedDamage)
-        otherRobot.getBodypartAt(hand.position).health -= hand.isCharged ? 3 * damage : damage
+        const damage = Math.max(0, this.damage - blockingHandsCount * this.blockedDamage)
+        otherRobot.getBodypartAt(hand.position).health -= hand.damageMultiplier * damage
     }
 
     _cleanup(hand) {
@@ -67,7 +68,8 @@ class PunchCard extends Card {
 
 class Up1Card extends Card {
     icon = "☝️"
-    name = "Up"
+    name = "Raise"
+    description = "Moves your hand up by one position."
 
     _prepare(hand) {
         hand.position -= 1
@@ -76,7 +78,8 @@ class Up1Card extends Card {
 
 class Up2Card extends Card {
     icon = "☝️❗"
-    name = "Uup"
+    name = "Raise by two"
+    description = "Moves your hand up two positions closer to the head."
 
     _prepare(hand) {
         hand.position -= 2
@@ -85,7 +88,8 @@ class Up2Card extends Card {
 
 class Up3Card extends Card {
     icon = "☝️‼️"
-    name = "Uuup"
+    name = "Triple Raise"
+    description = "Moves your hand up three positions in a single action."
 
     _prepare(hand) {
         hand.position -= 3
@@ -94,7 +98,8 @@ class Up3Card extends Card {
 
 class Down1Card extends Card {
     icon = "👇"
-    name = "Down"
+    name = "Lower"
+    description = "Moves your hand down by one position."
 
     _prepare(hand) {
         hand.position += 1
@@ -103,7 +108,8 @@ class Down1Card extends Card {
 
 class Down2Card extends Card {
     icon = "👇❗"
-    name = "Doown"
+    name = "Lower by two"
+    description = "Moves your hand down two positions closer to the heatsink below."
 
     _prepare(hand) {
         hand.position += 2
@@ -112,7 +118,8 @@ class Down2Card extends Card {
 
 class Down3Card extends Card {
     icon = "👇‼️"
-    name = "Dooown"
+    name = "Triple Lower"
+    description = "Moves your hand down three positions in a single action."
 
     _prepare(hand) {
         hand.position += 3
@@ -122,16 +129,19 @@ class Down3Card extends Card {
 class ChargeCard extends Card {
     icon = "💥"
     name = "Charge"
+    damageMultiplier = 3
+    description = `Prepares your hand to give increased damage for the next punch, but it cannot block. Will multiple next resulting damage by ${this.damageMultiplier}.`
 
     _prepare(hand) {
         hand.isBlocking = false
-        hand.isCharged = true
+        hand.damageMultiplier = this.damageMultiplier
     }
 }
 
 class PushUpCard extends Card {
     icon = "🖐️☝️"
-    name = "Push up"
+    name = "Nudge up"
+    description = "Forces opponent's blocking hand in this position to move down by one, breaking through their guard and creating an opening for attack."
 
     _prepare(hand) {
         hand.isBlocking = false
@@ -150,7 +160,8 @@ class PushUpCard extends Card {
 
 class PushDownCard extends Card {
     icon = "🖐️👇"
-    name = "Push down"
+    name = "Nudge down"
+    description = "Forces opponent's blocking hand in this position to move down by one, disrupting their strategy and creating an opening for attack."
 
     _prepare(hand) {
         hand.isBlocking = false
@@ -169,7 +180,8 @@ class PushDownCard extends Card {
 
 class HandFlipCard extends Card {
     icon = "👋"
-    name = "Hand flip"
+    name = "Mirror Hand"
+    description = "This card commands the hand to switch to the opposite position, confusing opponents and creating new attack angles."
 
     _prepare(hand) {
         hand.position = hand.max - hand.position + hand.min
@@ -178,7 +190,8 @@ class HandFlipCard extends Card {
 
 class FlipPunchCard extends PunchCard {
     icon = "👋👊"
-    name = "Flip Punch"
+    name = "Mirror Punch"
+    description = `Punch the opposing robot in an opposite position, creating unexpected attack pattern and potentially overwhelming the opponent's defenses. Deals ${this.damage} damage.`
 
     _prepare(hand) {
         hand.position = hand.max - hand.position + hand.min
@@ -188,7 +201,8 @@ class FlipPunchCard extends PunchCard {
 
 class UpPunchCard extends PunchCard {
     icon = "☝️👊"
-    name = "Up Punch"
+    name = "Raise Punch"
+    description = `Punch the opposing robot with the hand in a higher position, dealing damage and potentially knocking them off balance. Deals ${this.damage} damage. Attack will miss in the topmost position.`
 
     _prepare(hand) {
         hand.allowPositionOutOfBounds = true
@@ -204,7 +218,8 @@ class UpPunchCard extends PunchCard {
 
 class DownPunchCard extends PunchCard {
     icon = "👇👊"
-    name = "Down Punch"
+    name = "Lower Punch"
+    description = `Punch the opposing robot with the hand in a lower position, delivering a low blow and potentially disrupting their strategy. Deals ${this.damage} damage. Attack will miss in the lowest position.`
 
     _prepare(hand) {
         hand.allowPositionOutOfBounds = true
@@ -221,13 +236,15 @@ class DownPunchCard extends PunchCard {
 class RepairCard extends Card {
     icon = "🔧"
     name = "Repair"
+    healthIncrease = 10
+    description = `Restores ${this.healthIncrease} HP to the bodypart in the current lane, repairing damage and strengthening the robot's defenses.`
 
     _prepare(hand) {
         hand.isCharged = false
         hand.isBlocking = false
     }
     _do(hand, thisRobot, otherRobot) {
-        thisRobot.getBodypartAt(hand.position).health += 10
+        thisRobot.getBodypartAt(hand.position).health += this.healthIncrease
     }
     _cleanup(hand, thisRobot) {
         hand.isBlocking = true
@@ -236,20 +253,25 @@ class RepairCard extends Card {
 
 class ReinforceCard extends Card {
     icon = "🛠️"
-    name = "Reinforce"
+    name = "Brace up"
+    maxHealthIncrease = 10
+    healthIncrease = 15
+    neighborsHealthDecrease = 10
+    description = `Reinforces the bodypart in the current lane, increasing its maximum HP by ${this.maxHealthIncrease} and restoring ${this.healthIncrease} HP. However, neighboring bodyparts lose ${this.neighborsHealthDecrease} HP in total as their energy shifts to accommodate the strengthened part.`
 
     _prepare(hand) {
         hand.isCharged = false
         hand.isBlocking = false
     }
+
     _do(hand, thisRobot, otherRobot) {
-        const thisBodypart = thisRobot.getBodypartAt(hand.position);
-        thisBodypart.maxHealth += 10
-        thisBodypart.health += 15
+        const thisBodypart = thisRobot.getBodypartAt(hand.position)
+        thisBodypart.maxHealth += this.maxHealthIncrease
+        thisBodypart.health += this.healthIncrease
 
         const neighboringBodyparts = thisRobot.getNeighboringBodyparts(thisBodypart)
         neighboringBodyparts.forEach((bodypart) => {
-            bodypart.health -= 10 / neighboringBodyparts.length
+            bodypart.health -= this.neighborsHealthDecrease / neighboringBodyparts.length
         })
     }
     _cleanup(hand, thisRobot) {
@@ -259,7 +281,8 @@ class ReinforceCard extends Card {
 
 class BlankCard extends Card {
     icon = "📄"
-    name = "Blank"
+    name = "Idle"
+    description = "This card commands the hand to stay in the current position, conserving energy and waiting for the right moment to strike. In other words, it does nothing."
 }
 
 const CARDS = {

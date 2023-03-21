@@ -75,6 +75,7 @@ export default class CardsRender {
 
         cardElement.append(iconElement)
         cardElement.append(card.name)
+        cardElement.title = card.description
 
         return cardElement
     }

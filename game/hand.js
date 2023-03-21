@@ -2,7 +2,7 @@ export default class Hand {
     isBlocking = true
     isAttacking = false
     isBlocked = false
-    isCharged = false
+    damageMultiplier = 1
 
     _allowPositionOutOfBounds = false
 
@@ -20,6 +20,17 @@ export default class Hand {
             isBlocked: this.isBlocked,
             isCharged: this.isCharged,
         })
+    }
+
+    get isCharged() {
+        return this.damageMultiplier > 1
+    }
+
+    set isCharged(isCharged) {
+        if (isCharged) {
+            throw "To set hand as charged you must set damageMultiplier to value > 1"
+        }
+        this.damageMultiplier = 1
     }
 
     set allowPositionOutOfBounds(allow) {
