@@ -18,8 +18,8 @@ export default class AppServer {
     cardsCount = 5
     maxTimeToInput = 5
     tickInterval = 1000
-    deckCards = {punch: 6, up1: 3, up2: 2, up3: 1, down1: 3, down2: 2, down3: 1, charge: 2}
-    cards = []
+    deckCards = {up2: 2, up3: 1, down2: 2, down3: 1, hand_flip: 1, punch: 2, up_flip: 1, down_flip: 1, flip_punch: 1, charge: 2, push_up: 2, push_down: 2, repair: 2, reinforce: 1}
+    cards = ["punch", "up1", "down1"]
 
     clientConnections = []
     controllerListeners = []
