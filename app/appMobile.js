@@ -21,7 +21,7 @@ export default class AppMobile {
         this.timer = new Timer()
         this.peer.on('open', id => {
             console.info('Peer.js is ready to connect. Peer ID is ' + id)
-            this.serverConnection = this.peer.connect(serverPeerId, {serialization: "json"})
+            this.serverConnection = this.peer.connect(serverPeerId)
             this.serverConnection.on('data', data => {
                 console.debug('Received data from server: ', data)
                 this.eventManager.publish(data.type, data.payload)
