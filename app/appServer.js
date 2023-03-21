@@ -290,9 +290,13 @@ export default class AppServer {
 
         appendLine(menu, "Advanced options:")
 
-        const deckCustomizationButton = appendLine(menu, "Customize cards")
-        deckCustomizationButton.classList.add("clickable", "with-hover", "indented")
-        deckCustomizationButton.addEventListener("click", () => this.options.showCardsMenu())
+        const robotCustomizationButton = appendLine(menu, "Robot settings")
+        robotCustomizationButton.classList.add("clickable", "with-hover", "indented")
+        robotCustomizationButton.addEventListener("click", () => this.options.showRobotMenu())
+
+        const cardsCustomizationButton = appendLine(menu, "Customize cards")
+        cardsCustomizationButton.classList.add("clickable", "with-hover", "indented")
+        cardsCustomizationButton.addEventListener("click", () => this.options.showCardsMenu())
 
         this.root.append(menu)
     }
