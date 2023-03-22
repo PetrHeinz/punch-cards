@@ -50,6 +50,9 @@ export default class RobotRender {
     }
 
     render(robotInfo) {
+        this.playHandSound(this.rightHand, robotInfo.rightHand)
+        this.playHandSound(this.leftHand, robotInfo.leftHand)
+
         this.state.textContent = robotInfo.state
         this.head.querySelector(".health").textContent = robotInfo.head.health
         this.torso.querySelector(".health").textContent = robotInfo.torso.health
@@ -65,5 +68,14 @@ export default class RobotRender {
         this.leftHand.classList.toggle('attacking', robotInfo.leftHand.isAttacking)
         this.leftHand.classList.toggle('blocked', robotInfo.leftHand.isBlocked)
         this.leftHand.classList.toggle('charged', robotInfo.leftHand.isCharged)
+    }
+
+    playHandSound(currentElement, hand) {
+        if (currentElement.matches(".attacking:not(.blocked)") && !hand.isAttacking) {
+            (new Audio('../audio/hit.wav')).play()
+        }
+        if (currentElement.matches(".attacking.blocked") && !hand.isAttacking) {
+            (new Audio('../audio/hit-blocked.wav')).play()
+        }
     }
 }
