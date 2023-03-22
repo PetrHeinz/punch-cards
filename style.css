@@ -49,7 +49,7 @@ body {
     position: relative;
     min-height: calc(20 * var(--unit));
     width: calc(20 * var(--unit));
-    margin: calc(5vh - var(--border)) auto;
+    margin: calc(5vh - 2 * var(--border)) auto;
     border: calc(2 * var(--border)) solid var(--color-game-border);
     border-radius: calc(var(--unit) / 2);
     background-size: var(--unit) var(--unit);
