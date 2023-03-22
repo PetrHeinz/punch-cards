@@ -143,7 +143,7 @@ h1.line {
     width: 100%;
     border-style: none;
     font-size: inherit;
-    font-family: 'Spline Sans Mono', monospace;
+    font-family: inherit;
     font-weight: bold;
     color: var(--color-active-text);
     background-color: transparent;
@@ -369,9 +369,13 @@ h1.line {
 
 .icon {
     --fontsize-multiplier: 1;
+    font-family: initial;
     font-size: calc(var(--fontsize-multiplier) * var(--fontsize));
     height: calc(var(--card-height) / 2);
     line-height: calc(var(--card-height) / 2);
+}
+.icon-font {
+    font-family: initial;
 }
 
 .hand-toggle {
