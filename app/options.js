@@ -255,16 +255,10 @@ export default class Options {
 
             const cardElement = document.createElement('span')
             cardElement.append(cardCountInput)
-            cardElement.append(card.name)
+            cardElement.append(`${card.name} ${card.icon}`)
             cardElement.title = card.description
-
-            const iconElement = document.createElement('span')
-            iconElement.textContent = card.icon
-            iconElement.style.paddingLeft = "0.5rem"
-            iconElement.style.fontFamily = "initial"
-            cardElement.append(iconElement)
-
             cardSettings.append(cardElement)
+
             deckMenu.append(cardSettings)
         }
         menu.append(deckMenu)

@@ -278,7 +278,7 @@ class ReinforceCard extends Card {
 }
 
 class BlankCard extends Card {
-    icon = "📄"
+    icon = "⏱️"
     name = "Idle"
     description = "This card commands the hand to stay in the current position, conserving energy and waiting for the right moment to strike. In other words, it does nothing."
 }

@@ -56,7 +56,7 @@ body {
     background-image:
         linear-gradient(to right, var(--color-grid) 1px, transparent 1px),
         linear-gradient(to bottom, var(--color-grid) 1px, var(--color-grid-bg) 1px);
-    font-family: monospace;
+    font-family: 'Spline Sans Mono', monospace;
     font-size: var(--fontsize);
     user-select: none;
 }
@@ -82,7 +82,7 @@ body {
     background-image:
         linear-gradient(to right, var(--color-grid) 1px, transparent 1px),
         linear-gradient(to bottom, var(--color-grid) 1px, var(--color-grid-bg) 1px);
-    font-family: monospace;
+    font-family: 'Spline Sans Mono', monospace;
     font-size: var(--fontsize);
     user-select: none;
     -webkit-tap-highlight-color: transparent;
@@ -143,7 +143,7 @@ h1.line {
     width: 100%;
     border-style: none;
     font-size: inherit;
-    font-family: inherit;
+    font-family: 'Spline Sans Mono', monospace;
     font-weight: bold;
     color: var(--color-active-text);
     background-color: transparent;
@@ -369,7 +369,6 @@ h1.line {
 
 .icon {
     --fontsize-multiplier: 1;
-    font-family: initial;
     font-size: calc(var(--fontsize-multiplier) * var(--fontsize));
     height: calc(var(--card-height) / 2);
     line-height: calc(var(--card-height) / 2);
