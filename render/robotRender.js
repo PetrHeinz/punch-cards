@@ -79,8 +79,13 @@ export default class RobotRender {
                 const newElement = document.createElement('div')
                 newElement.classList.add('health-change')
                 newElement.textContent = `${healthChange > 0 ? '+' : '-'} ${Math.abs(healthChange)}`
-                element.append(newElement)
-                setTimeout(() => newElement.remove(), this.tickTimeout)
+                element.insertBefore(newElement, element.querySelector('.health-change'))
+                setTimeout(() => {
+                    const fadeoutTimeout = .25 * this.tickTimeout;
+                    newElement.style.transition = `${fadeoutTimeout}ms ease-out opacity`
+                    newElement.style.opacity = 0
+                    setTimeout(() => newElement.remove(), fadeoutTimeout)
+                }, this.tickTimeout)
             }
         }
 
