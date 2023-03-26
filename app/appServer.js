@@ -208,6 +208,19 @@ export default class AppServer {
         this.startGame()
     }
 
+    setupDebugGame() {
+        this.gameType = "debug"
+
+        this.setupGame = (game) => {
+            return {
+                leftCardsRender: new ControllableCardsRender(new DirectControl(game.leftRobot)),
+                rightCardsRender: new ControllableCardsRender(new DirectControl(game.rightRobot)),
+            }
+        }
+
+        this.startGame()
+    }
+
     startGame() {
         this.clear()
 
@@ -288,6 +301,10 @@ export default class AppServer {
         const gameWithTwoBotsButton = appendLine(menu, "Watch two bots fight")
         gameWithTwoBotsButton.classList.add("clickable", "with-hover", "indented")
         gameWithTwoBotsButton.addEventListener("click", () => this.setupGameWithTwoBots())
+
+        const debugGameButton = appendLine(menu, "Control both robots directly")
+        debugGameButton.classList.add("clickable", "with-hover", "indented")
+        debugGameButton.addEventListener("click", () => this.setupDebugGame())
 
         appendBlankLine(menu)
         appendLine(menu, "Advanced options:")
