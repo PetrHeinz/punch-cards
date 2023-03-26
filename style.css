@@ -45,6 +45,12 @@ body {
     background-color: var(--color-bg);
 }
 
+#root {
+    font-family: 'Spline Sans Mono', monospace;
+    font-size: var(--fontsize);
+    user-select: none;
+}
+
 .menu, .game {
     position: relative;
     min-height: calc(20 * var(--unit));
@@ -56,9 +62,6 @@ body {
     background-image:
         linear-gradient(to right, var(--color-grid) 1px, transparent 1px),
         linear-gradient(to bottom, var(--color-grid) 1px, var(--color-grid-bg) 1px);
-    font-family: 'Spline Sans Mono', monospace;
-    font-size: var(--fontsize);
-    user-select: none;
 }
 .game {
     display: flex;
@@ -82,9 +85,6 @@ body {
     background-image:
         linear-gradient(to right, var(--color-grid) 1px, transparent 1px),
         linear-gradient(to bottom, var(--color-grid) 1px, var(--color-grid-bg) 1px);
-    font-family: 'Spline Sans Mono', monospace;
-    font-size: var(--fontsize);
-    user-select: none;
     -webkit-tap-highlight-color: transparent;
 }
 
@@ -416,10 +416,10 @@ h1.line {
     font-weight: bold;
     text-align: center;
 }
-.clickable .hand-toggle:hover {
+.hand-toggle.clickable:hover {
     color: var(--color-card-hand-text-hover);
 }
-.clickable .hand-toggle:hover:before {
+.hand-toggle.clickable:hover:before {
     content: "TOGGLE ";
 }
 

@@ -3,13 +3,13 @@ import {ROBOT_STATE_INPUT} from "../game/robot.js";
 
 const ROBOT_CARDS_ACTION = "ACTION"
 const ROBOT_CARDS_HAND = "HAND"
-const ROBOT_CARDS_NONE = "NONE"
 
+const MOVEMENT_TOLERANCE = 5
 
 export default class ControllableCardsRender extends CardsRender {
     vars = {
-        selected: ROBOT_CARDS_NONE,
-        selectedIndex: 0,
+        draggedElement: null,
+        draggedMovement: 0,
         isInInputState: false,
     }
 
@@ -21,56 +21,83 @@ export default class ControllableCardsRender extends CardsRender {
     initialize(root) {
         super.initialize(root);
 
-        this.actionCards.addEventListener("click", (event) => {
+        document.addEventListener("mousedown", (event) => {
+            if (event.button !== 0) return
             if (!this.vars.isInInputState) return
-            if (event.target === this.actionCards) return
+
+            const draggedElement = document.createElement("div")
+            const actionCardIndex = getChildIndex(this.actionCards, event.target)
+            if (actionCardIndex !== null) {
+                draggedElement.append(this.actionCards.children[actionCardIndex].cloneNode(true))
+                draggedElement.dataset.selected = ROBOT_CARDS_ACTION
+                draggedElement.dataset.selectedIndex = actionCardIndex
+                draggedElement.querySelector(".hand-toggle")?.remove()
+            }
+            const handCardIndex = getChildIndex(this.handCards, event.target)
+            if (handCardIndex !== null) {
+                draggedElement.append(this.handCards.children[handCardIndex].cloneNode(true))
+                draggedElement.dataset.selected = ROBOT_CARDS_HAND
+                draggedElement.dataset.selectedIndex = handCardIndex
+            }
+            if (draggedElement.children.length === 0) return
+
+            if (this.vars.draggedElement !== null) {
+                this.vars.draggedElement.remove()
+            }
+            this.vars.draggedElement = draggedElement
+            this.vars.draggedMovement = 0
+
+            draggedElement.style.position = "fixed"
+            draggedElement.style.pointerEvents = "none"
+            draggedElement.style.zIndex = "100"
+
+            draggedElement.style.transform = `translate(-50%, -50%)`
+            draggedElement.style.left = `${event.clientX}px`
+            draggedElement.style.top = `${event.clientY}px`
+        })
+        document.addEventListener("mousemove", (event) => {
+            const draggedElement = this.vars.draggedElement
+            if (draggedElement === null) return
+
+            this.vars.draggedMovement += Math.abs(event.movementX) + Math.abs(event.movementY)
+
+            draggedElement.style.left = `${event.clientX}px`
+            draggedElement.style.top = `${event.clientY}px`
+
+            if (this.vars.draggedMovement > MOVEMENT_TOLERANCE && draggedElement.parentElement === null) {
+                root.append(draggedElement)
+            }
+        })
+        document.addEventListener("mouseup", (event) => {
+            const draggedElement = this.vars.draggedElement
+            if (draggedElement === null) return
+
+            draggedElement.remove()
+            this.vars.draggedElement = null
 
             const actionCardIndex = getChildIndex(this.actionCards, event.target)
-            if (event.target.classList.contains("hand-toggle")) {
-                this.robotControl.toggleActionHand(actionCardIndex)
-                return
-            }
-
-            if (this.vars.selected === ROBOT_CARDS_HAND) {
-                this.robotControl.chooseAction(this.vars.selectedIndex, actionCardIndex)
-                this._selectCard(ROBOT_CARDS_NONE)
-                return
-            }
-            if (this.vars.selected === ROBOT_CARDS_ACTION) {
-                if (actionCardIndex !== this.vars.selectedIndex) {
-                    this.robotControl.swapActions(actionCardIndex, this.vars.selectedIndex)
+            if (draggedElement.dataset.selected === ROBOT_CARDS_HAND) {
+                if (actionCardIndex !== null) {
+                    this.robotControl.chooseAction(draggedElement.dataset.selectedIndex, actionCardIndex)
+                    return
                 }
-                this._selectCard(ROBOT_CARDS_NONE)
-                return
             }
-            this._selectCard(ROBOT_CARDS_ACTION, actionCardIndex)
-        })
-
-        this.handCards.addEventListener("click", (event) => {
-            if (!this.vars.isInInputState) return
-            if (event.target === this.handCards) return
-
-            const handCardIndex = getChildIndex(this.handCards, event.target)
-            if (this.vars.selected === ROBOT_CARDS_ACTION) {
-                if (this.actionCards.children[this.vars.selectedIndex].dataset.handCardIndex === handCardIndex) {
-                    this.robotControl.discardAction(this.vars.selectedIndex)
-                } else {
-                    this.robotControl.chooseAction(handCardIndex, this.vars.selectedIndex)
+            if (draggedElement.dataset.selected === ROBOT_CARDS_ACTION) {
+                if (actionCardIndex === null) {
+                    this.robotControl.discardAction(draggedElement.dataset.selectedIndex)
+                    return
                 }
-                this._selectCard(ROBOT_CARDS_NONE)
-                return
+                if (`${actionCardIndex}` === draggedElement.dataset.selectedIndex) {
+                    this.robotControl.toggleActionHand(actionCardIndex)
+                    return
+                }
+                this.robotControl.swapActions(draggedElement.dataset.selectedIndex, actionCardIndex)
             }
-            if (this.vars.selected === ROBOT_CARDS_HAND && handCardIndex === this.vars.selectedIndex) {
-                this._selectCard(ROBOT_CARDS_NONE)
-                return
-            }
-            this._selectCard(ROBOT_CARDS_HAND, handCardIndex)
         })
 
         this.readyButton.addEventListener("click", () => {
             if (!this.vars.isInInputState) return
             this.robotControl.commit()
-            this._selectCard(ROBOT_CARDS_NONE)
         })
     }
 
@@ -82,26 +109,14 @@ export default class ControllableCardsRender extends CardsRender {
         super.render(cardsInfo)
 
         this.vars.isInInputState = cardsInfo.state === ROBOT_STATE_INPUT
-        this.actionCards.classList.toggle("clickable", this.vars.isInInputState)
-        this.handCards.classList.toggle("clickable", this.vars.isInInputState)
+        Array.from(this.actionCards.children).concat(this.handCards).forEach((actionCard) => {
+            actionCard.style.cursor = this.vars.isInInputState ? "grab" : ""
+            const handToggle = actionCard.querySelector(".hand-toggle");
+            if (handToggle !== null) {
+                handToggle.classList.toggle("clickable", this.vars.isInInputState)
+            }
+        })
         this.readyButton.classList.toggle("clickable", this.vars.isInInputState)
-    }
-
-    _selectCard(selected, selectedIndex) {
-        this.actionCards.querySelectorAll(".selected")
-            .forEach(e => e.classList.remove("selected"))
-        this.handCards.querySelectorAll(".selected")
-            .forEach(e => e.classList.remove("selected"))
-        if (selected === ROBOT_CARDS_ACTION) {
-            this.actionCards.children[selectedIndex].classList.add("selected")
-        }
-        if (selected === ROBOT_CARDS_HAND) {
-            this.handCards.children[selectedIndex].classList.add("selected")
-        }
-        this.vars.selected = selected
-        if (selectedIndex !== undefined) {
-            this.vars.selectedIndex = selectedIndex
-        }
     }
 }
 
@@ -110,6 +125,9 @@ function getChildIndex(element, childElement) {
         if (element.children[childIndex] === childElement) {
             return parseInt(childIndex)
         }
+    }
+    if (childElement.parentElement === null) {
+        return null
     }
     return getChildIndex(element, childElement.parentElement)
 }
