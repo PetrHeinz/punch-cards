@@ -34,6 +34,10 @@ export default class RobotRender {
         health.classList.add('health')
         bodypart.append(health)
 
+        const maxHealth = document.createElement('div')
+        maxHealth.classList.add('max-health')
+        bodypart.append(maxHealth)
+
         root.append(bodypart)
 
         return bodypart
@@ -52,8 +56,11 @@ export default class RobotRender {
     render(robotInfo) {
         this.state.textContent = robotInfo.state
         this.head.querySelector(".health").textContent = robotInfo.head.health
+        this.head.querySelector(".max-health").textContent = robotInfo.head.maxHealth
         this.torso.querySelector(".health").textContent = robotInfo.torso.health
+        this.torso.querySelector(".max-health").textContent = robotInfo.torso.maxHealth
         this.heatsink.querySelector(".health").textContent = robotInfo.heatsink.health
+        this.heatsink.querySelector(".max-health").textContent = robotInfo.heatsink.maxHealth
         this.tickRender.renderTimeToInput(robotInfo.timeToInput, robotInfo.state)
         this.rightHand.style.setProperty('--up', 8 - robotInfo.rightHand.position)
         this.rightHand.classList.toggle('blocking', robotInfo.rightHand.isBlocking)

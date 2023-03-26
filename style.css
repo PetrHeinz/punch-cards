@@ -12,6 +12,8 @@
     --color-bg: lightslategray;
     --color-bodypart-border: hsl(0, 0%, 30%);
     --color-bodypart-text: black;
+    --color-bodypart-text-info: grey;
+    --color-bodypart-text-important: red;
     --color-bodypart-hand-left-border: hsl(var(--hue-left), 100%, 30%);
     --color-bodypart-hand-right-border: hsl(var(--hue-right), 100%, 30%);
     --color-button-bg: white;
@@ -37,8 +39,6 @@
     --color-grid: silver;
     --color-header-menu-text-hover: hsl(var(--hue-selected), 100%, 50%);
     --color-header-menu-text: darkslategray;
-    --color-tick: grey;
-    --color-tick-active: red;
 }
 
 body {
@@ -207,6 +207,14 @@ h1.line {
     right: calc(var(--forward) * var(--unit) + var(--margin));
 }
 
+.max-health {
+    font-size: 40%;
+    color: var(--color-bodypart-text-info);
+}
+.max-health:before {
+    content: "/"
+}
+
 .tick {
     --tick-size: calc(var(--width) * var(--unit) - 2 * var(--border) - 2 * var(--margin));
     position: absolute;
@@ -216,7 +224,7 @@ h1.line {
     width: var(--tick-size);
     transform: translateX(-50%);
     font-size: 50%;
-    color: var(--color-tick);
+    color: var(--color-bodypart-text-info);
 }
 .mobile .tick {
     --tick-size: calc(3 * var(--unit));
@@ -235,7 +243,7 @@ h1.line {
 }
 .tick .time-to-input.active {
     font-weight: bold;
-    color: var(--color-tick-active);
+    color: var(--color-bodypart-text-important);
 }
 .tick .hand {
     position: absolute;
