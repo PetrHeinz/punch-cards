@@ -105,7 +105,6 @@ export default class CardsRender {
     }
 
     highlightAction(actionIndex) {
-        console.log("highlighting ", actionIndex)
         Array.from(this.actionCards.children).forEach((action, index) => {
             action.classList.toggle("highlight", actionIndex === index)
         })
