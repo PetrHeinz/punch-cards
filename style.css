@@ -401,6 +401,7 @@ h1.line {
     font-size: calc(var(--fontsize-multiplier) * var(--fontsize));
     height: calc(var(--card-height) / 2);
     line-height: calc(var(--card-height) / 2);
+    white-space: nowrap;
 }
 .icon-font {
     font-family: initial;
