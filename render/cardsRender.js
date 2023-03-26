@@ -104,6 +104,13 @@ export default class CardsRender {
         this.readyButton.classList.toggle("pushed", cardsInfo.state !== ROBOT_STATE_INPUT)
     }
 
+    highlightAction(actionIndex) {
+        console.log("highlighting ", actionIndex)
+        Array.from(this.actionCards.children).forEach((action, index) => {
+            action.classList.toggle("highlight", actionIndex === index)
+        })
+    }
+
     _enrichHandCardsInfo(cardsInfo) {
         const usedHandCardIndexes = cardsInfo.actions.map(action => action.handCardIndex);
 

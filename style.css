@@ -341,11 +341,15 @@ h1.line {
     text-align: center;
     background-color: var(--color-card-bg);
     color: var(--color-card-text);
+    transition: .2s cubic-bezier(1, 0, 0.75, 2) transform;
 }
-.card-settings {
-    display: inline-block;
-    font-size: calc(2 * var(--fontsize));
-    margin: calc(var(--unit) / 4);
+.card.highlight {
+    z-index: 10;
+    transform: scale(1.35) rotate(5deg);
+
+}
+.side.right .card.highlight {
+    transform: scale(1.35) rotate(-5deg);
 }
 
 .actions .card {

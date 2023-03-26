@@ -71,7 +71,13 @@ export default class Game {
     }
 
     _tickUpdate() {
-        this.eventManager.publish('tick', {tickCounter: this._tickCounter++})
+        const bothRobotsCommitted = this.leftRobot.state === ROBOT_STATE_COMMIT && this.rightRobot.state === ROBOT_STATE_COMMIT
+        const anyRobotInAction = this.leftRobot.state === ROBOT_STATE_ACTION || this.rightRobot.state === ROBOT_STATE_ACTION
+
+        this.eventManager.publish('tick', {
+            currentAction: bothRobotsCommitted || anyRobotInAction ? this.currentAction : -1,
+            tickCounter: this._tickCounter++
+        })
     }
 
     _robotsUpdate() {

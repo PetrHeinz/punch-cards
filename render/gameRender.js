@@ -42,10 +42,12 @@ export default class GameRender {
         eventManager.listen("rightRobotInfoUpdate", rightRobotInfo => this.rightRobot.render(rightRobotInfo))
         eventManager.listen("rightCardsInfoUpdate", rightCardsInfo => this.rightCardsRender.render(rightCardsInfo))
 
-        eventManager.listen("tick", ({tickCounter}) =>
+        eventManager.listen("tick", ({tickCounter, currentAction}) =>
         {
             this.leftRobot.tickRender.renderTick(tickCounter)
             this.rightRobot.tickRender.renderTick(tickCounter)
+            this.leftCardsRender.highlightAction(currentAction)
+            this.rightCardsRender.highlightAction(currentAction)
         })
 
         let currentTickTimeout = 0
