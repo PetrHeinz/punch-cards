@@ -55,12 +55,9 @@ export default class RobotRender {
 
     render(robotInfo) {
         this.state.textContent = robotInfo.state
-        this.head.querySelector(".health").textContent = robotInfo.head.health
-        this.head.querySelector(".max-health").textContent = robotInfo.head.maxHealth
-        this.torso.querySelector(".health").textContent = robotInfo.torso.health
-        this.torso.querySelector(".max-health").textContent = robotInfo.torso.maxHealth
-        this.heatsink.querySelector(".health").textContent = robotInfo.heatsink.health
-        this.heatsink.querySelector(".max-health").textContent = robotInfo.heatsink.maxHealth
+        this._renderBodypartChange(this.head, robotInfo.head)
+        this._renderBodypartChange(this.torso, robotInfo.torso)
+        this._renderBodypartChange(this.heatsink, robotInfo.heatsink)
         this.tickRender.renderTimeToInput(robotInfo.timeToInput, robotInfo.state)
         this.rightHand.style.setProperty('--up', 8 - robotInfo.rightHand.position)
         this.rightHand.classList.toggle('blocking', robotInfo.rightHand.isBlocking)
@@ -72,5 +69,22 @@ export default class RobotRender {
         this.leftHand.classList.toggle('attacking', robotInfo.leftHand.isAttacking)
         this.leftHand.classList.toggle('blocked', robotInfo.leftHand.isBlocked)
         this.leftHand.classList.toggle('charged', robotInfo.leftHand.isCharged)
+    }
+
+    _renderBodypartChange(element, bodypartInfo) {
+        if (element.querySelector(".health").textContent !== ""){
+            const previousHealth = parseFloat(element.querySelector(".health").textContent)
+            const healthChange = bodypartInfo.health - previousHealth
+            if (healthChange !== 0) {
+                const newElement = document.createElement('div')
+                newElement.classList.add('health-change')
+                newElement.textContent = `${healthChange > 0 ? '+' : '-'} ${Math.abs(healthChange)}`
+                element.append(newElement)
+                setTimeout(() => newElement.remove(), this.tickTimeout)
+            }
+        }
+
+        element.querySelector(".health").textContent = bodypartInfo.health
+        element.querySelector(".max-health").textContent = bodypartInfo.maxHealth
     }
 }

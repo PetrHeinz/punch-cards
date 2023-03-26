@@ -215,6 +215,22 @@ h1.line {
     content: "/"
 }
 
+.health-change {
+    white-space: nowrap;
+    position: relative;
+    top: calc(-.5 * var(--unit));
+    color: var(--color-bodypart-text-important);
+    font-weight: bold;
+}
+.side.left .health-change {
+    float: right;
+    right: calc(2 * var(--unit));
+}
+.side.right .health-change {
+    float: left;
+    left: calc(2 * var(--unit));
+}
+
 .tick {
     --tick-size: calc(var(--width) * var(--unit) - 2 * var(--border) - 2 * var(--margin));
     position: absolute;
