@@ -195,14 +195,15 @@ export default class Game {
         }
 
         if (this.leftRobot.state === ROBOT_STATE_ACTION || this.rightRobot.state === ROBOT_STATE_ACTION) {
-            actions.forEach(action => action.prepare())
-            actions.forEach(action => action.afterPrepare())
+            actions.forEach(action => action.selfPrepare())
+            actions.forEach(action => action.otherPrepare())
             this._actionPhaseInfoUpdate('prepare')
 
-            actions.forEach(action => action.do())
+            actions.forEach(action => action.selfDo())
+            actions.forEach(action => action.otherDo())
             this._actionPhaseInfoUpdate('do')
 
-            actions.forEach(action => action.cleanup())
+            actions.forEach(action => action.selfCleanup())
             this._actionPhaseInfoUpdate('cleanup')
 
             this.currentAction++
